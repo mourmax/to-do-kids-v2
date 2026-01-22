@@ -7,7 +7,7 @@ import ChildDashboard from './components/child/ChildDashboard'
 import ParentDashboard from './components/parent/ParentDashboard'
 import ParentPinModal from './components/ui/ParentPinModal'
 import PinSetup from './components/ui/PinSetup'
-import { Baby, Lock } from 'lucide-react' // On ajoute des icônes pour le sélecteur
+import { Baby, Lock } from 'lucide-react'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -38,14 +38,15 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30 pb-20">
+    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30">
       
-      {/* --- NOUVEAU SÉLECTEUR EN HAUT --- */}
-      <div className="fixed top-0 left-0 right-0 z-40 p-4 bg-gradient-to-b from-[#020617] to-[#020617]/0">
-        <div className="bg-slate-900/90 backdrop-blur-md border border-white/10 p-1 rounded-full flex relative shadow-2xl max-w-sm mx-auto">
+      {/* --- SÉLECTEUR EN HAUT (CORRIGÉ Z-INDEX 50) --- */}
+      <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-[#020617] via-[#020617]/90 to-transparent">
+        <div className="bg-slate-900 border border-white/10 p-1 rounded-full flex relative shadow-2xl max-w-xs mx-auto">
           {/* Fond animé du switch */}
           <motion.div 
             className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600 rounded-full shadow-lg z-0"
+            initial={false}
             animate={{ x: isParentMode ? '100%' : '0%' }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             style={{ left: '4px' }}
@@ -57,22 +58,22 @@ export default function App() {
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full relative z-10 text-[10px] font-black uppercase tracking-widest transition-colors ${!isParentMode ? 'text-white' : 'text-slate-400 hover:text-white'}`}
           >
             <Baby size={16} className="mb-0.5" />
-            Espace Enfant
+            Enfant
           </button>
 
-          {/* Bouton Parent (Déclenche le PIN) */}
+          {/* Bouton Parent */}
           <button 
             onClick={() => !isParentMode && setShowPinModal(true)}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full relative z-10 text-[10px] font-black uppercase tracking-widest transition-colors ${isParentMode ? 'text-white' : 'text-slate-400 hover:text-white'}`}
           >
             <Lock size={14} className="mb-0.5" />
-            Espace Parent
+            Parent
           </button>
         </div>
       </div>
 
-      {/* Contenu principal avec padding-top pour ne pas être caché par le header */}
-      <div className="pt-24 px-4">
+      {/* Padding top 32 (pt-32) pour que le contenu ne soit pas caché par le menu */}
+      <div className="pt-32 pb-12 px-4 max-w-md mx-auto">
         <AnimatePresence mode="wait">
           {isParentMode ? (
             <ParentDashboard 
@@ -89,7 +90,6 @@ export default function App() {
               profile={profile}
               challenge={challenge}
               missions={missions}
-              // On passe la fonction pour ouvrir le modal via le bouton de fin de mission
               onParentMode={() => setShowPinModal(true)} 
               refresh={refresh}
             />
@@ -97,7 +97,7 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      {/* Modal de sécurité */}
+      {/* Modal PIN */}
       <AnimatePresence>
         {showPinModal && (
           <ParentPinModal 
