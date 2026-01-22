@@ -1,83 +1,80 @@
-import confetti from 'canvas-confetti'
-import { Lock } from 'lucide-react'
-import { supabase } from '../../supabaseClient'
+import { motion } from 'framer-motion'
+import { CheckCircle, Lock } from 'lucide-react' // Ajout de Lock
+import MissionCard from '../ui/MissionCard'
+import ProgressBar from '../ui/ProgressBar'
 
-// Import des modules factorisés
-import ChildHeader from './ChildHeader'
-import ChildProgressBar from './ChildProgressBar'
-import MissionCard from './MissionCard'
-import VictoryModal from './VictoryModal'
-
-export default function ChildDashboard({ profile, challenge, missions, onParentMode, refresh }) {
+export default function ChildDashboard({ profile, challenge, missions, refresh, onParentMode }) {
   
-  const streak = challenge?.current_streak || 0
-  const goal = challenge?.duration_days || 1
-  const isChallengeWon = streak >= goal
-  
-  const sortedMissions = [...missions].sort((a, b) => a.is_completed - b.is_completed)
-
-  const handleMissionClick = async (missionId, isDone) => {
-    if (isChallengeWon) return
-
-    if (!isDone) {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
-    }
-
-    const today = new Date().toISOString().split('T')[0]
-    
-    // Appel DB
-    const { error } = await supabase
-      .from('daily_logs')
-      .upsert({ 
-        mission_id: missionId, 
-        child_validated: !isDone, 
-        date: today 
-      }, { onConflict: 'mission_id, date' })
-
-    if (!error) {
-      // 🌟 LA CORRECTION EST ICI : On utilise le mode silencieux (true)
-      refresh(true) 
-    } else {
-      console.error("Erreur DB:", error.message)
-    }
-  }
+  // Vérifier si toutes les missions sont cochées par l'enfant
+  const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed)
 
   return (
-    <div className="flex flex-col gap-6 p-4 max-w-xl mx-auto min-h-screen bg-[#020617] font-sans relative">
+    <div className="space-y-8 pb-12 max-w-sm mx-auto">
       
-      <ChildHeader />
-
-      <div className="px-2">
-        <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none">
-          Salut {profile?.child_name}!
+      {/* En-tête Enfant */}
+      <div className="text-center space-y-2">
+        <motion.div 
+          initial={{ scale: 0 }} animate={{ scale: 1 }}
+          className="inline-block px-4 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-black uppercase tracking-widest"
+        >
+          Bonjour {profile?.child_name || 'Champion'}
+        </motion.div>
+        <h1 className="text-3xl font-black text-white italic tracking-tighter uppercase">
+          Tes Missions
         </h1>
-        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
-          Tes missions du jour
-        </p>
       </div>
 
-      <ChildProgressBar 
-        streak={streak} 
-        goal={goal} 
-        rewardName={challenge?.reward_name} 
-      />
+      {/* Barre de progression (Challenge) */}
+      {challenge && (
+        <ProgressBar 
+          current={challenge.current_streak} 
+          total={challenge.duration_days} 
+          reward={challenge.reward_name}
+        />
+      )}
 
-      <div className="grid grid-cols-2 gap-4">
-        {sortedMissions.map((m) => (
-          <MissionCard key={m.id} mission={m} onClick={handleMissionClick} />
+      {/* Liste des missions */}
+      <div className="space-y-4">
+        {missions.map((mission, index) => (
+          <MissionCard 
+            key={mission.id} 
+            mission={mission} 
+            index={index} 
+            onToggle={() => refresh(true)} // Refresh silencieux
+          />
         ))}
       </div>
 
-      <button onClick={onParentMode} className="mt-4 py-4 flex items-center justify-center gap-2 text-slate-500 font-black text-[9px] uppercase tracking-[0.2em] hover:text-white transition-colors">
-        <Lock size={14} /> Accès Parent
-      </button>
+      {/* --- NOUVEAU : Message de fin de journée --- */}
+      {allMissionsDone && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-green-500 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(34,197,94,0.3)] text-center space-y-4 mt-8"
+        >
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+            <CheckCircle size={32} className="text-white" />
+          </div>
+          
+          <div>
+            <h3 className="text-2xl font-black uppercase italic tracking-tight">Mission Complète !</h3>
+            <p className="text-green-100 font-bold text-sm mt-1">Tu as tout terminé, bravo !</p>
+          </div>
 
-      {isChallengeWon && (
-        <VictoryModal 
-          rewardName={challenge?.reward_name} 
-          onParentMode={onParentMode} 
-        />
+          <p className="text-xs font-bold uppercase tracking-widest opacity-80 pt-2 border-t border-white/20">
+            Demande à tes parents de valider
+          </p>
+
+          <button
+            onClick={onParentMode}
+            className="w-full bg-white text-green-600 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
+          >
+            <Lock size={16} />
+            Accès Parents
+          </button>
+        </motion.div>
       )}
+
     </div>
   )
 }
