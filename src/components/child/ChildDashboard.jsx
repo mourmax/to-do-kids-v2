@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { CheckCircle, Lock } from 'lucide-react'
-import MissionCard from '../ui/MissionCard'
-import ProgressBar from '../ui/ProgressBar'
+import MissionCard from './MissionCard'
+import ProgressBar from './ChildProgressBar'
 
 export default function ChildDashboard({ profile, challenge, missions, refresh, onParentMode }) {
   
