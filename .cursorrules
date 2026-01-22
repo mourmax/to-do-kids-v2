@@ -1,0 +1,9 @@
+# RÈGLES CRITIQUES POUR TO-DO KIDS
+- NE JAMAIS supprimer de code existant. Livrer des fichiers complets (INTERDICTION des '// ... rest of code').
+- Stack : React 19, Vite, Tailwind, Supabase. Pas de Next.js.
+- Modularité : Un composant par fichier. Fichiers < 200 lignes.
+- Separation Parent/Enfant : Créer des dossiers distincts /components/parent et /components/child.
+- Test-Driven : Proposer un test simple pour chaque logique de calcul de "Streak".
+- PWA : Toujours vérifier que les nouveaux assets sont compatibles avec le manifest PWA.
+- Schéma DB : Se référer au schéma SQL du PRD. Ne pas modifier sans accord.
+- Animations : Utiliser Framer Motion pour les entrées/sorties de composants.
