@@ -57,7 +57,7 @@ export default function Auth() {
         className="w-full max-w-sm space-y-6"
       >
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">HeroMissions</h1>
+          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">TO DO KIDS</h1>
           <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">L'aventure commence ici</p>
         </div>
 
