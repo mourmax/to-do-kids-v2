@@ -27,14 +27,14 @@ export default function ChildDashboard({ profile, challenge, missions, refresh, 
       {/* Barre de progression */}
       {challenge && (
         <ProgressBar 
-          current={challenge.current_streak} 
-          total={challenge.duration_days} 
-          reward={challenge.reward_name}
+        current={Number(challenge.current_streak) || 0} 
+        total={Number(challenge.duration_days) || 1} 
+        reward={challenge.reward_name || "Surprise"}
         />
       )}
 
       {/* Liste des missions */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
         {missions.map((mission, index) => (
           <MissionCard 
             key={mission.id} 
