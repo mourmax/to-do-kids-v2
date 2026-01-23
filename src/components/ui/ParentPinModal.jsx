@@ -1,35 +1,51 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Delete, ChevronRight, Lock } from 'lucide-react'
+import { Delete, LogOut } from 'lucide-react'
+import { supabase } from '../../supabaseClient'
 
-// On récupère correctPin depuis les props
 export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
   const [pin, setPin] = useState('')
   const [error, setError] = useState(false)
 
-  const handleKeyPress = (val) => {
-    if (error) setError(false)
-    if (val === 'delete') {
-      setPin(prev => prev.slice(0, -1))
-      return
-    }
+  const handleNumberClick = (num) => {
     if (pin.length < 4) {
-      const newPin = pin + val
+      const newPin = pin + num
       setPin(newPin)
       if (newPin.length === 4) {
-        // Utilisation du code dynamique au lieu de "1234"
         if (newPin === correctPin) {
-          setTimeout(onSuccess, 200)
+          onSuccess()
         } else {
           setError(true)
-          setTimeout(() => { setPin(''); setError(false); }, 600)
+          setTimeout(() => {
+            setPin('')
+            setError(false)
+          }, 400)
         }
       }
     }
   }
 
+  const handleDelete = () => {
+    setPin(prev => prev.slice(0, -1))
+    setError(false)
+  }
+
+  // 🔥 FONCTION CLÉ : CODE OUBLIÉ
+  const handleForgotPin = async () => {
+    if (confirm("Code oublié ?\n\nSécurité : Vous allez être déconnecté.\nReconnectez-vous avec votre email ou Google pour définir un nouveau code.")) {
+      // 1. On pose le "drapeau" pour dire qu'on veut reset le PIN
+      localStorage.setItem('reset_pin_mode', 'true')
+      
+      // 2. On déconnecte
+      await supabase.auth.signOut()
+      
+      // 3. On recharge la page pour renvoyer vers l'Auth
+      window.location.reload()
+    }
+  }
+
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }} 
         animate={{ scale: 1, opacity: 1 }}
@@ -37,49 +53,66 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
       >
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 font-bold text-xs"
+          className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 font-bold text-xs uppercase"
         >
-          FERMER
+          Annuler
         </button>
 
-        <div className="flex flex-col items-center mb-5">
-          <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-indigo-600 mb-3">
-            <Lock size={18} />
-          </div>
-          <h2 className="text-slate-800 font-black uppercase tracking-widest text-[10px]">Accès Parent</h2>
+        <div className="text-center mb-8 mt-2">
+          <h2 className="text-slate-800 font-black uppercase tracking-widest text-sm mb-1">Accès Parents</h2>
+          <p className="text-slate-400 text-[10px] font-bold uppercase">Saisis ton code secret</p>
         </div>
 
-        <div className="flex justify-center gap-3 mb-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className={`w-3 h-3 rounded-full border-2 transition-all ${
-              pin.length > i ? (error ? 'bg-red-500 border-red-500' : 'bg-indigo-600 border-indigo-600') : 'border-slate-200'
-            }`} />
+        {/* --- INDICATEURS PIN --- */}
+        <div className="flex justify-center gap-4 mb-8">
+          {[0, 1, 2, 3].map((i) => (
+            <div 
+              key={i}
+              className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                error 
+                  ? 'bg-red-500 scale-110' 
+                  : pin.length > i 
+                    ? 'bg-indigo-600 scale-100' 
+                    : 'bg-slate-100'
+              }`}
+            />
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'delete', 0, 'next'].map((val, i) => {
-            if (val === 'next') return (
-              <button 
-                key={i} 
-                onClick={() => pin === correctPin && onSuccess()}
-                className={`aspect-square rounded-2xl flex items-center justify-center transition-all ${pin === correctPin ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-300'}`}
-              >
-                <ChevronRight size={24} strokeWidth={3} />
-              </button>
-            )
-            if (val === 'delete') return (
-              <button key={i} onClick={() => handleKeyPress('delete')} className="aspect-square rounded-2xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100">
-                <Delete size={20} />
-              </button>
-            )
-            return (
-              <button key={i} onClick={() => handleKeyPress(val)} className="aspect-square rounded-2xl bg-slate-50 text-slate-800 text-xl font-black hover:bg-slate-100 border border-slate-100/50">
-                {val}
-              </button>
-            )
-          })}
+        {/* --- CLAVIER NUMÉRIQUE --- */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleNumberClick(num)}
+              className="h-16 rounded-2xl bg-slate-50 text-xl font-black text-slate-700 active:bg-indigo-50 active:scale-95 transition-all shadow-sm border border-slate-100"
+            >
+              {num}
+            </button>
+          ))}
+          <div className="pointer-events-none"></div>
+          <button
+            onClick={() => handleNumberClick(0)}
+            className="h-16 rounded-2xl bg-slate-50 text-xl font-black text-slate-700 active:bg-indigo-50 active:scale-95 transition-all shadow-sm border border-slate-100"
+          >
+            0
+          </button>
+          <button
+            onClick={handleDelete}
+            className="h-16 rounded-2xl bg-red-50 text-red-400 flex items-center justify-center active:bg-red-100 active:scale-95 transition-all"
+          >
+            <Delete size={24} />
+          </button>
         </div>
+
+        {/* --- BOUTON CODE OUBLIÉ --- */}
+        <button 
+          onClick={handleForgotPin}
+          className="w-full py-3 text-center text-slate-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border-t border-slate-100 mt-2"
+        >
+          <LogOut size={12} /> Code oublié ?
+        </button>
+
       </motion.div>
     </div>
   )
