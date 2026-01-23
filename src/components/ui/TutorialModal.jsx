@@ -5,7 +5,7 @@ import { ChevronRight, X, CheckCircle, Trophy, Shield } from 'lucide-react'
 const slides = [
   {
     title: "Bienvenue à Bord !",
-    text: "L'application qui transforme les choses à faire en bonne habitudes.",
+    text: "Fini les rappels inutiles, place à l'organisation ludique pour toute la famille.",
     icon: "🚀",
     color: "bg-indigo-500"
   },
@@ -17,13 +17,13 @@ const slides = [
   },
   {
     title: "Pour le Parent",
-    text: "Fini de répéter en boucle pour que les choses soient faites...Valides les missions en fin de journée. Tu es le maître du jeu.",
+    text: "Fini de répéter les mêmes consignes en boucle...L'app guide l'enfant, vous n'avez plus qu'à féliciter.",
     icon: <Shield size={72} />,
     color: "bg-orange-500"
   },
   {
     title: "La Récompense",
-    text: "Définissez ensemble un cadeau à la fin de la série. C'est la motivation ultime !",
+    text: "Un objectif clair, une motivation forte. La récompense choisie ensemble est le moteur naturel de son autonomie !",
     icon: <Trophy size={72} />,
     color: "bg-pink-500"
   }
