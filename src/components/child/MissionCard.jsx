@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, Check } from 'lucide-react'
 
-export default function MissionCard({ mission, onClick }) {
+// 1. On change "onClick" en "onToggle" dans les arguments
+export default function MissionCard({ mission, onToggle }) {
   const isDone = mission.is_completed
 
   return (
@@ -34,7 +35,8 @@ export default function MissionCard({ mission, onClick }) {
       </div>
 
       <button 
-        onClick={() => onClick(mission.id, isDone)} 
+        // 2. On utilise "onToggle" et on passe les bonnes infos
+        onClick={() => onToggle(mission.id, isDone)} 
         className={`w-full py-2.5 rounded-[1.5rem] font-black uppercase text-[8px] tracking-[0.1em] transition-all z-30 ${
           isDone 
           ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30' 
