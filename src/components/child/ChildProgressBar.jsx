@@ -1,13 +1,19 @@
 import { motion } from 'framer-motion'
 import { Flame, Gift } from 'lucide-react'
 
-export default function ChildProgressBar({ streak, goal, rewardName }) {
-  const safeGoal = goal || 1
-  const displayStreak = Math.min(streak, safeGoal)
-  const progress = (displayStreak / safeGoal) * 100
+// 👇 J'ai changé les noms ici pour correspondre au Dashboard : current, total, reward
+export default function ChildProgressBar({ current, total, reward }) {
+  
+  // Sécurités Anti-NaN et Division par zéro
+  const safeTotal = Math.max(1, Number(total) || 1)
+  const safeCurrent = Math.max(0, Number(current) || 0)
+  
+  // On limite l'affichage pour ne pas dépasser 100%
+  const displayCurrent = Math.min(safeCurrent, safeTotal)
+  const progress = (displayCurrent / safeTotal) * 100
 
-  // On crée les étapes : 0, 1, 2...
-  const steps = Array.from({ length: safeGoal + 1 }, (_, i) => i)
+  // On crée les étapes : 0, 1, 2... jusqu'au total
+  const steps = Array.from({ length: safeTotal + 1 }, (_, i) => i)
 
   return (
     <section className="bg-slate-900 p-8 rounded-[3rem] border-2 border-white/5 relative shadow-2xl">
@@ -15,12 +21,12 @@ export default function ChildProgressBar({ streak, goal, rewardName }) {
         <div>
           <p className="text-orange-500 text-[10px] font-black uppercase tracking-widest mb-1">Objectif final</p>
           <h2 className="text-white font-black text-lg flex items-center gap-2 italic uppercase tracking-tight">
-            🎁 {rewardName || "Surprise"}
+            🎁 {reward || "Surprise"}
           </h2>
         </div>
         <div className="text-right">
-          <span className="text-5xl font-black text-indigo-400 leading-none">{displayStreak}</span>
-          <span className="text-slate-600 font-black uppercase ml-1">/{safeGoal}j</span>
+          <span className="text-5xl font-black text-indigo-400 leading-none">{displayCurrent}</span>
+          <span className="text-slate-600 font-black uppercase ml-1">/{safeTotal}j</span>
         </div>
       </div>
 
@@ -34,16 +40,17 @@ export default function ChildProgressBar({ streak, goal, rewardName }) {
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }} 
+            transition={{ type: "spring", stiffness: 50, damping: 20 }}
             className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 relative z-0" 
           />
           
-          {/* 📏 POINTS D'ÉTAPE (Barres verticales À L'INTÉRIEUR du masque overflow-hidden) */}
+          {/* 📏 POINTS D'ÉTAPE (Barres verticales) */}
           {steps.map((step) => {
-            // Ne pas afficher la barre pour le début (0) et la fin (goal) pour éviter les bords moches
-            if (step === 0 || step === safeGoal) return null
+            // Pas de barre aux extrémités pour le style
+            if (step === 0 || step === safeTotal) return null
             
-            const positionPercent = (step / safeGoal) * 100
-            const isPassed = displayStreak >= step
+            const positionPercent = (step / safeTotal) * 100
+            const isPassed = displayCurrent >= step
 
             return (
               <div 
@@ -55,10 +62,10 @@ export default function ChildProgressBar({ streak, goal, rewardName }) {
           })}
         </div>
 
-        {/* CHIFFRES ET ICÔNES (En dehors du masque overflow-hidden) */}
+        {/* CHIFFRES ET ICÔNES (Sous la barre) */}
         {steps.map((step) => {
-          const positionPercent = (step / safeGoal) * 100
-          const isPassed = displayStreak >= step
+          const positionPercent = (step / safeTotal) * 100
+          const isPassed = displayCurrent >= step
 
           return (
             <div 
@@ -68,7 +75,7 @@ export default function ChildProgressBar({ streak, goal, rewardName }) {
             >
               {/* Le numéro en dessous */}
               <div className={`absolute -bottom-6 text-[10px] font-black transition-colors ${isPassed ? 'text-indigo-400' : 'text-slate-600'}`}>
-                {step === safeGoal ? <Gift size={16} /> : step}
+                {step === safeTotal ? <Gift size={16} /> : step}
               </div>
             </div>
           )
@@ -78,7 +85,7 @@ export default function ChildProgressBar({ streak, goal, rewardName }) {
         <motion.div 
           initial={{ left: 0 }}
           animate={{ left: `${progress}%` }}
-          transition={{ type: "spring", stiffness: 50, damping: 15 }}
+          transition={{ type: "spring", stiffness: 50, damping: 20 }}
           className="absolute top-0 h-full z-20"
           style={{ transform: 'translateX(-50%)' }}
         >

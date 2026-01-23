@@ -8,29 +8,36 @@ import ProgressBar from './ChildProgressBar'
 export default function ChildDashboard({ profile, challenge, missions, refresh, onParentMode }) {
   
   // 🚀 ÉTAT LOCAL POUR LA RAPIDITÉ (Optimistic UI)
-  // On copie les missions dans un état local pour pouvoir les modifier instantanément au clic
   const [optimisticMissions, setOptimisticMissions] = useState(missions || [])
 
-  // On synchronise quand les données réelles (DB) arrivent
+  // Synchronisation avec la DB
   useEffect(() => {
     setOptimisticMissions(missions || [])
   }, [missions])
 
-  // Vérification : toutes les missions locales sont-elles finies ?
+  // Vérification : tout est fini ?
   const allMissionsDone = optimisticMissions.length > 0 && optimisticMissions.every(m => m.is_completed)
 
   const handleToggleMission = async (missionId, isCompleted) => {
-    // 1. MISE À JOUR INSTANTANÉE (Visuel)
+    // 1. MISE À JOUR VISUELLE INSTANTANÉE
     const newStatus = !isCompleted
     const today = new Date().toISOString().split('T')[0]
 
-    // On met à jour l'écran TOUT DE SUITE sans attendre Supabase
-    setOptimisticMissions(current => 
-      current.map(m => m.id === missionId ? { ...m, is_completed: newStatus } : m)
+    // On calcule le nouvel état pour vérifier si c'est la fin
+    const newMissions = optimisticMissions.map(m => 
+      m.id === missionId ? { ...m, is_completed: newStatus } : m
     )
+    setOptimisticMissions(newMissions)
 
-    // 2. MISE À JOUR BACKGROUND (Données)
-    // On cherche s'il existe déjà un log pour aujourd'hui
+    // 🚀 SCROLL VERS LE HAUT SI TOUT EST FINI
+    const isAllDoneNow = newMissions.every(m => m.is_completed)
+    if (isAllDoneNow) {
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 300)
+    }
+
+    // 2. MISE À JOUR DB (Background)
     const { data: existingLog } = await supabase
       .from('daily_logs')
       .select('id')
@@ -48,18 +55,16 @@ export default function ChildDashboard({ profile, challenge, missions, refresh, 
     }
 
     if (!error) {
-      refresh(true) // On confirme avec la DB en silencieux
+      refresh(true)
     } else {
-      // Si erreur, on annule le changement local (Rollback)
       console.error("Erreur save:", error)
-      setOptimisticMissions(missions) 
+      setOptimisticMissions(missions) // Rollback si erreur
     }
   }
 
-  // Sécurisation des données pour éviter le NaN
-  // Si challenge est null ou duration <= 0, on force des valeurs par défaut
+  // Sécurisation Anti-NaN
   const safeCurrent = Math.max(0, Number(challenge?.current_streak) || 0)
-  const safeTotal = Math.max(1, Number(challenge?.duration_days) || 1) // Min 1 jour
+  const safeTotal = Math.max(1, Number(challenge?.duration_days) || 1)
 
   return (
     <div className="space-y-6 pb-20">
@@ -77,7 +82,7 @@ export default function ChildDashboard({ profile, challenge, missions, refresh, 
         </h1>
       </div>
 
-      {/* --- 🏆 MESSAGE DE FIN (DÉPLACÉ EN HAUT) --- */}
+      {/* --- 🏆 MESSAGE DE FIN (EN HAUT) --- */}
       <AnimatePresence>
         {allMissionsDone && (
           <motion.div 
@@ -86,7 +91,6 @@ export default function ChildDashboard({ profile, challenge, missions, refresh, 
             exit={{ opacity: 0, scale: 0.9 }}
             className="bg-green-500 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(34,197,94,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
           >
-            {/* Effet de brillance arrière-plan */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
 
             <div className="flex flex-col items-center gap-1 relative z-10">
@@ -113,7 +117,7 @@ export default function ChildDashboard({ profile, challenge, missions, refresh, 
         )}
       </AnimatePresence>
 
-      {/* Barre de progression (Anti-NaN) */}
+      {/* Barre de progression */}
       {challenge && (
         <ProgressBar 
           current={safeCurrent} 
@@ -122,7 +126,7 @@ export default function ChildDashboard({ profile, challenge, missions, refresh, 
         />
       )}
 
-      {/* Liste des missions (Utilise optimisticMissions pour la rapidité) */}
+      {/* Liste des missions */}
       <div className="grid grid-cols-2 gap-4">
         {optimisticMissions.map((mission, index) => (
           <MissionCard 
