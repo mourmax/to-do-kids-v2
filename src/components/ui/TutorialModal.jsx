@@ -4,27 +4,27 @@ import { ChevronRight, X, CheckCircle, Trophy, Shield } from 'lucide-react'
 
 const slides = [
   {
-    title: "Bienvenue à Bord !",
-    text: "Fini les rappels inutiles, place à l'organisation ludique pour toute la famille.",
+    title: "Bienvenue !",
+    text: "Fini les rappels inutiles,\nplace à l'organisation ludique pour toute la famille.",
     icon: "🚀",
     color: "bg-indigo-500"
   },
   {
     title: "Pour l'Enfant",
-    text: "Réalise tes missions, coche les cases et regarde ta progression vers ta récompense !",
-    icon: <CheckCircle size={72} />,
+    text: "Réalise tes missions,\ncoche les cases et regarde ta progression vers ta récompense !",
+    icon: <CheckCircle size={80} strokeWidth={2.5} />,
     color: "bg-emerald-500"
   },
   {
     title: "Pour le Parent",
-    text: "Fini de répéter les mêmes consignes en boucle...L'app guide l'enfant, vous n'avez plus qu'à féliciter.",
-    icon: <Shield size={72} />,
+    text: "Fini de répéter les consignes en boucle !\nL'app guide l'enfant, vous n'avez plus qu'à féliciter.",
+    icon: <Shield size={80} strokeWidth={2.5} />,
     color: "bg-orange-500"
   },
   {
     title: "La Récompense",
-    text: "Un objectif clair, une motivation forte. La récompense choisie ensemble est le moteur naturel de son autonomie !",
-    icon: <Trophy size={72} />,
+    text: "Un objectif clair, une motivation forte.\nLe moteur idéal pour son autonomie !",
+    icon: <Trophy size={80} strokeWidth={2.5} />,
     color: "bg-pink-500"
   }
 ]
@@ -41,58 +41,68 @@ export default function TutorialModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-slate-900 border border-white/10 w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl relative"
+        className="bg-slate-900 border border-white/10 w-full max-w-sm rounded-[3rem] overflow-hidden shadow-2xl relative"
       >
         {/* Bouton Fermer */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-500 hover:text-white z-20">
-          <X size={24} />
+        <button onClick={onClose} className="absolute top-6 right-6 text-white/40 hover:text-white z-20 transition-colors">
+          <X size={28} />
         </button>
 
-        {/* Contenu du Slide */}
-        <div className={`h-48 ${slides[index].color} flex items-center justify-center text-white relative overflow-hidden transition-colors duration-500`}>
+        {/* Contenu visuel (Icône) */}
+        <div className={`h-44 ${slides[index].color} flex items-center justify-center text-white relative overflow-hidden transition-colors duration-500`}>
           <motion.div
             key={index}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring" }}
-            className="text-6xl drop-shadow-md"
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="drop-shadow-2xl"
           >
-            {slides[index].icon}
+            {typeof slides[index].icon === 'string' ? (
+              <span className="text-7xl">{slides[index].icon}</span>
+            ) : (
+              slides[index].icon
+            )}
           </motion.div>
         </div>
 
-        <div className="p-8 text-center space-y-6">
+        {/* Zone de Texte optimisée */}
+        <div className="p-10 text-center space-y-8">
           <motion.div
             key={`text-${index}`}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-2"
+            className="space-y-5"
           >
-            <h3 className="text-2xl font-black text-white uppercase italic tracking-tight">
+            <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter leading-none">
               {slides[index].title}
             </h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            
+            <p className="text-slate-200 text-xl font-medium leading-relaxed whitespace-pre-line px-2">
               {slides[index].text}
             </p>
           </motion.div>
 
-          {/* Pagination */}
-          <div className="flex justify-center gap-2">
+          {/* Pagination plus visible */}
+          <div className="flex justify-center gap-3">
             {slides.map((_, i) => (
-              <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === index ? 'bg-indigo-500 w-6' : 'bg-slate-700'}`} />
+              <div 
+                key={i} 
+                className={`h-2 rounded-full transition-all duration-300 ${i === index ? 'bg-white w-8' : 'bg-white/20 w-2'}`} 
+              />
             ))}
           </div>
 
+          {/* Bouton Suivant plus imposant */}
           <button 
             onClick={nextSlide}
-            className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+            className="w-full bg-white text-slate-900 py-5 rounded-2xl font-black uppercase text-lg tracking-widest hover:bg-slate-100 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-xl"
           >
             {index === slides.length - 1 ? "C'est parti !" : "Suivant"}
-            {index < slides.length - 1 && <ChevronRight size={16} />}
+            {index < slides.length - 1 && <ChevronRight size={20} />}
           </button>
         </div>
       </motion.div>
