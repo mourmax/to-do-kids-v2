@@ -5,26 +5,26 @@ import { ChevronRight, X, CheckCircle, Trophy, Shield } from 'lucide-react'
 const slides = [
   {
     title: "Bienvenue à Bord !",
-    text: "L'application qui transforme les corvées en aventures.",
+    text: "L'application qui transforme les choses à faire en bonne habitudes.",
     icon: "🚀",
     color: "bg-indigo-500"
   },
   {
     title: "Pour l'Enfant",
-    text: "Réalise tes missions, coche les cases et regarde ta flamme grandir jour après jour !",
-    icon: <CheckCircle size={48} />,
+    text: "Réalise tes missions, coche les cases et regarde ta progression vers ta récompense !",
+    icon: <CheckCircle size={72} />,
     color: "bg-emerald-500"
   },
   {
     title: "Pour le Parent",
-    text: "Valide les journées pour débloquer les points. Tu es le maître du jeu.",
-    icon: <Shield size={48} />,
+    text: "Fini de répéter en boucle pour que les choses soient faites...Valides les missions en fin de journée. Tu es le maître du jeu.",
+    icon: <Shield size={72} />,
     color: "bg-orange-500"
   },
   {
     title: "La Récompense",
     text: "Définissez ensemble un cadeau à la fin de la série. C'est la motivation ultime !",
-    icon: <Trophy size={48} />,
+    icon: <Trophy size={72} />,
     color: "bg-pink-500"
   }
 ]
