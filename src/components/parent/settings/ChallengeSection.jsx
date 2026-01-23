@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Trophy } from 'lucide-react'
-import { supabase } from '../../../../supabaseClient'
+import { supabase } from '../../../supabaseClient'
 import SectionCard from './SectionCard'
 
 export default function ChallengeSection({ challenge, onShowSuccess, refresh }) {

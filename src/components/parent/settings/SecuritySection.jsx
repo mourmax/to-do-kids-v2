@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Check, Lock } from 'lucide-react'
-import { supabase } from '../../../../supabaseClient'
+import { supabase } from '../../../supabaseClient'
 import SectionCard from './SectionCard'
 
 export default function SecuritySection({ profile, onShowSuccess }) {

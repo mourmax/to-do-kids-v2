@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { Plus, Trash2, Check, X, Edit2 } from 'lucide-react'
-import { supabase } from '../../../../supabaseClient'
-import IconPicker from '../../IconPicker'
+import { supabase } from '../../../supabaseClient'
+import IconPicker from '../IconPicker'
 
 // Sous-composant MissionItem interne
 const MissionItem = ({ mission, isEditing, onEditStart, onEditSave, onEditCancel, onDelete, editState, setEditState, setShowPicker, showPicker, onIconSelect }) => (
