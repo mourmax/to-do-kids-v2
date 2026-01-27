@@ -222,6 +222,7 @@ export default function App() {
                 onParentMode={() => setShowPinModal(true)}
                 onSwitchProfile={switchProfile}
                 refresh={refresh}
+                isChildSession={!session && !!childFamilyId}
               />
             )}
           </AnimatePresence>

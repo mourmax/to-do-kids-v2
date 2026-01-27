@@ -7,13 +7,13 @@ import ProgressBar from './ChildProgressBar'
 import { useTranslation } from 'react-i18next'
 import confetti from 'canvas-confetti'
 
-export default function ChildDashboard({ profile, profiles, challenge, missions, refresh, onParentMode, onSwitchProfile }) {
+export default function ChildDashboard({ profile, profiles, challenge, missions, refresh, onParentMode, onSwitchProfile, isChildSession }) {
   const { t } = useTranslation()
 
-  // Filter only child profiles
-  const childProfiles = profiles?.filter(p => !p.is_parent) || []
+  // Filter only child profiles - BUT hide switcher if this is a child-only session (invited via code)
+  const childProfiles = isChildSession ? [] : (profiles?.filter(p => !p.is_parent) || [])
 
-  // ... (getColorClasses helper remain the same) ...
+  // Helper for colors
   const getColorClasses = (colorName) => {
     const maps = {
       rose: 'bg-rose-500/20 border-rose-500/30 text-rose-300',
