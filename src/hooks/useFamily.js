@@ -1,77 +1,192 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 
-export function useFamily(userId) {
-  const [profile, setProfile] = useState(null)
-  const [challenge, setChallenge] = useState(null)
+export function useFamily(userId, familyId = null) {
+  const [family, setFamily] = useState(null)
+  const [profiles, setProfiles] = useState([])
+  const [activeProfileId, setActiveProfileId] = useState(localStorage.getItem('active_profile_id'))
   const [missions, setMissions] = useState([])
+  const [familyMissions, setFamilyMissions] = useState([]) // Raw list for management
+  const [challenge, setChallenge] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const loadFamilyData = useCallback(async (isSilent = false) => {
-    if (!userId) { setIsLoading(false); return }
-    
+    // If no userId and no familyId, we can't load anything
+    if (!userId && !familyId) { setIsLoading(false); return }
+
     try {
-      // Refresh silencieux pour éviter le scintillement
       if (!isSilent) setIsLoading(true)
-      
-      const today = new Date().toISOString().split('T')[0]
-      
-      // 1. Profil : Création automatique si inexistant
-      let { data: prof } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
-      
-      if (!prof) {
-        // A. Créer le profil avec un nom générique et sans code PIN (pour déclencher le setup)
-        const { data: newProf, error: errProf } = await supabase
+
+      let fam = null
+      let famError = null
+
+      // 1. Get or Create Family
+      if (userId) {
+        // Parent path: find by owner ID
+        let { data, error } = await supabase
+          .from('families')
+          .select('*')
+          .eq('parent_owner_id', userId)
+          .maybeSingle()
+
+        fam = data
+        famError = error
+
+        if (!fam && !famError) {
+          // Create family if it doesn't exist for parent
+          const { data: newFam, error: createFamError } = await supabase
+            .from('families')
+            .insert([{ parent_owner_id: userId }])
+            .select()
+            .single()
+
+          if (createFamError) throw createFamError
+          fam = newFam
+        }
+      } else if (familyId) {
+        // Child path: find by family ID
+        let { data, error } = await supabase
+          .from('families')
+          .select('*')
+          .eq('id', familyId)
+          .maybeSingle()
+
+        fam = data
+        famError = error
+      }
+
+      if (famError) throw famError
+      if (!fam) {
+        setIsLoading(false)
+        return
+      }
+
+      setFamily(fam)
+
+      // 2. Get Profiles for this family
+      let { data: profs } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('family_id', fam.id)
+
+      if (!profs || profs.length === 0) {
+        // This should only happen for new parents
+        const { data: newProfs, error: profError } = await supabase
           .from('profiles')
-          .insert([{ id: userId, child_name: "Prénom enfant", pin_code: null }]) 
+          .insert([
+            { family_id: fam.id, child_name: "Parent", role: 'parent', is_parent: true },
+            { family_id: fam.id, child_name: "Mon enfant", role: 'child', is_parent: false, invite_code: Math.random().toString(36).substring(2, 8).toUpperCase() }
+          ])
+          .select()
+
+        if (profError) throw profError
+        profs = newProfs || []
+
+        // Create Default Missions ONLY if none exist
+        const { data: existingMissions } = await supabase
+          .from('missions')
+          .select('id')
+          .eq('family_id', fam.id)
+          .limit(1)
+
+        if (!existingMissions || existingMissions.length === 0) {
+          const defaultMissions = [
+            { title: "Faire ses devoirs", icon: "📚", family_id: fam.id, order_index: 1 },
+            { title: "Ranger sa chambre", icon: "🧸", family_id: fam.id, order_index: 2 },
+            { title: "Mettre la table", icon: "🍽️", family_id: fam.id, order_index: 3 }
+          ]
+          await supabase.from('missions').insert(defaultMissions)
+        }
+      }
+      setProfiles(profs || [])
+
+      // 2.5 Patch ALL existing profiles without invite codes
+      const profilesToPatch = (profs || []).filter(p => !p.is_parent && !p.invite_code)
+      if (profilesToPatch.length > 0) {
+        let hasUpdated = false
+        const updatedProfs = [...(profs || [])]
+        for (const p of profilesToPatch) {
+          const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+          const { data, error: upError } = await supabase
+            .from('profiles')
+            .update({ invite_code: code })
+            .eq('id', p.id)
+            .select()
+
+          if (upError) {
+            console.error("Failed to patch profile with invite_code:", upError)
+          } else if (data) {
+            const idx = updatedProfs.findIndex(pr => pr.id === p.id)
+            if (idx !== -1) updatedProfs[idx] = data[0]
+            hasUpdated = true
+          }
+        }
+        if (hasUpdated) setProfiles(updatedProfs)
+      }
+
+      // 3. Handle Active Profile
+      let currentProfId = activeProfileId
+      if (!currentProfId || !profs.find(p => p.id === currentProfId)) {
+        // Default to first child profile
+        const firstChild = profs.find(p => p.role === 'child') || profs[0]
+        currentProfId = firstChild?.id
+        setActiveProfileId(currentProfId)
+        localStorage.setItem('active_profile_id', currentProfId)
+      }
+
+      // 4. Fetch Missions & Logs
+      const today = new Date().toISOString().split('T')[0]
+
+      const { data: curMissions } = await supabase
+        .from('missions')
+        .select('*')
+        .eq('family_id', fam.id)
+        .order('order_index')
+
+      const { data: todayLogs } = await supabase
+        .from('daily_logs')
+        .select('*')
+        .eq('profile_id', currentProfId)
+        .eq('date', today)
+
+      // 5. Fetch Challenge - STRICTLY per-child (no shared family challenges)
+      let { data: challs, error: challError } = await supabase
+        .from('challenges')
+        .select('*')
+        .eq('family_id', fam.id)
+        .eq('assigned_to', currentProfId) // 🛠️ CRUCIAL: Seulement les challenges de cet enfant
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (challError) console.error("Error fetching challenge:", challError)
+      let chall = challs?.[0] || null
+
+      if (!chall) {
+        console.log("No challenge found for profile, creating one:", currentProfId)
+        const { data: newChall, error: createError } = await supabase
+          .from('challenges')
+          .insert([{
+            family_id: fam.id,
+            assigned_to: currentProfId, // 🛠️ CRUCIAL: Assigner à l'enfant actif
+            reward_name: "Cadeau Surprise",
+            duration_days: 7,
+            is_active: true,
+            current_streak: 0
+          }])
           .select()
           .single()
-        
-        if (errProf) throw errProf
-        prof = newProf
 
-        // B. Créer les 5 missions par défaut (SANS LES POINTS)
-        const defaultMissions = [
-          { title: "Faire ses devoirs et préparer son cartable", icon: "📚", parent_id: userId, order_index: 1 },
-          { title: "Ranger sa chambre", icon: "🧸", parent_id: userId, order_index: 2 },
-          { title: "Mettre la table et débarrasser", icon: "🍽️", parent_id: userId, order_index: 3 },
-          { title: "Lire pendant 20 minutes", icon: "📖", parent_id: userId, order_index: 4 },
-          { title: "Aller au lit sans râler", icon: "🌙", parent_id: userId, order_index: 5 }
-        ]
-        
-        // On insère les missions en base de données
-        await supabase.from('missions').insert(defaultMissions)
-      }
-      setProfile(prof)
-
-      // 2. Challenge (Isolation par parent_id)
-      let { data: chall } = await supabase.from('challenges').select('*').eq('parent_id', userId).eq('is_active', true).maybeSingle()
-      if (!chall) {
-        // Création d'un challenge par défaut de 7 jours (ou 3 selon ta préférence)
-        const { data: newChall } = await supabase.from('challenges').insert([{ parent_id: userId, reward_name: "Cadeau Surprise", duration_days: 7, current_streak: 0 }]).select().single()
+        if (createError) console.error("Error creating default challenge:", createError)
         chall = newChall
       }
       setChallenge(chall)
 
-      // 3. Missions (Récupération fraîche après création potentielle)
-      const { data: curMissions } = await supabase.from('missions').select('*').eq('parent_id', userId).order('order_index')
+      // 6. Merge & Filter Missions
+      const filteredMissions = (curMissions || []).filter(m =>
+        !m.assigned_to || m.assigned_to === currentProfId
+      )
 
-      // 4. Logs (Sécurisation Multi-Famille par jointure inner)
-      const { data: todayLogs } = await supabase
-        .from('daily_logs')
-        .select(`
-          id, 
-          mission_id, 
-          child_validated, 
-          parent_validated, 
-          date,
-          missions!inner(parent_id)
-        `)
-        .eq('missions.parent_id', userId)
-        .eq('date', today)
-
-      // 5. Fusion des données
-      const mergedMissions = (curMissions || []).map(m => {
+      const mergedMissions = filteredMissions.map(m => {
         const log = todayLogs?.find(l => l.mission_id === m.id)
         return {
           ...m,
@@ -81,14 +196,36 @@ export function useFamily(userId) {
       })
       setMissions(mergedMissions)
 
-    } catch (e) { 
-      console.error("Erreur de chargement des données famille:", e) 
-    } finally { 
-      if (!isSilent) setIsLoading(false) 
-    }
-  }, [userId])
+      // 7. Save the raw list for management
+      setFamilyMissions(curMissions || [])
 
-  useEffect(() => { loadFamilyData() }, [loadFamilyData])
-  
-  return { profile, challenge, missions, isLoading, refresh: loadFamilyData }
+    } catch (e) {
+      console.error("Erreur useFamily:", e)
+    } finally {
+      if (!isSilent) setIsLoading(false)
+    }
+  }, [userId, familyId, activeProfileId])
+
+  useEffect(() => {
+    // Effectuer un chargement "silencieux" si la famille est déjà chargée
+    // Cela évite l'écran de chargement global sur un switch de profil
+    loadFamilyData(!!family)
+  }, [loadFamilyData])
+
+  const switchProfile = (id) => {
+    setActiveProfileId(id)
+    localStorage.setItem('active_profile_id', id)
+  }
+
+  return {
+    family,
+    profiles,
+    activeProfile: profiles.find(p => p.id === activeProfileId),
+    missions,
+    allMissions: familyMissions, // Unfiltered for management
+    challenge,
+    isLoading,
+    refresh: loadFamilyData,
+    switchProfile
+  }
 }

@@ -1,0 +1,57 @@
+{
+    "auth": {
+        "welcome": "Olá {{name}}",
+        "login_title": "TO DO KIDS",
+        "login_subtitle": "A aventura começa aqui",
+        "i_am_child": "Sou uma criança",
+        "i_am_parent": "Sou um pai",
+        "invite_code": "Código de convite",
+        "enter_code": "Insere o código dos teus pais",
+        "login_google": "Continuar com o Google",
+        "or_separator": "OU",
+        "email_placeholder": "E-mail dos pais",
+        "password_placeholder": "Senha",
+        "login_button": "Entrar",
+        "signup_button": "Criar uma conta",
+        "already_account": "Já tem uma conta? Entrar",
+        "no_account": "Não tem uma conta? Registre-se",
+        "forgot_pin": "Esqueceu o PIN?"
+    },
+    "dashboard": {
+        "child_title": "Tuas missões",
+        "parent_title": "Área dos pais",
+        "missions_empty": "Nenhuma missão para hoje",
+        "all_done": "Tudo pronto!",
+        "good_job": "Bom trabalho hoje!",
+        "request_validation": "Solicitar validação",
+        "day_validated": "Dia validado! 🎉",
+        "counter_reset": "Contador reiniciado",
+        "parent_exit": "Modo criança",
+        "switch_child": "Trocar criança"
+    },
+    "tabs": {
+        "validation": "Validação",
+        "missions": "Missões",
+        "challenges": "Desafios",
+        "settings": "Definições"
+    },
+    "actions": {
+        "next": "Próximo",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "logout": "Sair",
+        "validate_all": "Validar tudo",
+        "add_mission": "Adicionar missão"
+    },
+    "settings": {
+        "language": "Idioma",
+        "theme": "Tema",
+        "dark": "Escuro",
+        "light": "Claro",
+        "premium_status": "Versão Premium"
+    },
+    "errors": {
+        "reset_failed": "Erro ao redefinir",
+        "invalid_code": "Código inválido"
+    }
+}

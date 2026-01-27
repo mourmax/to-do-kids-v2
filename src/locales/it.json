@@ -1,0 +1,57 @@
+{
+    "auth": {
+        "welcome": "Ciao {{name}}",
+        "login_title": "TO DO KIDS",
+        "login_subtitle": "L'avventura inizia qui",
+        "i_am_child": "Sono un bambino",
+        "i_am_parent": "Sono un genitore",
+        "invite_code": "Codice invito",
+        "enter_code": "Inserisci il codice dei tuoi genitori",
+        "login_google": "Continua con Google",
+        "or_separator": "OPPURE",
+        "email_placeholder": "Email dei genitori",
+        "password_placeholder": "Password",
+        "login_button": "Accedi",
+        "signup_button": "Crea un account",
+        "already_account": "Hai già un account? Accedi",
+        "no_account": "Non hai un account? Registrati",
+        "forgot_pin": "PIN dimenticato?"
+    },
+    "dashboard": {
+        "child_title": "Le tue missioni",
+        "parent_title": "Area genitori",
+        "missions_empty": "Nessuna missione per oggi",
+        "all_done": "Tutto finito!",
+        "good_job": "Ottimo lavoro oggi!",
+        "request_validation": "Richiedi validazione",
+        "day_validated": "Giorno validato! 🎉",
+        "counter_reset": "Contatore azzerato",
+        "parent_exit": "Modalità bambino",
+        "switch_child": "Cambia bambino"
+    },
+    "tabs": {
+        "validation": "Validazione",
+        "missions": "Missioni",
+        "challenges": "Sfide",
+        "settings": "Impostazioni"
+    },
+    "actions": {
+        "next": "Avanti",
+        "save": "Salva",
+        "cancel": "Annulla",
+        "logout": "Esci",
+        "validate_all": "Valida tutto",
+        "add_mission": "Aggiungi missione"
+    },
+    "settings": {
+        "language": "Lingua",
+        "theme": "Tema",
+        "dark": "Scuro",
+        "light": "Chiaro",
+        "premium_status": "Versione Premium"
+    },
+    "errors": {
+        "reset_failed": "Errore durante il ripristino",
+        "invalid_code": "Codice non valido"
+    }
+}

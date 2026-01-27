@@ -3,18 +3,18 @@ import { motion } from 'framer-motion'
 import { supabase } from '../../supabaseClient'
 import { Lock, Check } from 'lucide-react'
 
-export default function PinSetup({ userId, onComplete }) {
+export default function PinSetup({ profileId, onComplete }) {
   const [pin, setPin] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSave = async () => {
     if (pin.length !== 4) return alert("Le code doit faire 4 chiffres")
-    
+
     setLoading(true)
     const { error } = await supabase
       .from('profiles')
       .update({ pin_code: pin })
-      .eq('id', userId)
+      .eq('id', profileId)
 
     if (error) {
       alert("Erreur: " + error.message)
@@ -26,7 +26,7 @@ export default function PinSetup({ userId, onComplete }) {
 
   return (
     <div className="fixed inset-0 bg-[#020617] z-50 flex flex-col items-center justify-center p-6 text-white">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="w-full max-w-sm text-center space-y-6"
@@ -34,7 +34,7 @@ export default function PinSetup({ userId, onComplete }) {
         <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(79,70,229,0.5)]">
           <Lock size={32} />
         </div>
-        
+
         <div>
           <h2 className="text-2xl font-black uppercase tracking-tight">Code Secret Parent</h2>
           <p className="text-slate-400 text-sm mt-2">Choisis un code à 4 chiffres pour sécuriser l'accès aux réglages.</p>

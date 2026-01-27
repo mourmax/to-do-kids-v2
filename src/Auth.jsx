@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { supabase } from './supabaseClient'
 import { motion } from 'framer-motion'
 import { Trophy, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import LanguageSelector from './components/ui/LanguageSelector'
 
-export default function Auth() {
+export default function Auth({ onBack }) {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,7 +31,7 @@ export default function Auth() {
   const handleEmailLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     let result
     if (isSignUp) {
       result = await supabase.auth.signUp({ email, password })
@@ -42,23 +45,34 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 font-sans">
-      
+    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 font-sans relative">
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageSelector />
+      </div>
+
       {/* Logo Animé */}
-      <motion.div 
-        initial={{ scale: 0 }} animate={{ scale: 1 }} 
+      <motion.div
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
         className="bg-indigo-600 p-4 rounded-3xl shadow-[0_0_30px_rgba(79,70,229,0.3)] mb-8"
       >
         <Trophy size={40} className="text-white" />
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm space-y-6"
       >
+        <button
+          onClick={onBack}
+          className="text-slate-500 hover:text-white font-bold uppercase tracking-widest text-[10px] flex items-center gap-2 mb-4 transition-colors"
+        >
+          <ArrowRight className="w-4 h-4 rotate-180" />
+          {t('actions.cancel')}
+        </button>
+
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">TO DO KIDS</h1>
-          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">L'aventure commence ici</p>
+          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">{t('auth.login_title')}</h1>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{t('auth.login_subtitle')}</p>
         </div>
 
         {/* --- BOUTON GOOGLE --- */}
@@ -73,12 +87,12 @@ export default function Auth() {
           ) : (
             <>
               <svg width="18" height="18" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"/>
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335" />
               </svg>
-              <span>Continuer avec Google</span>
+              <span>{t('auth.login_google')}</span>
             </>
           )}
         </motion.button>
@@ -86,7 +100,7 @@ export default function Auth() {
         {/* Séparateur */}
         <div className="relative flex items-center py-2">
           <div className="flex-grow border-t border-white/10"></div>
-          <span className="flex-shrink-0 mx-4 text-slate-500 text-[9px] font-black uppercase tracking-widest">OU</span>
+          <span className="flex-shrink-0 mx-4 text-slate-500 text-[9px] font-black uppercase tracking-widest">{t('auth.or_separator')}</span>
           <div className="flex-grow border-t border-white/10"></div>
         </div>
 
@@ -95,9 +109,9 @@ export default function Auth() {
           <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-1 focus-within:border-indigo-500/50 transition-colors">
             <div className="flex items-center px-4">
               <Mail className="text-slate-500" size={16} />
-              <input 
-                type="email" 
-                placeholder="Email des parents"
+              <input
+                type="email"
+                placeholder={t('auth.email_placeholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-transparent p-3 text-white placeholder:text-slate-600 font-bold outline-none text-sm"
@@ -106,9 +120,9 @@ export default function Auth() {
             <div className="h-[1px] bg-white/5 mx-2" />
             <div className="flex items-center px-4">
               <Lock className="text-slate-500" size={16} />
-              <input 
-                type="password" 
-                placeholder="Mot de passe"
+              <input
+                type="password"
+                placeholder={t('auth.password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-transparent p-3 text-white placeholder:text-slate-600 font-bold outline-none text-sm"
@@ -116,25 +130,25 @@ export default function Auth() {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-900/20 hover:bg-indigo-500 active:scale-95 transition-all flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin" /> : (
               <>
-                {isSignUp ? "Créer un compte" : "Se connecter"} <ArrowRight size={16} />
+                {isSignUp ? t('auth.signup_button') : t('auth.login_button')} <ArrowRight size={16} />
               </>
             )}
           </button>
         </form>
 
         <div className="text-center">
-          <button 
+          <button
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-slate-500 text-[10px] font-bold hover:text-white transition-colors uppercase tracking-wider"
           >
-            {isSignUp ? "Déjà un compte ? Se connecter" : "Pas de compte ? S'inscrire"}
+            {isSignUp ? t('auth.already_account') : t('auth.no_account')}
           </button>
         </div>
 

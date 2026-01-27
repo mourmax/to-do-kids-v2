@@ -8,20 +8,38 @@ import ParentDashboard from './components/parent/ParentDashboard'
 import ParentPinModal from './components/ui/ParentPinModal'
 import PinSetup from './components/ui/PinSetup'
 import TutorialModal from './components/ui/TutorialModal'
-import { Baby, Lock, HelpCircle } from 'lucide-react'
+import { Baby, Lock, HelpCircle, LogOut, Sliders } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+
+import RoleSelection from './components/auth/RoleSelection'
+import ErrorBoundary from './components/ui/ErrorBoundary'
 
 export default function App() {
+  const { t } = useTranslation()
   const [session, setSession] = useState(null)
+  const [childFamilyId, setChildFamilyId] = useState(localStorage.getItem('child_family_id'))
+  const [showAuth, setShowAuth] = useState(false)
   const [isParentMode, setIsParentMode] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
-  
+
   // État du tutoriel
   const [showTutorial, setShowTutorial] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => setSession(s))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
-    
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s)
+      if (s && !localStorage.getItem('child_family_id')) {
+        setIsParentMode(true)
+      }
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s)
+      if (s) {
+        setShowAuth(false)
+        setIsParentMode(true) // Force parent interface on login
+      }
+    })
+
     // Vérification du tutoriel au chargement (seulement si pas vu)
     const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1')
     if (!hasSeenTuto) {
@@ -31,7 +49,30 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const { profile, challenge, missions, isLoading, refresh } = useFamily(session?.user?.id)
+  const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, refresh, switchProfile } = useFamily(
+    session?.user?.id,
+    childFamilyId
+  )
+
+  const handleInviteCode = async (code) => {
+    // 1. Check if profile exists with this code
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, family_id')
+      .eq('invite_code', code)
+      .maybeSingle()
+
+    if (profileError) throw profileError
+    if (!profileData) throw new Error('Invalid code')
+
+    // 3. Update session state
+    setChildFamilyId(profileData.family_id)
+    localStorage.setItem('child_family_id', profileData.family_id)
+    localStorage.setItem('active_profile_id', profileData.id)
+
+    // Refresh to update useFamily data
+    refresh()
+  }
 
   const handleCloseTutorial = () => {
     setShowTutorial(false)
@@ -40,8 +81,7 @@ export default function App() {
 
   // --- LOGIQUE D'AFFICHAGE ET SÉCURITÉ ---
 
-  if (!session) return <Auth />
-  
+  // 1. Initial Loading State
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">
@@ -50,21 +90,32 @@ export default function App() {
     )
   }
 
-  // 🔥 INTERCEPTION POUR LE "CODE OUBLIÉ" OU PREMIÈRE CONNEXION
-  // On vérifie deux choses :
-  // 1. Est-ce que le PIN est vide en base de données ? (Première fois)
-  // 2. Est-ce que le parent a demandé un reset ? (localStorage 'reset_pin_mode')
-  const needsPinSetup = !profile?.pin_code || localStorage.getItem('reset_pin_mode') === 'true'
-
-  if (profile && needsPinSetup) {
+  // 2. Auth & Role Selection
+  if (!session && !childFamilyId) {
+    if (showAuth) {
+      return <Auth onBack={() => setShowAuth(false)} />
+    }
     return (
-      <PinSetup 
-        userId={session.user.id} 
+      <RoleSelection
+        onSelectParent={() => setShowAuth(true)}
+        onSelectChild={handleInviteCode}
+      />
+    )
+  }
+
+  // 🔥 INTERCEPTION POUR LE "CODE OUBLIÉ" OU PREMIÈRE CONNEXION
+  const parentProfile = profiles.find(p => p.is_parent)
+  const needsPinSetup = parentProfile && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
+
+  if (parentProfile && needsPinSetup) {
+    return (
+      <PinSetup
+        profileId={parentProfile.id}
         onComplete={() => {
           // Une fois le nouveau PIN défini, on supprime le drapeau de reset
           localStorage.removeItem('reset_pin_mode')
           refresh() // On rafraîchit les données pour passer à l'écran suivant
-        }} 
+        }}
       />
     )
   }
@@ -72,84 +123,121 @@ export default function App() {
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30">
-      
-      {/* Tuto Modal (s'affiche par dessus tout) */}
-      <AnimatePresence>
-        {showTutorial && <TutorialModal onClose={handleCloseTutorial} />}
-      </AnimatePresence>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30">
 
-      {/* HEADER FIXE */}
-      <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-[#020617] via-[#020617]/90 to-transparent flex justify-center items-start">
-        
-        {/* Sélecteur Central (Enfant / Parent) */}
-        <div className="bg-slate-900 border border-white/10 p-1 rounded-full flex relative shadow-2xl max-w-xs w-full">
-          <motion.div 
-            className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600 rounded-full shadow-lg z-0"
-            animate={{ x: isParentMode ? '100%' : '0%' }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            style={{ left: '4px' }}
-          />
-          <button 
-            onClick={() => setIsParentMode(false)} 
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full relative z-10 text-[10px] font-black uppercase tracking-widest transition-colors ${!isParentMode ? 'text-white' : 'text-slate-400 hover:text-white'}`}
-          >
-            <Baby size={16} className="mb-0.5" /> Enfant
-          </button>
-          <button 
-            onClick={() => !isParentMode && setShowPinModal(true)} 
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full relative z-10 text-[10px] font-black uppercase tracking-widest transition-colors ${isParentMode ? 'text-white' : 'text-slate-400 hover:text-white'}`}
-          >
-            <Lock size={14} className="mb-0.5" /> Parent
-          </button>
+        {/* Tuto Modal (s'affiche par dessus tout) */}
+        <AnimatePresence>
+          {showTutorial && <TutorialModal onClose={handleCloseTutorial} />}
+        </AnimatePresence>
+
+        {/* HEADER FIXE */}
+        <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-[#020617] via-[#020617]/90 to-transparent flex justify-between items-center">
+
+          {/* Logo/Title (Discret) */}
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg">
+              <Baby size={18} className="text-white" />
+            </div>
+            <span className="text-sm font-black uppercase italic tracking-tighter text-white">To-Do Kids</span>
+          </div>
+
+          {/* Actions à droite */}
+          <div className="flex items-center gap-3">
+
+            {/* Toggle Parent/Child (Uniquement si Parent Loggé) */}
+            {session && (
+              <button
+                onClick={() => {
+                  if (isParentMode) {
+                    setIsParentMode(false)
+                  } else {
+                    setShowPinModal(true)
+                  }
+                }}
+                className="bg-slate-900 border border-white/10 px-3 py-2 rounded-xl text-slate-400 hover:text-white transition-all flex items-center gap-2 group"
+              >
+                {isParentMode ? (
+                  <>
+                    <Baby size={18} className="group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t('dashboard.parent_exit')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sliders size={18} className="group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t('dashboard.parent_title')}</span>
+                  </>
+                )}
+              </button>
+            )}
+
+            {/* Bouton pour relancer le Tuto */}
+            <button
+              onClick={() => setShowTutorial(true)}
+              className="bg-slate-900 border border-white/10 p-2 rounded-xl text-slate-400 hover:text-white transition-colors"
+              title="Aide"
+            >
+              <HelpCircle size={18} />
+            </button>
+
+            {/* Bouton Déconnexion */}
+            <button
+              onClick={async () => {
+                localStorage.removeItem('child_family_id')
+                localStorage.removeItem('active_profile_id')
+                await supabase.auth.signOut()
+                window.location.reload()
+              }}
+              className="bg-slate-900 border border-white/5 p-2 rounded-xl text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
+              title={t('actions.logout')}
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* Bouton pour relancer le Tuto (à droite) */}
-        <button 
-          onClick={() => setShowTutorial(true)}
-          className="absolute right-4 top-5 bg-slate-800 p-2 rounded-full text-slate-400 hover:text-white border border-white/5 transition-colors active:scale-95"
-          title="Revoir le tutoriel"
-        >
-          <HelpCircle size={20} />
-        </button>
+        {/* CONTENU PRINCIPAL (Dashboard) */}
+        <div className={`pt-32 pb-12 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
+          <AnimatePresence mode="wait">
+            {isParentMode ? (
+              <ParentDashboard
+                key="parent"
+                family={family}
+                profile={activeProfile}
+                challenge={challenge}
+                missions={missions}
+                allMissions={allMissions}
+                profiles={profiles}
+                onExit={() => setIsParentMode(false)}
+                onSwitchProfile={switchProfile}
+                refresh={refresh}
+              />
+            ) : (
+              <ChildDashboard
+                key="child"
+                profile={activeProfile}
+                profiles={profiles}
+                challenge={challenge}
+                missions={missions}
+                onParentMode={() => setShowPinModal(true)}
+                onSwitchProfile={switchProfile}
+                refresh={refresh}
+              />
+            )}
+          </AnimatePresence>
+        </div>
 
-      </div>
-
-      {/* CONTENU PRINCIPAL (Dashboard) */}
-      <div className="pt-32 pb-12 px-4 max-w-md mx-auto">
-        <AnimatePresence mode="wait">
-          {isParentMode ? (
-            <ParentDashboard 
-              key="parent"
-              profile={profile}
-              challenge={challenge}
-              missions={missions}
-              onExit={() => setIsParentMode(false)}
-              refresh={refresh}
-            />
-          ) : (
-            <ChildDashboard 
-              key="child"
-              profile={profile}
-              challenge={challenge}
-              missions={missions}
-              onParentMode={() => setShowPinModal(true)} 
-              refresh={refresh}
+        {/* MODAL PIN (pour passer en mode parent) */}
+        <AnimatePresence>
+          {showPinModal && (
+            <ParentPinModal
+              correctPin={parentProfile?.pin_code || "0000"}
+              onSuccess={() => { setShowPinModal(false); setIsParentMode(true); }}
+              onClose={() => setShowPinModal(false)}
             />
           )}
         </AnimatePresence>
       </div>
-
-      {/* MODAL PIN (pour passer en mode parent) */}
-      <AnimatePresence>
-        {showPinModal && (
-          <ParentPinModal 
-            correctPin={profile?.pin_code || "0000"} 
-            onSuccess={() => { setShowPinModal(false); setIsParentMode(true); }}
-            onClose={() => setShowPinModal(false)}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+    </ErrorBoundary>
   )
 }

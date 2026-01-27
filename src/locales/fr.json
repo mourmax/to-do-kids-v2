@@ -1,0 +1,91 @@
+{
+    "auth": {
+        "welcome": "Bonjour {{name}}",
+        "login_title": "TO DO KIDS",
+        "login_subtitle": "L'aventure commence ici",
+        "i_am_child": "Je suis un enfant",
+        "i_am_parent": "Je suis un parent",
+        "invite_code": "Code d'invitation",
+        "enter_code": "Entre le code de tes parents",
+        "login_google": "Continuer avec Google",
+        "or_separator": "OU",
+        "email_placeholder": "Email des parents",
+        "password_placeholder": "Mot de passe",
+        "login_button": "Se connecter",
+        "signup_button": "Créer un compte",
+        "already_account": "Déjà un compte ? Se connecter",
+        "no_account": "Pas de compte ? S'inscrire",
+        "forgot_pin": "Code PIN oublié ?"
+    },
+    "dashboard": {
+        "child_title": "Tes Missions",
+        "parent_title": "Espace Parent",
+        "missions_empty": "Aucune mission pour aujourd'hui",
+        "all_done": "Tout est fini !",
+        "good_job": "Super boulot aujourd'hui !",
+        "request_validation": "Demander validation",
+        "day_validated": "Journée validée ! 🎉",
+        "counter_reset": "Compteur remis à zéro",
+        "parent_exit": "Mode Enfant",
+        "switch_child": "Changer d'enfant"
+    },
+    "tabs": {
+        "validation": "Validation",
+        "missions": "Missions",
+        "challenges": "Défis",
+        "settings": "Paramètres"
+    },
+    "actions": {
+        "next": "Et ensuite ?",
+        "save": "Sauvegarder",
+        "choose_library": "Choisir dans la bibliothèque",
+        "add_success": "Mission ajoutée !",
+        "add_placeholder": "Ajouter une mission...",
+        "save_success": "Modifications enregistrées !",
+        "cancel": "Annuler",
+        "logout": "Déconnexion",
+        "validate_all": "Tout valider",
+        "add_mission": "Ajouter une mission"
+    },
+    "settings": {
+        "title": "Réglages",
+        "identity_title": "Gestion des Enfants",
+        "child_name_label": "Prénom de l'enfant",
+        "add_child": "Ajouter un enfant",
+        "challenge_title": "Réglages du Défi",
+        "reward_label": "Récompense",
+        "reward_placeholder": "Ex: Un tour à la piscine",
+        "duration_label": "Durée (jours)",
+        "current_streak": "Série actuelle",
+        "malus_label": "Sanction (Malus)",
+        "malus_placeholder": "Ex: Pas de dessert ce soir",
+        "security_title": "Code d'accès Parent",
+        "security_label": "Modifier le code PIN",
+        "family_title": "Gestion de la famille",
+        "invite_code_description": "Code d'activation enfant",
+        "invite_code_hint": "Utilisez ce code sur la tablette ou le téléphone de votre enfant pour le connecter sans mot de passe.",
+        "family_access_title": "Code accès famille",
+        "family_access_hint": "Partagez ce code avec un autre parent ou une nounou pour qu'ils puissent gérer les missions de la famille.",
+        "missions_title": "Édition des Missions",
+        "premium_limit_reached": "Limite de 5 missions atteinte. Passez à la version Premium pour en ajouter plus !",
+        "language": "Langue",
+        "theme": "Thème",
+        "dark": "Sombre",
+        "light": "Clair",
+        "premium_status": "Version Premium"
+    },
+    "library": {
+        "title": "Bibliothèque de Missions",
+        "missions_count": "missions actives",
+        "category_hygiene": "Hygiène & Santé",
+        "category_house": "Maison & Rangement",
+        "category_school": "École & Devoirs",
+        "category_behavior": "Comportement"
+    },
+    "errors": {
+        "reset_failed": "Erreur lors du reset",
+        "invalid_code": "Code invalide",
+        "invalid_pin": "Code PIN incorrect",
+        "mission_limit_reached": "Désolé, vous avez atteint la limite de 5 missions gratuites."
+    }
+}

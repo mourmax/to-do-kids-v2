@@ -4,51 +4,68 @@ import { CheckCircle2, Check } from 'lucide-react'
 // 1. On change "onClick" en "onToggle" dans les arguments
 export default function MissionCard({ mission, onToggle }) {
   const isDone = mission.is_completed
+  const isParentValidated = mission.parent_validated
 
   return (
     <motion.div
       layout
-      className={`relative overflow-hidden p-4 aspect-square rounded-[2.5rem] border-2 transition-all duration-500 flex flex-col items-center justify-between ${
-        isDone ? 'bg-emerald-600 border-emerald-500' : 'bg-slate-900 border-white/5 shadow-xl shadow-black/20'
-      }`}
+      className={`relative overflow-hidden p-4 aspect-square rounded-[2.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-between ${isParentValidated
+          ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_0_30px_rgba(251,191,36,0.3)]'
+          : isDone
+            ? 'bg-emerald-600 border-emerald-500'
+            : 'bg-slate-900 border-white/5 shadow-xl shadow-black/20'
+        }`}
     >
       <AnimatePresence>
-        {isDone && (
-          <motion.div 
-            initial={{ scale: 0, opacity: 0 }} 
-            animate={{ scale: 1.2, opacity: 0.2 }} 
+        {isDone && !isParentValidated && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1.2, opacity: 0.2 }}
             exit={{ scale: 0, opacity: 0 }}
             className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none"
           >
             <CheckCircle2 size={120} className="text-white" strokeWidth={3} />
           </motion.div>
         )}
+        {isParentValidated && (
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            className="absolute top-3 right-3 z-40 bg-white text-orange-600 px-2 py-1 rounded-lg font-black text-[8px] tracking-widest shadow-xl flex items-center gap-1"
+          >
+            <Check size={10} strokeWidth={4} /> VALIDÉ
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      <div className="flex flex-col items-center gap-1 mt-2 z-10 text-center pointer-events-none">
-        <span className={`text-5xl mb-1 transition-all ${isDone ? 'scale-110 drop-shadow-md' : 'grayscale-[0.2]'}`}>
+      <div className={`flex flex-col items-center gap-1 mt-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''}`}>
+        <span className={`text-5xl mb-1 transition-all ${isDone ? 'scale-110 drop-shadow-md' : 'grayscale-[0.2] opacity-50'}`}>
           {mission.icon || '⭐'}
         </span>
-        <h3 className="font-black uppercase text-[10px] tracking-tight leading-tight px-1 text-white text-shadow-sm">
+        <h3 className={`font-black uppercase text-[10px] tracking-tight leading-tight px-1 text-shadow-sm ${isParentValidated ? 'text-white' : 'text-white'}`}>
           {mission.title}
         </h3>
       </div>
 
-      <button 
-        // 2. On utilise "onToggle" et on passe les bonnes infos
-        onClick={() => onToggle(mission.id, isDone)} 
-        className={`w-full py-2.5 rounded-[1.5rem] font-black uppercase text-[8px] tracking-[0.1em] transition-all z-30 ${
-          isDone 
-          ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30' 
-          : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1'
-        }`}
-      >
-        {isDone ? (
-          <span className="flex items-center justify-center gap-1">
-            <Check size={10} strokeWidth={4} /> ANNULER
-          </span>
-        ) : "A FAIRE"}
-      </button>
+      {!isParentValidated ? (
+        <button
+          onClick={() => onToggle(mission.id, isDone)}
+          className={`w-full py-2.5 rounded-[1.5rem] font-black uppercase text-[8px] tracking-[0.1em] transition-all z-30 ${isDone
+              ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
+              : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1'
+            }`}
+        >
+          {isDone ? (
+            <span className="flex items-center justify-center gap-1">
+              <Check size={10} strokeWidth={4} /> ANNULER
+            </span>
+          ) : "A FAIRE"}
+        </button>
+      ) : (
+        <div className="w-full py-2.5 rounded-[1.5rem] bg-white text-orange-600 font-black uppercase text-[8px] tracking-widest text-center shadow-inner">
+          BRAVO !
+        </div>
+      )}
     </motion.div>
   )
 }

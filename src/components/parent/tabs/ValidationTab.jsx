@@ -8,17 +8,33 @@ import FailureModal from '../FailureModal'
 import Toast from '../Toast'
 import ValidationHeader from './ValidationHeader'
 import ValidationMissionList from './ValidationMissionList'
+import { useTranslation } from 'react-i18next'
+import { ListChecks } from 'lucide-react'
 
-export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName }) {
-  
+export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName, profile }) {
+  const { t } = useTranslation()
+
   const [showVictoryAnimation, setShowVictoryAnimation] = useState(false)
   const [showFailureModal, setShowFailureModal] = useState(false)
-  
+
   // Toast State : null ou { message: string, type: 'success' | 'error' }
-  const [toast, setToast] = useState(null) 
+  const [toast, setToast] = useState(null)
 
   const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed && m.parent_validated)
+  const childFinishedAll = missions.length > 0 && missions.every(m => m.is_completed) && !allMissionsDone
   const isChallengeFinished = !showVictoryAnimation && (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
+
+  // Helper for colors
+  const getColorClasses = (colorName) => {
+    const maps = {
+      rose: 'bg-rose-500/10 border-rose-500 text-rose-500',
+      sky: 'bg-sky-500/10 border-sky-500 text-sky-500',
+      emerald: 'bg-emerald-500/10 border-emerald-500 text-emerald-500',
+      amber: 'bg-amber-500/10 border-amber-500 text-amber-500',
+      violet: 'bg-indigo-500/10 border-indigo-500 text-indigo-500',
+    }
+    return maps[colorName] || maps.violet
+  }
 
   // --- Gestion du Toast ---
   const showToast = (message, type = 'success') => {
@@ -29,13 +45,23 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   // --- Logique Métier ---
 
   const validateParent = async (missionId, currentStatus) => {
-    const today = new Date().toISOString().split('T')[0]
-    await supabase.from('daily_logs').upsert({
-      mission_id: missionId,
-      parent_validated: !currentStatus,
-      date: today
-    }, { onConflict: 'mission_id, date' })
-    refresh(true)
+    try {
+      if (!profile?.id) throw new Error("No profile selected")
+      const today = new Date().toISOString().split('T')[0]
+
+      const { error } = await supabase.from('daily_logs').upsert({
+        mission_id: missionId,
+        profile_id: profile.id, // 🛠️ CRUCIAL: Identifier l'enfant
+        parent_validated: !currentStatus,
+        date: today
+      }, { onConflict: 'mission_id, profile_id, date' })
+
+      if (error) throw error
+      refresh(true)
+    } catch (err) {
+      console.error("Error validating parent:", err)
+      showToast("Erreur de validation", "error")
+    }
   }
 
   const handleDayResultClick = (isSuccess) => {
@@ -50,7 +76,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     if (!challenge?.id) return
     if (!allMissionsDone) {
       // 🚨 REMPLACEMENT ALERT
-      showToast("Validez toutes les missions !", "error")
+      showToast(t('actions.validate_all'), "error")
       return
     }
     const newStreak = (challenge.current_streak || 0) + 1
@@ -62,9 +88,13 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       const today = new Date().toISOString().split('T')[0]
       const missionIds = missions.map(m => m.id)
       if (missionIds.length > 0) {
-        await supabase.from('daily_logs').delete().in('mission_id', missionIds).eq('date', today)
+        // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
+        await supabase.from('daily_logs').delete()
+          .in('mission_id', missionIds)
+          .eq('profile_id', profile.id)
+          .eq('date', today)
       }
-      showToast("Journée validée ! 🎉") // ✅ REMPLACEMENT ALERT
+      showToast(t('dashboard.day_validated')) // ✅ REMPLACEMENT ALERT
       refresh(true)
     }
   }
@@ -75,9 +105,13 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
     const missionIds = missions.map(m => m.id)
     if (missionIds.length > 0) {
-      await supabase.from('daily_logs').delete().in('mission_id', missionIds).eq('date', today)
+      // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
+      await supabase.from('daily_logs').delete()
+        .in('mission_id', missionIds)
+        .eq('profile_id', profile.id)
+        .eq('date', today)
     }
-    showToast("Compteur remis à zéro") // ✅ REMPLACEMENT ALERT
+    showToast(t('dashboard.counter_reset')) // ✅ REMPLACEMENT ALERT
     refresh(true)
   }
 
@@ -86,9 +120,13 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     const today = new Date().toISOString().split('T')[0]
     const missionIds = missions.map(m => m.id)
     if (missionIds.length > 0) {
-      await supabase.from('daily_logs').delete().in('mission_id', missionIds).eq('date', today)
+      // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
+      await supabase.from('daily_logs').delete()
+        .in('mission_id', missionIds)
+        .eq('profile_id', profile.id)
+        .eq('date', today)
     }
-    refresh(true) 
+    refresh(true)
   }
 
   const handleStartNewChallenge = async () => {
@@ -97,26 +135,51 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
       const missionIds = missions.map(m => m.id)
       if (missionIds.length > 0) {
-        await supabase.from('daily_logs').delete().in('mission_id', missionIds).eq('date', today)
+        // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
+        await supabase.from('daily_logs').delete()
+          .in('mission_id', missionIds)
+          .eq('profile_id', profile.id)
+          .eq('date', today)
       }
       await refresh(true)
-      onExit() 
+      onExit()
     } catch (error) {
       console.error("Erreur reset:", error)
-      showToast("Erreur lors du reset", "error") // ✅ REMPLACEMENT ALERT ERREUR
+      showToast(t('errors.reset_failed'), "error") // ✅ REMPLACEMENT ALERT ERREUR
     }
   }
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-      
+
       {/* 🌟 TOAST */}
       <AnimatePresence>
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       </AnimatePresence>
 
-      {/* 1. Header (Verdict ou Fin) */}
-      <ValidationHeader 
+      {/* 🟢 NOTIFICATION: ENFANT A TOUT FINI */}
+      <AnimatePresence>
+        {childFinishedAll && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`p-6 rounded-3xl border-2 border-dashed flex flex-col items-center gap-3 text-center transition-colors ${getColorClasses(profile?.color)}`}
+          >
+            <div className="w-12 h-12 rounded-full bg-current opacity-20 flex items-center justify-center animate-bounce">
+              <ListChecks size={24} className="text-current" />
+            </div>
+            <div>
+              <h4 className="font-black uppercase italic tracking-tighter text-lg">
+                {childName} a fini toutes ses missions !
+              </h4>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-70">
+                Validez sa journée pour avancer le challenge
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <ValidationHeader
         isChallengeFinished={isChallengeFinished}
         allMissionsDone={allMissionsDone}
         challenge={challenge}
@@ -127,7 +190,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       />
 
       {/* 2. Liste des Missions */}
-      <ValidationMissionList 
+      <ValidationMissionList
         missions={missions}
         onValidate={validateParent}
       />
@@ -135,7 +198,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       {/* 3. Modales */}
       <AnimatePresence>
         {showVictoryAnimation && (
-          <ParentVictoryModal 
+          <ParentVictoryModal
             childName={childName}
             rewardName={challenge?.reward_name}
             onClose={handleCloseVictoryModal}

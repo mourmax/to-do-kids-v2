@@ -1,0 +1,57 @@
+{
+    "auth": {
+        "welcome": "Hallo {{name}}",
+        "login_title": "TO DO KIDS",
+        "login_subtitle": "Das Abenteuer beginnt hier",
+        "i_am_child": "Ich bin ein Kind",
+        "i_am_parent": "Ich bin ein Elternteil",
+        "invite_code": "Einladungscode",
+        "enter_code": "Gib den Code deiner Eltern ein",
+        "login_google": "Weiter mit Google",
+        "or_separator": "ODER",
+        "email_placeholder": "E-Mail der Eltern",
+        "password_placeholder": "Passwort",
+        "login_button": "Anmelden",
+        "signup_button": "Konto erstellen",
+        "already_account": "Hast du schon ein Konto? Anmelden",
+        "no_account": "Hast du noch kein Konto? Registrieren",
+        "forgot_pin": "PIN vergessen?"
+    },
+    "dashboard": {
+        "child_title": "Deine Missionen",
+        "parent_title": "Elternbereich",
+        "missions_empty": "Keine Missionen für heute",
+        "all_done": "Alles fertig!",
+        "good_job": "Gute Arbeit heute!",
+        "request_validation": "Validierung anfordern",
+        "day_validated": "Tag validiert! 🎉",
+        "counter_reset": "Zähler zurückgesetzt",
+        "parent_exit": "Kindermodus",
+        "switch_child": "Kind wechseln"
+    },
+    "tabs": {
+        "validation": "Validierung",
+        "missions": "Missionen",
+        "challenges": "Herausforderungen",
+        "settings": "Einstellungen"
+    },
+    "actions": {
+        "next": "Weiter",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "logout": "Abmelden",
+        "validate_all": "Alles validieren",
+        "add_mission": "Mission hinzufügen"
+    },
+    "settings": {
+        "language": "Sprache",
+        "theme": "Design",
+        "dark": "Dunkel",
+        "light": "Hell",
+        "premium_status": "Premium-Version"
+    },
+    "errors": {
+        "reset_failed": "Fehler beim Zurücksetzen",
+        "invalid_code": "Ungültiger Code"
+    }
+}

@@ -1,0 +1,91 @@
+{
+    "auth": {
+        "welcome": "Hello {{name}}",
+        "login_title": "TO DO KIDS",
+        "login_subtitle": "The adventure starts here",
+        "i_am_child": "I am a child",
+        "i_am_parent": "I am a parent",
+        "invite_code": "Invite code",
+        "enter_code": "Enter your parents' code",
+        "login_google": "Continue with Google",
+        "or_separator": "OR",
+        "email_placeholder": "Parents' Email",
+        "password_placeholder": "Password",
+        "login_button": "Log In",
+        "signup_button": "Create an Account",
+        "already_account": "Already have an account? Log In",
+        "no_account": "Don't have an account? Sign Up",
+        "forgot_pin": "Forgot PIN?"
+    },
+    "dashboard": {
+        "child_title": "My Missions",
+        "parent_title": "Parent Space",
+        "missions_empty": "No missions for today",
+        "all_done": "All done!",
+        "good_job": "Great job today!",
+        "request_validation": "Request validation",
+        "day_validated": "Day validated! 🎉",
+        "counter_reset": "Counter reset to zero",
+        "parent_exit": "Child Mode",
+        "switch_child": "Switch child"
+    },
+    "tabs": {
+        "validation": "Validation",
+        "missions": "Missions",
+        "challenges": "Challenges",
+        "settings": "Settings"
+    },
+    "actions": {
+        "next": "And next?",
+        "save": "Save",
+        "choose_library": "Choose from library",
+        "add_success": "Mission added!",
+        "add_placeholder": "Add a mission...",
+        "save_success": "Changes saved!",
+        "cancel": "Cancel",
+        "logout": "Logout",
+        "validate_all": "Validate all",
+        "add_mission": "Add mission"
+    },
+    "settings": {
+        "title": "Settings",
+        "identity_title": "Kids Management",
+        "child_name_label": "Child's First Name",
+        "add_child": "Add a child",
+        "challenge_title": "Challenge Settings",
+        "reward_label": "Reward",
+        "reward_placeholder": "Ex: Trip to the pool",
+        "duration_label": "Duration (days)",
+        "current_streak": "Current Streak",
+        "malus_label": "Penalty (Malus)",
+        "malus_placeholder": "Ex: No dessert tonight",
+        "security_title": "Parent Access Code",
+        "security_label": "Change PIN Code",
+        "family_title": "Family Management",
+        "invite_code_description": "Child Activation Code",
+        "invite_code_hint": "Use this code on your child's tablet or phone to connect them without a password.",
+        "family_access_title": "Family Access Code",
+        "family_access_hint": "Share this code with another parent or a nanny so they can manage the family's missions.",
+        "missions_title": "Mission Edition",
+        "language": "Language",
+        "theme": "Theme",
+        "dark": "Dark",
+        "light": "Light",
+        "premium_status": "Premium Version",
+        "premium_limit_reached": "5 mission limit reached. Upgrade to Premium to add more!"
+    },
+    "library": {
+        "title": "Mission Library",
+        "missions_count": "active missions",
+        "category_hygiene": "Hygiene & Health",
+        "category_house": "Home & tidying",
+        "category_school": "School & Homework",
+        "category_behavior": "Behavior"
+    },
+    "errors": {
+        "reset_failed": "Error during reset",
+        "invalid_code": "Invalid code",
+        "invalid_pin": "Incorrect PIN code",
+        "mission_limit_reached": "Sorry, you have reached the limit of 5 free missions."
+    }
+}
