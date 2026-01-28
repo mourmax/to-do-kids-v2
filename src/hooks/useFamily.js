@@ -9,6 +9,7 @@ export function useFamily(userId, familyId = null) {
   const [familyMissions, setFamilyMissions] = useState([]) // Raw list for management
   const [challenge, setChallenge] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const loadFamilyData = useCallback(async (isSilent = false) => {
     // If no userId and no familyId, we can't load anything

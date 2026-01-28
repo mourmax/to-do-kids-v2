@@ -11,7 +11,7 @@ import FamilySection from '../settings/FamilySection'
 import ChallengeSection from '../settings/ChallengeSection'
 import MissionsSection from '../settings/MissionsSection'
 
-export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, activeSubMenu: propSubMenu, onSubMenuChange }) {
+export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser }) {
   const { t } = useTranslation()
   const [toastMessage, setToastMessage] = useState(null)
 
@@ -67,18 +67,38 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
         >
           {activeSubMenu === 'children' && (
             <div className="space-y-8">
-              <IdentitySection familyId={family?.id} profile={profile} profiles={profiles} onShowSuccess={showSuccess} refresh={refresh} />
+              <IdentitySection
+                familyId={family?.id}
+                profile={profile}
+                profiles={profiles}
+                onShowSuccess={showSuccess}
+                refresh={refresh}
+                isNewUser={isNewUser}
+              />
               <FamilySection family={family} />
               <SecuritySection profile={profile} onShowSuccess={showSuccess} />
             </div>
           )}
 
           {activeSubMenu === 'missions' && (
-            <MissionsSection missions={missions} profiles={profiles} familyId={family?.id} profileId={profile?.id} onShowSuccess={showSuccess} refresh={refresh} />
+            <MissionsSection
+              missions={missions}
+              profiles={profiles}
+              familyId={family?.id}
+              profileId={profile?.id}
+              onShowSuccess={showSuccess}
+              refresh={refresh}
+              isNewUser={isNewUser}
+            />
           )}
 
           {activeSubMenu === 'challenge' && (
-            <ChallengeSection challenge={challenge} onShowSuccess={showSuccess} refresh={refresh} />
+            <ChallengeSection
+              challenge={challenge}
+              onShowSuccess={showSuccess}
+              refresh={refresh}
+              isNewUser={isNewUser}
+            />
           )}
         </motion.div>
       </AnimatePresence>

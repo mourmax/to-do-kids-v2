@@ -246,6 +246,7 @@ export default function ParentDashboard({ family, profile, profiles, challenge, 
                 refresh={refresh}
                 activeSubMenu={activeSubTab}
                 onSubMenuChange={setActiveSubTab}
+                isNewUser={profiles?.length <= 2} // Robust fallback: check if only defaults exist
               />
             </motion.div>
           )}

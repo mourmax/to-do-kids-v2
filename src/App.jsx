@@ -27,8 +27,20 @@ export default function App() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [pinSuccessfullySet, setPinSuccessfullySet] = useState(false)
 
-  // Track if this is an onboarding session (stays constant during the session)
-  const [isOnboardingSession] = useState(!localStorage.getItem('hasSeenTutorial_v1'))
+  // Track if this is an onboarding session
+  const [isOnboardingSession, setIsOnboardingSession] = useState(false)
+
+  // Update onboarding status based on data (Sticky)
+  useEffect(() => {
+    if (!isLoading && session && family && !isOnboardingSession) {
+      const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
+      const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+
+      if (!hasSeenTuto || isDefaultFamily) {
+        setIsOnboardingSession(true)
+      }
+    }
+  }, [isLoading, !!session, !!family, profiles.length, isOnboardingSession])
 
   // 1. Session management
   useEffect(() => {
@@ -213,6 +225,8 @@ export default function App() {
             onClick={async () => {
               localStorage.removeItem('child_family_id')
               localStorage.removeItem('active_profile_id')
+              localStorage.removeItem('hasSeenTutorial_v1') // Nettoyage pour tests
+              localStorage.removeItem('reset_pin_mode')
               await supabase.auth.signOut()
               window.location.reload()
             }}
