@@ -374,14 +374,14 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                 <Check size={20} />
               </div>
               <div className="space-y-1">
-                <h4 className="text-sm font-black uppercase text-indigo-400 tracking-widest">Missions configurées !</h4>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest">Presque fini... Il reste à définir la récompense du défi !</p>
+                <h4 className="text-sm font-black uppercase text-indigo-400 tracking-widest">{t('onboarding.missions_configured')}</h4>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest">{t('onboarding.missions_configured_subtitle')}</p>
               </div>
               <button
                 onClick={() => onNextStep('challenge')}
                 className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95"
               >
-                Étape suivante : Le Défi
+                {t('onboarding.next_step_challenge')}
               </button>
             </motion.div>
           )}
