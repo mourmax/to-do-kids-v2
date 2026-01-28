@@ -46,7 +46,7 @@ export default function ParentDashboard({ family, profile, profiles, challenge, 
 
     // Abonnement aux changements
     const channel = supabase
-      .channel(`parent-sync-${family.id}`)
+      .channel(`parent-sync-${family?.id || 'no-family'}`)
       .on(
         'postgres_changes',
         {
