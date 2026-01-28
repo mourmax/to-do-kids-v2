@@ -19,11 +19,11 @@ export default function PinSetup({ profileId, onComplete }) {
 
     if (error) {
       console.error("PIN Update Error:", error)
-      alert("Erreur: " + error.message)
+      alert("Erreur: Impossible de sauvegarder le code PIN. Vérifiez votre connexion.")
       setLoading(false)
     } else if (!data || data.length === 0) {
-      console.error("PIN Update failed: No rows affected. ProfileID:", profileId)
-      alert("Erreur: Impossible de mettre à jour votre profil parent. Vérifiez vos permissions.")
+      console.error("PIN Update failed: No rows affected. RLS or missing linkage.")
+      alert("Erreur critique: Votre profil n'est pas correctement lié. Veuillez vous reconnecter.")
       setLoading(false)
     } else {
       console.log("PIN updated successfully for profile:", profileId)

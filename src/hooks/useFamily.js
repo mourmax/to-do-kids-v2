@@ -139,6 +139,14 @@ export function useFamily(userId, familyId = null) {
 
       // 3. Handle Active Profile
       let currentProfId = activeProfileId
+      const parentProf = profs.find(p => p.is_parent)
+
+      // Double check if parent has family_id (recovery if RLS was messed up)
+      if (parentProf && !parentProf.family_id && fam.id) {
+        console.warn("Parent profile missing family_id, patching...")
+        await supabase.from('profiles').update({ family_id: fam.id }).eq('id', parentProf.id)
+      }
+
       if (!currentProfId || !profs.find(p => p.id === currentProfId)) {
         // Default to first child profile
         const firstChild = profs.find(p => p.role === 'child') || profs[0]
