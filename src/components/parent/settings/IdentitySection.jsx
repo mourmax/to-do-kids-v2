@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Check, User, Copy, Plus } from 'lucide-react'
 import { supabase } from '../../../supabaseClient'
 import { useTranslation } from 'react-i18next'
