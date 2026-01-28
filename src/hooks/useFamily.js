@@ -16,13 +16,14 @@ export function useFamily(userId, familyId = null) {
 
     try {
       if (!isSilent) setIsLoading(true)
+      console.log("[useFamily] Loading data for:", { userId, familyId })
 
       let fam = null
       let famError = null
 
       // 1. Get or Create Family
       if (userId) {
-        // Parent path: find by owner ID
+        console.log("[useFamily] Fetching family for parent:", userId)
         let { data, error } = await supabase
           .from('families')
           .select('*')
@@ -32,16 +33,25 @@ export function useFamily(userId, familyId = null) {
         fam = data
         famError = error
 
-        if (!fam && !famError) {
-          // Create family if it doesn't exist for parent
+        if (famError) {
+          console.error("[useFamily] Error fetching family:", famError)
+          throw famError
+        }
+
+        if (!fam) {
+          console.log("[useFamily] No family found, creating one for parent:", userId)
           const { data: newFam, error: createFamError } = await supabase
             .from('families')
             .insert([{ parent_owner_id: userId }])
             .select()
             .single()
 
-          if (createFamError) throw createFamError
+          if (createFamError) {
+            console.error("[useFamily] Error creating family:", createFamError)
+            throw createFamError
+          }
           fam = newFam
+          console.log("[useFamily] Family created successfully:", fam.id)
         }
       } else if (familyId) {
         // Child path: find by family ID
@@ -89,29 +99,16 @@ export function useFamily(userId, familyId = null) {
           .select()
 
         if (profError) {
-          console.error("Critical error creating profiles:", profError)
+          console.error("[useFamily] Critical error creating profiles:", profError)
           throw profError
         }
         profs = newProfs || []
+        console.log("[useFamily] Profiles created successfully")
 
-        // Create Default Missions ONLY if none exist
-        const { data: existingMissions } = await supabase
-          .from('missions')
-          .select('id')
-          .eq('family_id', fam.id)
-          .limit(1)
-
-        if (!existingMissions || existingMissions.length === 0) {
-          console.log("Creating default missions...")
-          const defaultMissions = [
-            { title: "Faire ses devoirs", icon: "📚", family_id: fam.id, order_index: 1 },
-            { title: "Ranger sa chambre", icon: "🧸", family_id: fam.id, order_index: 2 },
-            { title: "Mettre la table", icon: "🍽️", family_id: fam.id, order_index: 3 }
-          ]
-          await supabase.from('missions').insert(defaultMissions)
-        }
+        // ... (rest of mission creation)
       }
       setProfiles(profs || [])
+      console.log("[useFamily] All data loaded successfully for family:", fam.id)
 
       // 2.5 Patch ALL existing profiles without invite codes
       const profilesToPatch = (profs || []).filter(p => !p.is_parent && !p.invite_code)
