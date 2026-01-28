@@ -144,16 +144,16 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
                 Où trouver le code d'activation ?
               </h5>
               <p className="text-[10px] text-slate-400 text-left pl-7">
-                Rendez-vous dans <strong className="text-white">Réglages → Identité</strong> pour copier le code unique de chaque enfant.
+                Rendez-vous dans <strong className="text-white">Paramètres → Enfants</strong> pour copier le code unique de chaque enfant.
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => onNextStep('done')}
+            onClick={() => onNextStep('identity')}
             className="bg-orange-500 hover:bg-orange-400 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-orange-500/20 transition-all active:scale-95"
           >
-            Aller au tableau de bord
+            Voir les codes enfants
           </button>
         </motion.div>
       )}
