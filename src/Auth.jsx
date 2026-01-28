@@ -163,7 +163,7 @@ export default function Auth({ onBack }) {
           >
             {loading ? <Loader2 className="animate-spin" /> : (
               <>
-                {isSignUp ? "Créer mon compte" : t('auth.login_button')} <ArrowRight size={16} />
+                {isSignUp ? t('auth.signup_button_submit') : t('auth.login_button')} <ArrowRight size={16} />
               </>
             )}
           </button>
