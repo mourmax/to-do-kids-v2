@@ -1,7 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function CompletionModal({ isOpen, onClose, onNavigateToChildren }) {
+    const { t } = useTranslation()
     if (!isOpen) return null
 
     return (
@@ -39,10 +41,10 @@ export default function CompletionModal({ isOpen, onClose, onNavigateToChildren 
                     {/* Title */}
                     <div className="text-center space-y-3 mb-8">
                         <h2 className="text-2xl font-black uppercase text-orange-400 tracking-widest">
-                            Configuration Terminée !
+                            {t('completion_modal.title')}
                         </h2>
                         <p className="text-sm text-slate-300 max-w-md mx-auto">
-                            Tout est prêt ! Suivez les étapes ci-dessous pour connecter vos enfants.
+                            {t('completion_modal.subtitle')}
                         </p>
                     </div>
 
@@ -52,20 +54,20 @@ export default function CompletionModal({ isOpen, onClose, onNavigateToChildren 
                         <div>
                             <h3 className="text-xs font-black uppercase text-indigo-400 tracking-widest flex items-center gap-2 mb-3">
                                 <span className="bg-indigo-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                                Sur l'appareil de votre enfant
+                                {t('completion_modal.step1_title')}
                             </h3>
                             <ul className="text-left text-xs text-slate-400 space-y-2 pl-8">
                                 <li className="flex items-start gap-2">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span>Ouvrez l'application <strong className="text-white">To Do Kids</strong></span>
+                                    <span>{t('completion_modal.step1_item1')} <strong className="text-white">To Do Kids</strong></span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span>Cliquez sur <strong className="text-white">"Je suis un enfant"</strong></span>
+                                    <span>{t('completion_modal.step1_item2')} <strong className="text-white">{t('completion_modal.step1_item2_bold')}</strong></span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span>Entrez le <strong className="text-white">code d'activation</strong> de l'enfant</span>
+                                    <span>{t('completion_modal.step1_item3')} <strong className="text-white">{t('completion_modal.step1_item3_bold')}</strong> {t('completion_modal.step1_item3_end')}</span>
                                 </li>
                             </ul>
                         </div>
@@ -74,10 +76,10 @@ export default function CompletionModal({ isOpen, onClose, onNavigateToChildren 
                         <div className="border-t border-white/5 pt-5">
                             <h3 className="text-xs font-black uppercase text-emerald-400 tracking-widest flex items-center gap-2 mb-3">
                                 <span className="bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                                Où trouver le code d'activation ?
+                                {t('completion_modal.step2_title')}
                             </h3>
                             <p className="text-xs text-slate-400 text-left pl-8">
-                                Rendez-vous dans <strong className="text-white">Paramètres → Enfants</strong> pour copier le code unique de chaque enfant.
+                                {t('completion_modal.step2_text')} <strong className="text-white">{t('completion_modal.step2_text_bold')}</strong> {t('completion_modal.step2_text_end')}
                             </p>
                         </div>
                     </div>
@@ -87,7 +89,7 @@ export default function CompletionModal({ isOpen, onClose, onNavigateToChildren 
                         onClick={onNavigateToChildren}
                         className="w-full bg-orange-500 hover:bg-orange-400 text-white px-10 py-4 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl shadow-orange-500/20 transition-all active:scale-95"
                     >
-                        Voir les codes enfants
+                        {t('completion_modal.button')}
                     </button>
                 </motion.div>
             </motion.div>

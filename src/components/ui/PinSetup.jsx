@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '../../supabaseClient'
 import { Lock, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function PinSetup({ profileId, onComplete }) {
+  const { t } = useTranslation()
   const [pin, setPin] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSave = async () => {
-    if (pin.length !== 4) return alert("Le code doit faire 4 chiffres")
+    if (pin.length !== 4) return alert(t('pin_setup.error_length'))
 
     setLoading(true)
     const { data, error } = await supabase
@@ -19,11 +21,11 @@ export default function PinSetup({ profileId, onComplete }) {
 
     if (error) {
       console.error("PIN Update Error:", error)
-      alert("Erreur: Impossible de sauvegarder le code PIN. Vérifiez votre connexion.")
+      alert(t('pin_setup.error_save'))
       setLoading(false)
     } else if (!data || data.length === 0) {
       console.error("PIN Update failed: No rows affected. RLS or missing linkage.")
-      alert("Erreur critique: Votre profil n'est pas correctement lié. Veuillez vous reconnecter.")
+      alert(t('pin_setup.error_critical'))
       setLoading(false)
     } else {
       console.log("PIN updated successfully for profile:", profileId)
@@ -43,8 +45,8 @@ export default function PinSetup({ profileId, onComplete }) {
         </div>
 
         <div>
-          <h2 className="text-2xl font-black uppercase tracking-tight">Code Secret Parent</h2>
-          <p className="text-slate-400 text-sm mt-2">Choisis un code à 4 chiffres pour sécuriser l'accès aux réglages.</p>
+          <h2 className="text-2xl font-black uppercase tracking-tight">{t('pin_setup.title')}</h2>
+          <p className="text-slate-400 text-sm mt-2">{t('pin_setup.description')}</p>
         </div>
 
         <input
@@ -61,7 +63,7 @@ export default function PinSetup({ profileId, onComplete }) {
           disabled={loading || pin.length !== 4}
           className="w-full bg-white text-slate-900 font-black uppercase py-4 rounded-2xl tracking-widest hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {loading ? "Enregistrement..." : <>Valider <Check size={20} /></>}
+          {loading ? "Enregistrement..." : <>{t('pin_setup.validate')} <Check size={20} /></>}
         </button>
       </motion.div>
     </div>

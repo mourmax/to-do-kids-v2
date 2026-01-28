@@ -5,6 +5,7 @@
         "login_subtitle": "A aventura começa aqui",
         "signup_title": "Criar uma conta",
         "signup_subtitle": "A aventura começa aqui",
+        "signup_button_submit": "Criar minha conta",
         "i_am_child": "Sou uma criança",
         "i_am_parent": "Sou um pai",
         "invite_code": "Código de convite",
@@ -55,5 +56,54 @@
     "errors": {
         "reset_failed": "Erro ao redefinir",
         "invalid_code": "Código inválido"
+    },
+    "pin_setup": {
+        "title": "Código Secreto dos Pais",
+        "description": "Escolha um código de 4 dígitos para proteger o acesso às configurações.",
+        "error_length": "O código deve ter 4 dígitos",
+        "error_save": "Erro: Não é possível salvar o código PIN. Verifique sua conexão.",
+        "error_critical": "Erro crítico: Seu perfil não está vinculado corretamente. Reconecte-se.",
+        "validate": "Validar"
+    },
+    "tutorial": {
+        "welcome_title": "Bem-vindo!",
+        "welcome_text": "Chega de lembretes inúteis,\ntempo para organização divertida para toda a família.",
+        "child_title": "Para a Criança",
+        "child_text": "Complete suas missões,\nmarque as caixas e veja seu progresso em direção à recompensa!",
+        "parent_title": "Para os Pais",
+        "parent_text": "Chega de repetir instruções!\nO aplicativo guia a criança, você só precisa parabenizar.",
+        "reward_title": "A Recompensa",
+        "reward_text": "Um objetivo claro, motivação forte.\nO motor ideal para sua autonomia!",
+        "start": "Vamos lá!"
+    },
+    "completion_modal": {
+        "title": "Configuração Concluída!",
+        "subtitle": "Tudo pronto! Siga os passos abaixo para conectar seus filhos.",
+        "step1_title": "No dispositivo do seu filho",
+        "step1_item1": "Abra o aplicativo",
+        "step1_item2": "Clique em",
+        "step1_item2_bold": "\"Sou uma criança\"",
+        "step1_item3": "Insira o",
+        "step1_item3_bold": "código de ativação",
+        "step1_item3_end": "da criança",
+        "step2_title": "Onde encontrar o código de ativação?",
+        "step2_text": "Vá para",
+        "step2_text_bold": "Definições → Crianças",
+        "step2_text_end": "para copiar o código único de cada criança.",
+        "button": "Ver códigos das crianças"
+    },
+    "onboarding": {
+        "missions_title": "Configurar Missões",
+        "missions_description": "Escolha missões da biblioteca de missões ou configure sua missão personalizada... Lembre-se de salvar!",
+        "identity_title": "Preparar Perfis",
+        "identity_description": "Insira o nome do seu filho e sua cor favorita.",
+        "challenge_title": "O Grande Desafio",
+        "challenge_description": "Escolha a duração do desafio, a recompensa e a penalidade... Lembre-se de salvar!",
+        "missions_configured": "Missões Configuradas!",
+        "missions_configured_subtitle": "Quase pronto... falta definir a recompensa do desafio!",
+        "next_step_challenge": "Próximo Passo: O Desafio",
+        "profile_configured": "Perfil Configurado!",
+        "profile_configured_subtitle": "Agora, vamos para as coisas sérias.",
+        "next_step_missions": "Próximo Passo: Missões"
     }
 }

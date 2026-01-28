@@ -1,36 +1,38 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, X, CheckCircle, Trophy, Shield } from 'lucide-react'
-
-const slides = [
-  {
-    title: "Bienvenue !",
-    text: "Fini les rappels inutiles,\nplace à l'organisation ludique pour toute la famille.",
-    icon: "🚀",
-    color: "bg-indigo-500"
-  },
-  {
-    title: "Pour l'Enfant",
-    text: "Réalise tes missions,\ncoche les cases et regarde ta progression vers ta récompense !",
-    icon: <CheckCircle size={80} strokeWidth={2.5} />,
-    color: "bg-emerald-500"
-  },
-  {
-    title: "Pour le Parent",
-    text: "Fini de répéter les consignes en boucle !\nL'app guide l'enfant, vous n'avez plus qu'à féliciter.",
-    icon: <Shield size={80} strokeWidth={2.5} />,
-    color: "bg-orange-500"
-  },
-  {
-    title: "La Récompense",
-    text: "Un objectif clair, une motivation forte.\nLe moteur idéal pour son autonomie !",
-    icon: <Trophy size={80} strokeWidth={2.5} />,
-    color: "bg-pink-500"
-  }
-]
+import { useTranslation } from 'react-i18next'
 
 export default function TutorialModal({ onClose }) {
+  const { t } = useTranslation()
   const [index, setIndex] = useState(0)
+
+  const slides = [
+    {
+      title: t('tutorial.welcome_title'),
+      text: t('tutorial.welcome_text'),
+      icon: "🚀",
+      color: "bg-indigo-500"
+    },
+    {
+      title: t('tutorial.child_title'),
+      text: t('tutorial.child_text'),
+      icon: <CheckCircle size={80} strokeWidth={2.5} />,
+      color: "bg-emerald-500"
+    },
+    {
+      title: t('tutorial.parent_title'),
+      text: t('tutorial.parent_text'),
+      icon: <Shield size={80} strokeWidth={2.5} />,
+      color: "bg-orange-500"
+    },
+    {
+      title: t('tutorial.reward_title'),
+      text: t('tutorial.reward_text'),
+      icon: <Trophy size={80} strokeWidth={2.5} />,
+      color: "bg-pink-500"
+    }
+  ]
 
   const nextSlide = () => {
     if (index < slides.length - 1) {
@@ -42,7 +44,7 @@ export default function TutorialModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-slate-900 border border-white/10 w-full max-w-sm rounded-[3rem] overflow-hidden shadow-2xl relative"
@@ -80,7 +82,7 @@ export default function TutorialModal({ onClose }) {
             <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter leading-none">
               {slides[index].title}
             </h3>
-            
+
             <p className="text-slate-200 text-xl font-medium leading-relaxed whitespace-pre-line px-2">
               {slides[index].text}
             </p>
@@ -89,19 +91,19 @@ export default function TutorialModal({ onClose }) {
           {/* Pagination plus visible */}
           <div className="flex justify-center gap-3">
             {slides.map((_, i) => (
-              <div 
-                key={i} 
-                className={`h-2 rounded-full transition-all duration-300 ${i === index ? 'bg-white w-8' : 'bg-white/20 w-2'}`} 
+              <div
+                key={i}
+                className={`h-2 rounded-full transition-all duration-300 ${i === index ? 'bg-white w-8' : 'bg-white/20 w-2'}`}
               />
             ))}
           </div>
 
           {/* Bouton Suivant plus imposant */}
-          <button 
+          <button
             onClick={nextSlide}
             className="w-full bg-white text-slate-900 py-5 rounded-2xl font-black uppercase text-lg tracking-widest hover:bg-slate-100 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-xl"
           >
-            {index === slides.length - 1 ? "C'est parti !" : "Suivant"}
+            {index === slides.length - 1 ? t('tutorial.start') : "Suivant"}
             {index < slides.length - 1 && <ChevronRight size={20} />}
           </button>
         </div>
