@@ -65,19 +65,24 @@ export function useFamily(userId, familyId = null) {
         famError = error
       }
 
-      if (famError) throw famError
+      if (famError) {
+        console.error("[useFamily] Final family check error:", famError)
+        throw new Error(`SQL_${famError.code || 'UNKNOWN'}: ${famError.message}`)
+      }
       if (!fam) {
-        setIsLoading(false)
-        return
+        console.warn("[useFamily] No family found after creation attempt")
+        throw new Error("Missing family")
       }
 
       setFamily(fam)
 
       // 2. Get Profiles for this family
-      let { data: profs } = await supabase
+      let { data: profs, error: profsFetchError } = await supabase
         .from('profiles')
         .select('*')
         .eq('family_id', fam.id)
+
+      if (profsFetchError) throw new Error(`SQL_PROFS_${profsFetchError.code}: ${profsFetchError.message}`)
 
       if (!profs || profs.length === 0) {
         console.log("Creating initial profiles for family:", fam.id)
@@ -100,12 +105,31 @@ export function useFamily(userId, familyId = null) {
 
         if (profError) {
           console.error("[useFamily] Critical error creating profiles:", profError)
-          throw profError
+          throw new Error(`SQL_CREATE_PROFS_${profError.code}: ${profError.message}`)
         }
         profs = newProfs || []
         console.log("[useFamily] Profiles created successfully")
 
-        // ... (rest of mission creation)
+        // Default Missions creation (keep as is but maybe wrap in try/catch if critical)
+        try {
+          const { data: existingMissions } = await supabase
+            .from('missions')
+            .select('id')
+            .eq('family_id', fam.id)
+            .limit(1)
+
+          if (!existingMissions || existingMissions.length === 0) {
+            console.log("Creating default missions...")
+            const defaultMissions = [
+              { title: "Faire ses devoirs", icon: "📚", family_id: fam.id, order_index: 1 },
+              { title: "Ranger sa chambre", icon: "🧸", family_id: fam.id, order_index: 2 },
+              { title: "Mettre la table", icon: "🍽️", family_id: fam.id, order_index: 3 }
+            ]
+            await supabase.from('missions').insert(defaultMissions)
+          }
+        } catch (mErr) {
+          console.warn("Default missions creation failed (non-critical):", mErr)
+        }
       }
       setProfiles(profs || [])
       console.log("[useFamily] All data loaded successfully for family:", fam.id)
@@ -220,7 +244,8 @@ export function useFamily(userId, familyId = null) {
       setFamilyMissions(curMissions || [])
 
     } catch (e) {
-      console.error("Erreur useFamily:", e)
+      console.error("Erreur useFamily (catch):", e)
+      setError(e.message || "Unknown error during data load")
     } finally {
       if (!isSilent) setIsLoading(false)
     }
@@ -245,6 +270,7 @@ export function useFamily(userId, familyId = null) {
     allMissions: familyMissions, // Unfiltered for management
     challenge,
     isLoading,
+    error,
     refresh: loadFamilyData,
     switchProfile
   }

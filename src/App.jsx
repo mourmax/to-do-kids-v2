@@ -251,7 +251,12 @@ export default function App() {
                 </div>
                 <h2 className="text-xl font-black uppercase text-white">Erreur de chargement</h2>
                 <p className="text-slate-400 text-sm max-w-xs uppercase tracking-widest leading-loose">
-                  {familyError === "Missing family" ? "Impossible de trouver votre famille." : "Un problème est survenu lors du chargement."}
+                  {familyError && (
+                    <span className="block text-[10px] text-rose-400/70 mb-2 font-mono">CODE: {familyError}</span>
+                  )}
+                  {familyError === "Missing family"
+                    ? "Impossible de créer votre espace famille. Vérifiez vos permissions SQL."
+                    : "Un problème est survenu lors de la récupération des données."}
                 </p>
                 <button onClick={() => loadFamilyData()} className="px-6 py-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all font-black uppercase text-[10px]">
                   Réessayer
