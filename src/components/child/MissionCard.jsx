@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // 1. On change "onClick" en "onToggle" dans les arguments
 export default function MissionCard({ mission, onToggle, disabled }) {
+  const { t } = useTranslation()
   const isDone = mission.is_completed
   const isParentValidated = mission.parent_validated && isDone
 
@@ -33,7 +35,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
             animate={{ scale: 1, rotate: 0 }}
             className="absolute top-3 right-3 z-40 bg-white text-orange-600 px-2 py-1 rounded-lg font-black text-[8px] tracking-widest shadow-xl flex items-center gap-1"
           >
-            <Check size={10} strokeWidth={4} /> VALIDÉ
+            <Check size={10} strokeWidth={4} /> {t('child.validated').toUpperCase()}
           </motion.div>
         )}
       </AnimatePresence>
@@ -57,13 +59,13 @@ export default function MissionCard({ mission, onToggle, disabled }) {
         >
           {isDone ? (
             <span className="flex items-center justify-center gap-1">
-              <Check size={10} strokeWidth={4} /> ANNULER
+              <Check size={10} strokeWidth={4} /> {t('actions.cancel').toUpperCase()}
             </span>
-          ) : "A FAIRE"}
+          ) : t('child.to_do').toUpperCase()}
         </button>
       ) : (
         <div className="w-full py-2.5 rounded-[1.5rem] bg-white text-orange-600 font-black uppercase text-[8px] tracking-widest text-center shadow-inner">
-          BRAVO !
+          {t('child.victory_title').toUpperCase()}
         </div>
       )}
     </motion.div>

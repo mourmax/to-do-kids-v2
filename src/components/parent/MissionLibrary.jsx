@@ -5,38 +5,38 @@ import { useTranslation } from 'react-i18next'
 const MISSION_CATALOG = [
     {
         category: 'hygiene', missions: [
-            { title: 'Se brosser les dents', icon: '🪥' },
-            { title: 'Prendre sa douche', icon: '🚿' },
-            { title: 'Se laver les mains', icon: '🧼' },
-            { title: 'Mettre son pyjama', icon: '🌙' },
-            { title: 'Se coiffer', icon: '🪮' },
-            { title: 'Préparer ses vêtements', icon: '👕' },
+            { title: 'missions.brush_teeth', icon: '🪥' },
+            { title: 'missions.take_shower', icon: '🚿' },
+            { title: 'missions.wash_hands', icon: '🧼' },
+            { title: 'missions.put_pajamas', icon: '🌙' },
+            { title: 'missions.comb_hair', icon: '🪮' },
+            { title: 'missions.prepare_clothes', icon: '👕' },
         ]
     },
     {
         category: 'house', missions: [
-            { title: 'Ranger ses jouets', icon: '🧸' },
-            { title: 'Faire son lit', icon: '🛏️' },
-            { title: 'Mettre la table', icon: '🍽️' },
-            { title: 'Débarrasser la table', icon: '🥣' },
-            { title: 'Aider à la cuisine', icon: '👨‍🍳' },
-            { title: 'Ranger ses chaussures', icon: '👟' },
+            { title: 'missions.tidy_toys', icon: '🧸' },
+            { title: 'missions.make_bed', icon: '🛏️' },
+            { title: 'missions.set_table', icon: '🍽️' },
+            { title: 'missions.clear_table', icon: '🥣' },
+            { title: 'missions.help_cooking', icon: '👨‍🍳' },
+            { title: 'missions.tidy_shoes', icon: '👟' },
         ]
     },
     {
         category: 'school', missions: [
-            { title: 'Faire ses devoirs', icon: '📚' },
-            { title: 'Préparer son sac', icon: '🎒' },
-            { title: 'Lire 15 minutes', icon: '📖' },
-            { title: 'Pratiquer un instrument', icon: '🎸' },
-            { title: 'Dessiner / Créer', icon: '🎨' },
+            { title: 'missions.do_homework', icon: '📚' },
+            { title: 'missions.prepare_bag', icon: '🎒' },
+            { title: 'missions.read_15min', icon: '📖' },
+            { title: 'missions.practice_instrument', icon: '🎸' },
+            { title: 'missions.draw_create', icon: '🎨' },
         ]
     },
     {
         category: 'behavior', missions: [
-            { title: 'Être poli(e)', icon: '🙏' },
-            { title: 'Partager ses jeux', icon: '🤝' },
-            { title: 'Dire merci / s\'il vous plaît', icon: '✨' },
+            { title: 'missions.be_polite', icon: '🙏' },
+            { title: 'missions.share_toys', icon: '🤝' },
+            { title: 'missions.say_thanks', icon: '✨' },
         ]
     }
 ]
@@ -97,7 +97,7 @@ export default function MissionLibrary({ onClose, onSelect, currentCount }) {
                                             {mission.icon}
                                         </span>
                                         <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors text-left leading-tight">
-                                            {mission.title}
+                                            {t(mission.title)}
                                         </span>
                                     </button>
                                 ))}
