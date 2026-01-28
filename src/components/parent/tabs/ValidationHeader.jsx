@@ -1,9 +1,9 @@
 import { Trophy, RefreshCw, ListChecks, Clock, Gift, Skull, AlertCircle, Edit2 } from 'lucide-react'
 
 export default function ValidationHeader({ isChallengeFinished, allMissionsDone, challenge, missionsCount, onStartNewChallenge, onDayResult, onEditSettings }) {
-  
+
   // Petit composant interne pour les lignes du récap
-  const RecapItem = ({ icon: Icon, label, value }) => (
+  const RecapItem = ({ icon: Icon, label, value, onClick }) => (
     <div className="flex items-center justify-between bg-black/20 p-3 rounded-xl border border-white/5">
       <div className="flex items-center gap-3">
         <Icon size={16} className="text-white/60" />
@@ -12,13 +12,13 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
           <p className="text-sm font-bold text-white">{value}</p>
         </div>
       </div>
-      <button onClick={onEditSettings} className="bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-colors text-white"><Edit2 size={12} /></button>
+      <button onClick={onClick} className="bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-colors text-white"><Edit2 size={12} /></button>
     </div>
   )
 
   return (
     <section className={`rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden transition-all duration-500 ${isChallengeFinished ? 'bg-gradient-to-br from-orange-500 to-red-600' : allMissionsDone ? 'bg-indigo-600' : 'bg-slate-900 border border-white/5'}`}>
-      
+
       {isChallengeFinished ? (
         // --- UI FIN DE SÉRIE ---
         <div className="relative z-10 flex flex-col gap-6">
@@ -31,13 +31,13 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
           </div>
 
           <div className="space-y-2 bg-black/10 p-4 rounded-3xl border border-white/10">
-            <RecapItem icon={ListChecks} label="Missions" value={`${missionsCount} actives`} />
-            <RecapItem icon={Clock} label="Durée" value={`${challenge?.duration_days} Jours`} />
-            <RecapItem icon={Gift} label="Récompense" value={challenge?.reward_name} />
-            <RecapItem icon={Skull} label="Malus" value={challenge?.malus_message} />
+            <RecapItem icon={ListChecks} label="Missions" value={`${missionsCount} actives`} onClick={() => onEditSettings('missions')} />
+            <RecapItem icon={Clock} label="Durée" value={`${challenge?.duration_days} Jours`} onClick={() => onEditSettings('challenge')} />
+            <RecapItem icon={Gift} label="Récompense" value={challenge?.reward_name} onClick={() => onEditSettings('challenge')} />
+            <RecapItem icon={Skull} label="Malus" value={challenge?.malus_message} onClick={() => onEditSettings('challenge')} />
           </div>
-          
-          <button 
+
+          <button
             onClick={onStartNewChallenge}
             className="w-full bg-white text-orange-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 hover:bg-orange-50 active:scale-95 transition-all"
           >

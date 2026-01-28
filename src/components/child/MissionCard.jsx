@@ -2,18 +2,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, Check } from 'lucide-react'
 
 // 1. On change "onClick" en "onToggle" dans les arguments
-export default function MissionCard({ mission, onToggle }) {
+export default function MissionCard({ mission, onToggle, disabled }) {
   const isDone = mission.is_completed
-  const isParentValidated = mission.parent_validated
+  const isParentValidated = mission.parent_validated && isDone
 
   return (
     <motion.div
       layout
       className={`relative overflow-hidden p-4 aspect-square rounded-[2.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-between ${isParentValidated
-          ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_0_30px_rgba(251,191,36,0.3)]'
-          : isDone
-            ? 'bg-emerald-600 border-emerald-500'
-            : 'bg-slate-900 border-white/5 shadow-xl shadow-black/20'
+        ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_0_30px_rgba(251,191,36,0.3)]'
+        : isDone
+          ? 'bg-emerald-600 border-emerald-500'
+          : 'bg-slate-900 border-white/5 shadow-xl shadow-black/20'
         }`}
     >
       <AnimatePresence>
@@ -49,10 +49,10 @@ export default function MissionCard({ mission, onToggle }) {
 
       {!isParentValidated ? (
         <button
-          onClick={() => onToggle(mission.id, isDone)}
+          onClick={() => !disabled && onToggle(mission.id, isDone)}
           className={`w-full py-2.5 rounded-[1.5rem] font-black uppercase text-[8px] tracking-[0.1em] transition-all z-30 ${isDone
-              ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
-              : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1'
+            ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
+            : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1'
             }`}
         >
           {isDone ? (

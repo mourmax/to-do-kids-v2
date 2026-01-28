@@ -1,15 +1,101 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ClipboardCheck, Sliders } from 'lucide-react'
 import ValidationTab from './tabs/ValidationTab'
 import SettingsTab from './tabs/SettingsTab'
+import NotificationBanner from '../ui/NotificationBanner'
+import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
 export default function ParentDashboard({ family, profile, profiles, challenge, missions, allMissions, onExit, refresh, onSwitchProfile }) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState('settings') // Default to settings as requested for onboarding
+  const [activeTab, setActiveTab] = useState('validation')
+  const [activeSubTab, setActiveSubTab] = useState('missions')
+  const [notifications, setNotifications] = useState([])
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
+
+  // ECOUTEUR TEMPS RÉEL (DEMANDES DE VALIDATION)
+  useEffect(() => {
+    if (!family?.id) return
+
+    // Charger l'état initial des notifications
+    const checkPendingValidations = async () => {
+      const today = new Date().toISOString().split('T')[0]
+      const { data } = await supabase
+        .from('daily_logs')
+        .select('profile_id, validation_requested, validation_result')
+        .eq('date', today)
+        .eq('validation_requested', true)
+        .is('validation_result', null)
+
+      if (data && data.length > 0) {
+        // Regrouper par enfant unique
+        const uniqueIds = [...new Set(data.map(d => d.profile_id))]
+        const newNotifs = uniqueIds.map(id => {
+          const child = childProfiles.find(p => p.id === id)
+          return child ? { profile_id: id, child_name: child.child_name } : null
+        }).filter(Boolean)
+        setNotifications(newNotifs)
+      } else {
+        setNotifications([])
+      }
+    }
+
+    checkPendingValidations()
+
+    // Abonnement aux changements
+    const channel = supabase
+      .channel(`parent-sync-${family.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen for all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'daily_logs',
+        },
+        async (payload) => {
+          const childId = payload.new?.profile_id || payload.old?.profile_id
+          const child = childProfiles.find(p => p.id === childId)
+          if (!child) return
+
+          // 🔄 Refresh global pour mettre à jour la liste des missions
+          refresh(true)
+
+          // Gestion des notifications (seulement sur UPDATE pour le point d'exclamation)
+          if (payload.eventType === 'UPDATE') {
+            // Si validation_requested devient TRUE et result est NULL
+            if (payload.new.validation_requested && !payload.new.validation_result) {
+              setNotifications(prev => {
+                if (prev.find(n => n.profile_id === child.id)) return prev
+                return [...prev, { profile_id: child.id, child_name: child.child_name }]
+              })
+            }
+            // Si validation_result passe à quelque chose (success/failure), on retire la notif
+            if (payload.new.validation_result) {
+              setNotifications(prev => prev.filter(n => n.profile_id !== child.id))
+            }
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'challenges',
+          filter: challenge?.id ? `id=eq.${challenge.id}` : undefined
+        },
+        () => {
+          refresh(true)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [family?.id, childProfiles]) // Attention aux dépendances, childProfiles doit être stable
 
   // Helper for colors
   const getColorClasses = (colorName) => {
@@ -41,6 +127,16 @@ export default function ParentDashboard({ family, profile, profiles, challenge, 
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-900/10 rounded-full blur-[120px]" />
       </div>
+
+      <NotificationBanner
+        notifications={notifications}
+        onSelect={(childId) => {
+          onSwitchProfile(childId)
+          setActiveTab('validation')
+          // Retirer la notif localement pour feedback immédiat
+          setNotifications(prev => prev.filter(n => n.profile_id !== childId))
+        }}
+      />
 
       <header className="space-y-6">
         <div className="flex flex-col items-center justify-center text-center">
@@ -127,7 +223,10 @@ export default function ParentDashboard({ family, profile, profiles, challenge, 
                 childName={profile?.child_name}
                 refresh={refresh}
                 onExit={onExit}
-                onEditSettings={() => setActiveTab('settings')}
+                onEditSettings={(target) => {
+                  setActiveTab('settings')
+                  if (target) setActiveSubTab(target)
+                }}
               />
             </motion.div>
           ) : (
@@ -145,6 +244,8 @@ export default function ParentDashboard({ family, profile, profiles, challenge, 
                 challenge={challenge}
                 missions={allMissions}
                 refresh={refresh}
+                activeSubMenu={activeSubTab}
+                onSubMenuChange={setActiveSubTab}
               />
             </motion.div>
           )}

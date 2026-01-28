@@ -191,7 +191,9 @@ export function useFamily(userId, familyId = null) {
         return {
           ...m,
           is_completed: log?.child_validated || false,
-          parent_validated: log?.parent_validated || false
+          parent_validated: log?.parent_validated || false,
+          validation_requested: log?.validation_requested || false,
+          validation_result: log?.validation_result || null
         }
       })
       setMissions(mergedMissions)

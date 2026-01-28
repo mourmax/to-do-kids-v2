@@ -22,7 +22,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
   const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed && m.parent_validated)
   const childFinishedAll = missions.length > 0 && missions.every(m => m.is_completed) && !allMissionsDone
-  const isChallengeFinished = !showVictoryAnimation && (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
+  const isChallengeFinished = challenge?.is_active === false && (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
 
   // Helper for colors
   const getColorClasses = (colorName) => {
@@ -75,26 +75,31 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   const handleSuccess = async () => {
     if (!challenge?.id) return
     if (!allMissionsDone) {
-      // 🚨 REMPLACEMENT ALERT
       showToast(t('actions.validate_all'), "error")
       return
     }
     const newStreak = (challenge.current_streak || 0) + 1
     await supabase.from('challenges').update({ current_streak: newStreak }).eq('id', challenge.id)
 
+    const today = new Date().toISOString().split('T')[0]
+    const missionIds = missions.map(m => m.id)
+
+    // ✅ SUCCESS: On met à jour le résultat pour notifier l'enfant en temps réel
+    const { error: logError } = await supabase.from('daily_logs').update({
+      validation_result: 'success',
+      child_validated: false, // 🔄 Reset pour la "journée suivante" ou le prochain cycle
+      parent_validated: false, // 🔄 Reset pour la "journée suivante"
+      validation_requested: false // 🔄 On libère la demande
+    })
+      .eq('profile_id', profile.id)
+      .eq('date', today)
+
+    if (logError) console.error("Error updating logs on success:", logError)
+
     if (newStreak >= (challenge?.duration_days || 1)) {
       setShowVictoryAnimation(true)
     } else {
-      const today = new Date().toISOString().split('T')[0]
-      const missionIds = missions.map(m => m.id)
-      if (missionIds.length > 0) {
-        // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
-        await supabase.from('daily_logs').delete()
-          .in('mission_id', missionIds)
-          .eq('profile_id', profile.id)
-          .eq('date', today)
-      }
-      showToast(t('dashboard.day_validated')) // ✅ REMPLACEMENT ALERT
+      showToast(t('dashboard.day_validated'))
       refresh(true)
     }
   }
@@ -102,31 +107,34 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   const confirmFailure = async () => {
     setShowFailureModal(false)
     const today = new Date().toISOString().split('T')[0]
-    await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
-    const missionIds = missions.map(m => m.id)
-    if (missionIds.length > 0) {
-      // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
-      await supabase.from('daily_logs').delete()
-        .in('mission_id', missionIds)
-        .eq('profile_id', profile.id)
-        .eq('date', today)
+
+    const { error: challError } = await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
+    if (challError) console.error("Error resetting streak:", challError)
+
+    // ❌ FAILURE: On supprime les logs du jour pour remettre Marie à zéro ("À faire")
+    const { error: logError } = await supabase.from('daily_logs').delete()
+      .eq('profile_id', profile.id)
+      .eq('date', today)
+
+    if (logError) {
+      console.error("Error deleting logs on failure:", logError)
+      showToast("Erreur de suppression", "error")
+    } else {
+      showToast(t('dashboard.counter_reset'))
     }
-    showToast(t('dashboard.counter_reset')) // ✅ REMPLACEMENT ALERT
-    refresh(true)
+
+    await refresh(true)
   }
 
   const handleCloseVictoryModal = async () => {
     setShowVictoryAnimation(false)
-    const today = new Date().toISOString().split('T')[0]
-    const missionIds = missions.map(m => m.id)
-    if (missionIds.length > 0) {
-      // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
-      await supabase.from('daily_logs').delete()
-        .in('mission_id', missionIds)
-        .eq('profile_id', profile.id)
-        .eq('date', today)
+    // Après la victoire, on passe en mode "en attente de re-programmation"
+    if (challenge?.id) {
+      await supabase.from('challenges').update({ is_active: false }).eq('id', challenge.id)
     }
     refresh(true)
+    // Rediriger vers l'onglet réglages (Bilan)
+    onEditSettings()
   }
 
   const handleStartNewChallenge = async () => {
@@ -135,7 +143,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
       const missionIds = missions.map(m => m.id)
       if (missionIds.length > 0) {
-        // 🛠️ CRUCIAL: Supprimer uniquement les logs de cet enfant
+        // �️ RESET: Là seulement on supprime pour repartir à zéro
         await supabase.from('daily_logs').delete()
           .in('mission_id', missionIds)
           .eq('profile_id', profile.id)
@@ -145,7 +153,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       onExit()
     } catch (error) {
       console.error("Erreur reset:", error)
-      showToast(t('errors.reset_failed'), "error") // ✅ REMPLACEMENT ALERT ERREUR
+      showToast(t('errors.reset_failed'), "error")
     }
   }
 
@@ -186,7 +194,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
         missionsCount={missions.length}
         onStartNewChallenge={handleStartNewChallenge}
         onDayResult={handleDayResultClick}
-        onEditSettings={onEditSettings}
+        onEditSettings={(target) => onEditSettings(target)}
       />
 
       {/* 2. Liste des Missions */}

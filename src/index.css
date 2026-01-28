@@ -1,12 +1,52 @@
 @import "tailwindcss";
 
+@theme {
+  --color-app-bg: var(--app-bg);
+  --color-app-card: var(--app-card);
+  --color-app-text: var(--app-text);
+  --color-app-text-muted: var(--app-text-muted);
+  --color-app-border: var(--app-border);
+}
+
 :root {
-  background-color: #020617;
+  /* Default: Light Theme */
+  --app-bg: #f8fafc; /* slate-50 */
+  --app-card: #ffffff;
+  --app-text: #0f172a; /* slate-900 */
+  --app-text-muted: #64748b; /* slate-500 */
+  --app-border: rgba(15, 23, 42, 0.08);
+  
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  color-scheme: light;
+}
+
+/* Dark Theme (Current Default Behavior) */
+.dark-theme {
+  --app-bg: #020617; /* current slate-950/indigo-950 */
+  --app-card: #0f172a; /* slate-900 */
+  --app-text: #f8fafc;
+  --app-text-muted: #94a3b8; /* slate-400 */
+  --app-border: rgba(255, 255, 255, 0.08);
+
+  background-color: var(--app-bg);
+  color: var(--app-text);
   color-scheme: dark;
 }
 
+/* Fix for existing hardcoded dark backgrounds in components */
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Custom Utilities to replace hardcoded colors if needed */
+.bg-app-bg { background-color: var(--app-bg); }
+.bg-app-card { background-color: var(--app-card); }
+.text-app-main { color: var(--app-text); }
+.text-app-muted { color: var(--app-text-muted); }
+.border-app { border-color: var(--app-border); }

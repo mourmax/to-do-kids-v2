@@ -25,6 +25,7 @@
         "good_job": "Super boulot aujourd'hui !",
         "request_validation": "Demander validation",
         "day_validated": "Journée validée ! 🎉",
+        "day_validated_success": "Tes missions ont été validées bravo !",
         "counter_reset": "Compteur remis à zéro",
         "parent_exit": "Mode Enfant",
         "switch_child": "Changer d'enfant"

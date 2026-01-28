@@ -8,7 +8,7 @@ import ParentDashboard from './components/parent/ParentDashboard'
 import ParentPinModal from './components/ui/ParentPinModal'
 import PinSetup from './components/ui/PinSetup'
 import TutorialModal from './components/ui/TutorialModal'
-import { Baby, Lock, HelpCircle, LogOut, Sliders } from 'lucide-react'
+import { Baby, Lock, HelpCircle, LogOut, Sliders, Sun, Moon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import RoleSelection from './components/auth/RoleSelection'
@@ -124,7 +124,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30">
+      <div className={`min-h-screen transition-colors duration-300 ${activeProfile?.preferred_theme === 'light' ? 'light-theme' : 'dark-theme'} ${activeProfile?.preferred_theme === 'light' ? 'bg-slate-50 text-slate-900' : 'bg-[#020617] text-slate-100'} font-sans selection:bg-indigo-500/30`}>
 
         {/* Tuto Modal (s'affiche par dessus tout) */}
         <AnimatePresence>
@@ -144,6 +144,22 @@ export default function App() {
 
           {/* Actions à droite */}
           <div className="flex items-center gap-3">
+
+            {/* Theme Toggle */}
+            <button
+              onClick={async () => {
+                const newTheme = activeProfile?.preferred_theme === 'light' ? 'dark' : 'light'
+                const { error } = await supabase
+                  .from('profiles')
+                  .update({ preferred_theme: newTheme })
+                  .eq('id', activeProfile.id)
+                if (!error) refresh()
+              }}
+              className="bg-slate-900 border border-white/10 p-2 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg shadow-black/20"
+              title="Changer de thème"
+            >
+              {activeProfile?.preferred_theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
 
             {/* Toggle Parent/Child (Uniquement si Parent Loggé) */}
             {session && (

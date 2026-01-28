@@ -3,19 +3,19 @@ import { motion } from 'framer-motion'
 import { Trophy, Sparkles } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
-export default function ParentVictoryModal({ childName, rewardName, onClose }) {
-  
+export default function ParentVictoryModal({ childName, rewardName, onClose, isParent = true, isReady = false }) {
+
   // Explosion de confettis "Premium" à l'ouverture
   useEffect(() => {
     const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 60 };
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 110 }; // Augmenté zIndex pour passer au dessus de la modale
 
     function randomInRange(min, max) {
       return Math.random() * (max - min) + min;
     }
 
-    const interval = setInterval(function() {
+    const interval = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -31,9 +31,15 @@ export default function ParentVictoryModal({ childName, rewardName, onClose }) {
     return () => clearInterval(interval);
   }, [])
 
+  const getButtonText = () => {
+    if (isParent) return "Continuer vers le bilan"
+    if (isReady) return `Débuter le nouveau challenge ${childName}`
+    return "Bravo ! En attente du prochain défi..."
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#020617]/95 backdrop-blur-md">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.5, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.8, opacity: 0 }}
@@ -42,12 +48,12 @@ export default function ParentVictoryModal({ childName, rewardName, onClose }) {
       >
         {/* Rayons de lumière en arrière-plan */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-            <div className="w-[200%] h-[200%] bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent rotate-45 animate-[spin_10s_linear_infinite]" />
+          <div className="w-[200%] h-[200%] bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent rotate-45 animate-[spin_10s_linear_infinite]" />
         </div>
-        
+
         <div className="relative z-10 flex flex-col items-center gap-6">
           {/* Icône Trophée animée */}
-          <motion.div 
+          <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: "spring" }}
@@ -58,7 +64,7 @@ export default function ParentVictoryModal({ childName, rewardName, onClose }) {
           </motion.div>
 
           <div className="space-y-2">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -66,17 +72,17 @@ export default function ParentVictoryModal({ childName, rewardName, onClose }) {
             >
               Incroyable !
             </motion.h2>
-            <motion.p 
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               transition={{ delay: 0.6 }}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
               className="text-indigo-200 text-sm font-bold uppercase tracking-widest leading-relaxed"
             >
               Bravo {childName}, tu as réussi le challenge !
             </motion.p>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -86,14 +92,14 @@ export default function ParentVictoryModal({ childName, rewardName, onClose }) {
             <p className="text-2xl font-black text-white uppercase italic text-shadow">{rewardName}</p>
           </motion.div>
 
-          <motion.button 
+          <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1 }}
             onClick={onClose}
             className="w-full bg-white text-indigo-950 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all shadow-lg shadow-white/20 active:scale-95"
           >
-            Continuer vers le bilan
+            {getButtonText()}
           </motion.button>
         </div>
       </motion.div>

@@ -36,7 +36,9 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh }) 
       const { data, error, status } = await supabase.from('challenges').update({
         reward_name: rewardName.trim(),
         duration_days: finalLength,
-        malus_message: malusMessage.trim()
+        malus_message: malusMessage.trim(),
+        is_active: true,
+        current_streak: challenge.current_streak >= challenge.duration_days ? 0 : challenge.current_streak
       }).eq('id', challenge.id).select()
 
       if (error) throw error

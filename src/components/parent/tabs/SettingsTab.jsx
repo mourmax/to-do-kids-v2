@@ -11,10 +11,14 @@ import FamilySection from '../settings/FamilySection'
 import ChallengeSection from '../settings/ChallengeSection'
 import MissionsSection from '../settings/MissionsSection'
 
-export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh }) {
+export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, activeSubMenu: propSubMenu, onSubMenuChange }) {
   const { t } = useTranslation()
   const [toastMessage, setToastMessage] = useState(null)
-  const [activeSubMenu, setActiveSubMenu] = useState('children') // Default to children
+
+  // Si on a des props contrôlées, on les utilise, sinon on reste en local
+  const [localSubMenu, setLocalSubMenu] = useState('missions')
+  const activeSubMenu = propSubMenu || localSubMenu
+  const setActiveSubMenu = onSubMenuChange || setLocalSubMenu
 
   const showSuccess = (msg) => {
     setToastMessage(msg)
@@ -22,9 +26,9 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
   }
 
   const subTabs = [
-    { id: 'children', label: "Enfants", icon: <Users size={16} /> },
     { id: 'missions', label: "Missions", icon: <Sparkles size={16} /> },
     { id: 'challenge', label: "Défi", icon: <Trophy size={16} /> },
+    { id: 'children', label: "Enfants", icon: <Users size={16} /> },
   ]
 
   return (
@@ -41,8 +45,8 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               key={tab.id}
               onClick={() => setActiveSubMenu(tab.id)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ${activeSubMenu === tab.id
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                  : 'text-slate-500 hover:text-white hover:bg-white/5'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                : 'text-slate-500 hover:text-white hover:bg-white/5'
                 }`}
             >
               <span className={`${activeSubMenu === tab.id ? 'opacity-100' : 'opacity-60'}`}>{tab.icon}</span>
