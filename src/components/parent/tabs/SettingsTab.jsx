@@ -11,14 +11,22 @@ import FamilySection from '../settings/FamilySection'
 import ChallengeSection from '../settings/ChallengeSection'
 import MissionsSection from '../settings/MissionsSection'
 
-export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser }) {
+export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange }) {
   const { t } = useTranslation()
   const [toastMessage, setToastMessage] = useState(null)
 
   // Si on a des props contrôlées, on les utilise, sinon on reste en local
-  const [localSubMenu, setLocalSubMenu] = useState('missions')
+  const [localSubMenu, setLocalSubMenu] = useState('children')
   const activeSubMenu = propSubMenu || localSubMenu
   const setActiveSubMenu = onSubMenuChange || setLocalSubMenu
+
+  const handleNextStep = (step) => {
+    if (step === 'done') {
+      if (onTabChange) onTabChange('validation')
+    } else {
+      setActiveSubMenu(step)
+    }
+  }
 
   const showSuccess = (msg) => {
     setToastMessage(msg)
@@ -73,7 +81,9 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                 profiles={profiles}
                 onShowSuccess={showSuccess}
                 refresh={refresh}
+                updateProfile={updateProfile}
                 isNewUser={isNewUser}
+                onNextStep={handleNextStep}
               />
               <FamilySection family={family} />
               <SecuritySection profile={profile} onShowSuccess={showSuccess} />
@@ -89,6 +99,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
+              onNextStep={handleNextStep}
             />
           )}
 
@@ -98,6 +109,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
+              onNextStep={handleNextStep}
             />
           )}
         </motion.div>

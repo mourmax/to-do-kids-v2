@@ -5,18 +5,18 @@ import SectionCard from './SectionCard'
 import { useTranslation } from 'react-i18next'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 
-export default function ChallengeSection({ challenge, onShowSuccess, refresh }) {
+export default function ChallengeSection({ challenge, onShowSuccess, refresh, isNewUser, onNextStep }) {
   const { t } = useTranslation()
   const [rewardName, setRewardName] = useState('')
   const [seriesLength, setSeriesLength] = useState(3)
   const [malusMessage, setMalusMessage] = useState('')
-
   const [isSaving, setIsSaving] = useState(false)
 
-  const isOnboarding = challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === "Cadeau Surprise")
+  // Show onboarding if streak is 0 and no reward set
+  const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === "Cadeau Surprise"))
 
   useEffect(() => {
-    if (challenge && !isSaving) { // Don't reset states while saving or if we just saved
+    if (challenge && !isSaving) {
       setRewardName(challenge.reward_name || '')
       setSeriesLength(challenge.duration_days || 7)
       setMalusMessage(challenge.malus_message || '')
@@ -25,18 +25,11 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh }) 
 
   const saveChallengeSettings = async () => {
     if (!challenge?.id || isSaving) return
-
     setIsSaving(true)
     const finalLength = Math.max(1, parseInt(seriesLength) || 7)
 
     try {
-      console.log(`[Challenge] Attempting update for ID: ${challenge.id}`, {
-        reward_name: rewardName.trim(),
-        duration_days: finalLength,
-        malus_message: malusMessage.trim()
-      })
-
-      const { data, error, status } = await supabase.from('challenges').update({
+      const { data, error } = await supabase.from('challenges').update({
         reward_name: rewardName.trim(),
         duration_days: finalLength,
         malus_message: malusMessage.trim(),
@@ -45,27 +38,21 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh }) 
       }).eq('id', challenge.id).select()
 
       if (error) throw error
-
-      console.log(`[Challenge] Update successful (Status: ${status}). Data:`, data)
       onShowSuccess(t('actions.save_success'))
-
       refresh(true)
-      setTimeout(() => {
-        setIsSaving(false)
-        console.log("[Challenge] Saving state reset.")
-      }, 1000) // Increased timeout for DB propagation safety
+      setTimeout(() => setIsSaving(false), 1000)
     } catch (error) {
-      console.error("[Challenge] Update failed:", error)
-      onShowSuccess("Erreur : " + (error.message || "Problème de connexion"))
+      console.error("Update failed:", error)
+      onShowSuccess("Erreur : " + (error.message || "Problème"))
       setIsSaving(false)
     }
   }
 
   return (
     <div className="space-y-6">
-      {isOnboarding && (
+      {showOnboarding && (
         <OnboardingInfoBlock
-          step={5}
+          step={null} // Remove step number
           title="Le Grand Défi"
           description="Choisissez la durée du challenge, la récompense et le malus... Pensez à sauvegarder !"
           icon={Trophy}
@@ -110,6 +97,29 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh }) 
           </button>
         </div>
       </SectionCard>
+
+      {/* Finish Setup Button for Onboarding */}
+      {isNewUser && challenge?.reward_name && challenge?.reward_name !== "Cadeau Surprise" && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-orange-600/10 border border-orange-500/20 p-6 rounded-[2.5rem] flex flex-col items-center gap-4 text-center mt-8"
+        >
+          <div className="bg-orange-500 p-2 rounded-full text-white shadow-lg shadow-orange-500/20">
+            <Check size={20} />
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-sm font-black uppercase text-orange-400 tracking-widest">Configuration Terminée !</h4>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest">Tout est prêt. Vos enfants peuvent commencer à remplir leurs missions !</p>
+          </div>
+          <button
+            onClick={() => onNextStep('done')}
+            className="bg-orange-500 hover:bg-orange-400 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-orange-500/10 transition-all active:scale-95"
+          >
+            Aller au tableau de bord
+          </button>
+        </motion.div>
+      )}
     </div>
   )
 }

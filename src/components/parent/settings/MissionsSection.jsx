@@ -92,7 +92,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
   )
 }
 
-export default function MissionsSection({ missions, profiles, familyId, onShowSuccess, refresh }) {
+export default function MissionsSection({ missions, profiles, familyId, onShowSuccess, refresh, isNewUser, onNextStep }) {
   const { t } = useTranslation()
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
 
@@ -179,13 +179,14 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     return maps[colorName] || maps.violet
   }
 
-  const isOnboarding = missions.length <= 3
+  // Show onboarding if few missions exist
+  const showOnboarding = isNewUser || missions.length <= 3
 
   return (
     <div className="space-y-6">
-      {isOnboarding && (
+      {showOnboarding && (
         <OnboardingInfoBlock
-          step={4}
+          step={null} // Remove step number
           title="Configurez les missions"
           description="Choisissez des missions dans la bibliothèque de missions ou configurez votre mission sur mesure... Pensez à sauvegarder !"
           icon={Library}
@@ -361,6 +362,29 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
               ))
             )}
           </div >
+
+          {/* Next Step Button for Onboarding */}
+          {isNewUser && missions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-indigo-600/10 border border-indigo-500/20 p-6 rounded-[2.5rem] flex flex-col items-center gap-4 text-center mt-8"
+            >
+              <div className="bg-indigo-500 p-2 rounded-full text-white shadow-lg shadow-indigo-600/20">
+                <Check size={20} />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-black uppercase text-indigo-400 tracking-widest">Missions configurées !</h4>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest">Presque fini... Il reste à définir la récompense du défi !</p>
+              </div>
+              <button
+                onClick={() => onNextStep('challenge')}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95"
+              >
+                Étape suivante : Le Défi
+              </button>
+            </motion.div>
+          )}
         </div >
       </section >
     </div>

@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next'
 import SectionCard from './SectionCard'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 
-export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh }) {
+export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh, updateProfile, isNewUser, onNextStep }) {
   const { t } = useTranslation()
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
-
   const [updatingId, setUpdatingId] = useState(null)
 
   const COLORS = [
@@ -24,15 +23,14 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   const handleUpdateProfile = async (id, updates) => {
     try {
       setUpdatingId(id)
-      const { error } = await supabase.from('profiles').update(updates).eq('id', id)
-      if (error) throw error
+      // Use the injected updateProfile for optimistic UI + DB persistence
+      await updateProfile(id, updates)
 
       setEditingId(null)
       onShowSuccess(t('actions.save_success'))
-      refresh(true)
     } catch (err) {
       console.error("Error updating profile:", err)
-      onShowSuccess("Erreur de mise à jour (Vérifiez la DB)")
+      onShowSuccess("Erreur de mise à jour")
     } finally {
       setUpdatingId(null)
     }
@@ -43,15 +41,13 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
     try {
       setIsAdding(true)
       const childProfiles = profiles?.filter(p => !p.is_parent) || []
-      if (childProfiles.length >= 5) { // Expanded limit or handled by paywall later
-        onShowSuccess("Limite de profil atteinte (Premium requis)")
+      if (childProfiles.length >= 5) {
+        onShowSuccess("Limite de profil atteinte")
         return
       }
 
-      // 1. Validate familyId
       if (!familyId) {
-        console.error("Missing familyId in IdentitySection. profiles length:", profiles?.length)
-        onShowSuccess("Erreur : Famille non identifiée. Reconnectez-vous.")
+        onShowSuccess("Erreur : Famille non identifiée")
         return
       }
       const newInviteCode = Math.random().toString(36).substring(2, 8).toUpperCase()
@@ -70,7 +66,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
 
       if (error) {
         console.error("Error adding child:", error)
-        onShowSuccess(`Erreur : ${error.message || "vérifiez la console"}`)
+        onShowSuccess(`Erreur : ${error.message}`)
       } else {
         onShowSuccess("Enfant ajouté !")
         refresh(true)
@@ -83,13 +79,14 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   }
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
-  const isOnboarding = childProfiles.length === 1 && childProfiles[0].child_name === "Mon enfant"
+  // Show onboarding block if isNewUser is true OR if there's still a "Mon enfant" profile
+  const showOnboarding = isNewUser || childProfiles.some(p => p.child_name === "Mon enfant")
 
   return (
     <div className="space-y-6">
-      {isOnboarding && (
+      {showOnboarding && (
         <OnboardingInfoBlock
-          step={3}
+          step={null} // Remove step number
           title="Préparez les profils"
           description="Indiquez le prénom de votre enfant et sa couleur... Pensez à sauvegarder !"
           icon={User}
@@ -211,6 +208,29 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
           </button>
         </div>
       </SectionCard>
+
+      {/* Next Step Button for Onboarding */}
+      {isNewUser && childProfiles.length > 0 && !childProfiles.some(p => p.child_name === "Mon enfant") && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-emerald-600/10 border border-emerald-500/20 p-6 rounded-[2.5rem] flex flex-col items-center gap-4 text-center mt-8"
+        >
+          <div className="bg-emerald-500 p-2 rounded-full text-white shadow-lg shadow-emerald-500/20">
+            <Check size={20} />
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-sm font-black uppercase text-emerald-400 tracking-widest">Profil configuré !</h4>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest">Maintenant, passons aux choses sérieuses.</p>
+          </div>
+          <button
+            onClick={() => onNextStep('missions')}
+            className="bg-emerald-500 hover:bg-emerald-400 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/10 transition-all active:scale-95"
+          >
+            Étape suivante : Les missions
+          </button>
+        </motion.div>
+      )}
     </div>
   )
 }

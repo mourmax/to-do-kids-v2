@@ -49,7 +49,7 @@ export default function App() {
   }, [])
 
   // 2. Data loading (Call this BEFORE using its values)
-  const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, error: familyError, refresh: loadFamilyData, switchProfile } = useFamily(
+  const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, error: familyError, refresh: loadFamilyData, switchProfile, updateProfile } = useFamily(
     session?.user?.id,
     childFamilyId
   )
@@ -68,17 +68,19 @@ export default function App() {
 
   // 3. Derived states for onboarding (Safe to use profiles here)
   const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
-  const needsTutorial = !hasSeenTuto
   const parentProfile = profiles?.find(p => p.is_parent)
   const needsPinSetup = parentProfile && !pinSuccessfullySet && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
 
+  // Tutorial should show if not seen and PIN setup is NOT active
+  const shouldShowTutorial = !hasSeenTuto && !needsPinSetup && !isLoading && !!session
+
   // 4. Tutorial trigger
   useEffect(() => {
-    if (needsTutorial && !needsPinSetup && !isLoading && session) {
-      const timer = setTimeout(() => setShowTutorial(true), 1000)
+    if (shouldShowTutorial) {
+      const timer = setTimeout(() => setShowTutorial(true), 500)
       return () => clearTimeout(timer)
     }
-  }, [needsTutorial, needsPinSetup, isLoading, !!session])
+  }, [shouldShowTutorial])
 
   // --- HANDLERS ---
 
@@ -254,6 +256,7 @@ export default function App() {
                 onExit={() => setIsParentMode(false)}
                 onSwitchProfile={switchProfile}
                 refresh={loadFamilyData}
+                updateProfile={updateProfile}
                 isNewUser={isOnboardingSession}
                 initialTab={isOnboardingSession ? 'settings' : 'validation'}
                 initialSubTab={isOnboardingSession ? 'children' : 'missions'}

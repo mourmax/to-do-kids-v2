@@ -258,9 +258,18 @@ export function useFamily(userId, familyId = null) {
     loadFamilyData(!!family)
   }, [loadFamilyData])
 
-  const switchProfile = (id) => {
-    setActiveProfileId(id)
-    localStorage.setItem('active_profile_id', id)
+  const updateProfile = async (id, updates) => {
+    // 1. Optimistic Update
+    setProfiles(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p))
+
+    // 2. Database Update
+    const { error } = await supabase.from('profiles').update(updates).eq('id', id)
+    if (error) {
+      console.error("Failed to update profile in DB:", error)
+      // Rollback on error (re-load data)
+      loadFamilyData(true)
+      throw error
+    }
   }
 
   return {
@@ -273,6 +282,7 @@ export function useFamily(userId, familyId = null) {
     isLoading,
     error,
     refresh: loadFamilyData,
-    switchProfile
+    switchProfile,
+    updateProfile // New helper for instant UI feedback
   }
 }

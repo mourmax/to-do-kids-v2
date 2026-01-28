@@ -71,8 +71,34 @@ export default function Auth({ onBack }) {
         </button>
 
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">{t('auth.login_title')}</h1>
-          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{t('auth.login_subtitle')}</p>
+          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">{isSignUp ? t('auth.signup_title') || "Créer un compte" : t('auth.login_title')}</h1>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{isSignUp ? "L'aventure commence ici" : t('auth.login_subtitle')}</p>
+        </div>
+
+        {/* --- TOGGLE PROMINENT CREER COMPTE / SE CONNECTER --- */}
+        <div className="bg-slate-900/80 p-1.5 rounded-2xl border border-white/5 flex gap-1 relative overflow-hidden">
+          <motion.div
+            layoutId="activeTab"
+            className="absolute inset-y-1.5 rounded-xl bg-indigo-600 shadow-lg shadow-indigo-600/20"
+            initial={false}
+            animate={{
+              x: isSignUp ? '100%' : '0%',
+              width: 'calc(50% - 3px)'
+            }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          />
+          <button
+            onClick={() => setIsSignUp(false)}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest relative z-10 transition-colors ${!isSignUp ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            {t('auth.login_button')}
+          </button>
+          <button
+            onClick={() => setIsSignUp(true)}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest relative z-10 transition-colors ${isSignUp ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            {t('auth.signup_button') || "S'inscrire"}
+          </button>
         </div>
 
         {/* --- BOUTON GOOGLE --- */}
@@ -92,7 +118,7 @@ export default function Auth({ onBack }) {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335" />
               </svg>
-              <span>{t('auth.login_google')}</span>
+              <span>{isSignUp ? "S'inscrire avec Google" : t('auth.login_google')}</span>
             </>
           )}
         </motion.button>
@@ -137,20 +163,11 @@ export default function Auth({ onBack }) {
           >
             {loading ? <Loader2 className="animate-spin" /> : (
               <>
-                {isSignUp ? t('auth.signup_button') : t('auth.login_button')} <ArrowRight size={16} />
+                {isSignUp ? "Créer mon compte" : t('auth.login_button')} <ArrowRight size={16} />
               </>
             )}
           </button>
         </form>
-
-        <div className="text-center">
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-slate-500 text-[10px] font-bold hover:text-white transition-colors uppercase tracking-wider"
-          >
-            {isSignUp ? t('auth.already_account') : t('auth.no_account')}
-          </button>
-        </div>
 
       </motion.div>
     </div>

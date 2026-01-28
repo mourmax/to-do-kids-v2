@@ -7,7 +7,21 @@ import NotificationBanner from '../ui/NotificationBanner'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
-export default function ParentDashboard({ family, profile, profiles, challenge, missions, allMissions, onExit, refresh, onSwitchProfile, initialTab = 'validation', initialSubTab = 'missions' }) {
+export default function ParentDashboard({
+  family,
+  profile,
+  profiles,
+  challenge,
+  missions,
+  allMissions,
+  onExit,
+  onSwitchProfile,
+  refresh,
+  updateProfile,
+  isNewUser,
+  initialTab = 'validation',
+  initialSubTab = 'missions'
+}) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(initialTab)
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab)
@@ -244,9 +258,11 @@ export default function ParentDashboard({ family, profile, profiles, challenge, 
                 challenge={challenge}
                 missions={allMissions}
                 refresh={refresh}
+                updateProfile={updateProfile} // Pass the optimistic update helper
                 activeSubMenu={activeSubTab}
                 onSubMenuChange={setActiveSubTab}
-                isNewUser={profiles?.length <= 2} // Robust fallback: check if only defaults exist
+                isNewUser={isNewUser}
+                onTabChange={setActiveTab}
               />
             </motion.div>
           )}
