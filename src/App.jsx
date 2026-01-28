@@ -29,6 +29,7 @@ export default function App() {
   // Track if this is an onboarding session (stays constant during the session)
   const [isOnboardingSession] = useState(!localStorage.getItem('hasSeenTutorial_v1'))
 
+  // 1. Session management
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
@@ -43,17 +44,32 @@ export default function App() {
         setIsParentMode(true) // Force parent interface on login
       }
     })
-
-    // Supprimé : on gère ça via un useEffect réactif plus bas pour éviter les conflits avec le PIN
+    return () => subscription.unsubscribe()
   }, [])
 
+  // 2. Data loading (Call this BEFORE using its values)
   const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, refresh, switchProfile } = useFamily(
     session?.user?.id,
     childFamilyId
   )
 
+  // 3. Derived states for onboarding (Safe to use profiles here)
+  const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
+  const needsTutorial = !hasSeenTuto
+  const parentProfile = profiles?.find(p => p.is_parent)
+  const needsPinSetup = parentProfile && !pinSuccessfullySet && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
+
+  // 4. Tutorial trigger
+  useEffect(() => {
+    if (needsTutorial && !needsPinSetup && !isLoading && session) {
+      const timer = setTimeout(() => setShowTutorial(true), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [needsTutorial, needsPinSetup, isLoading, !!session])
+
+  // --- HANDLERS ---
+
   const handleInviteCode = async (code) => {
-    // 1. Check if profile exists with this code
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('id, family_id')
@@ -63,12 +79,9 @@ export default function App() {
     if (profileError) throw profileError
     if (!profileData) throw new Error('Invalid code')
 
-    // 3. Update session state
     setChildFamilyId(profileData.family_id)
     localStorage.setItem('child_family_id', profileData.family_id)
     localStorage.setItem('active_profile_id', profileData.id)
-
-    // Refresh to update useFamily data
     refresh()
   }
 
@@ -80,10 +93,10 @@ export default function App() {
   // --- LOGIQUE D'AFFICHAGE ET SÉCURITÉ ---
   const debug = new URLSearchParams(window.location.search).get('debug') === 'true'
   if (debug) {
-    console.log("[DEBUG] State:", { isLoading, session: !!session, family: !!family, profiles: profiles.length, isParentMode })
+    console.log("[DEBUG] State:", { isLoading, session: !!session, family: !!family, profiles: profiles?.length, isParentMode })
   }
 
-  // 1. Initial Loading State
+  // A. Initial Loading State
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">
@@ -92,7 +105,7 @@ export default function App() {
     )
   }
 
-  // 2. Auth & Role Selection
+  // B. Auth & Role Selection
   if (!session && !childFamilyId) {
     if (showAuth) {
       return <Auth onBack={() => setShowAuth(false)} />
@@ -105,10 +118,7 @@ export default function App() {
     )
   }
 
-  // 3. Condition for PIN Setup (Only for Parent)
-  const parentProfile = profiles.find(p => p.is_parent)
-  const needsPinSetup = parentProfile && !pinSuccessfullySet && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
-
+  // C. Condition for PIN Setup (Only for Parent)
   if (parentProfile && needsPinSetup) {
     return (
       <PinSetup
@@ -116,23 +126,11 @@ export default function App() {
         onComplete={() => {
           localStorage.removeItem('reset_pin_mode')
           setPinSuccessfullySet(true)
-          refresh() // will set isLoading to true
+          refresh()
         }}
       />
     )
   }
-
-  // 4. Force Onboarding for new parents
-  const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
-  const needsTutorial = !hasSeenTuto
-
-  // Ensure tutorial shows up if it's a new user and we are NOT in PIN setup anymore
-  useEffect(() => {
-    if (needsTutorial && !needsPinSetup && !isLoading && session) {
-      const timer = setTimeout(() => setShowTutorial(true), 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [needsTutorial, needsPinSetup, isLoading, !!session])
 
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
 
