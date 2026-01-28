@@ -258,6 +258,11 @@ export function useFamily(userId, familyId = null) {
     loadFamilyData(!!family)
   }, [loadFamilyData])
 
+  const switchProfile = (id) => {
+    setActiveProfileId(id)
+    localStorage.setItem('active_profile_id', id)
+  }
+
   const updateProfile = async (id, updates) => {
     // 1. Optimistic Update
     setProfiles(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p))
