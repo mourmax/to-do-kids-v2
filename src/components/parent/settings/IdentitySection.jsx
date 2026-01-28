@@ -5,6 +5,7 @@ import { supabase } from '../../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 import SectionCard from './SectionCard'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
+import ProfileCompletionModal from '../../ui/ProfileCompletionModal'
 
 export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh, updateProfile, isNewUser, onNextStep }) {
   const { t } = useTranslation()
@@ -12,6 +13,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   const [editName, setEditName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
   const [updatingId, setUpdatingId] = useState(null)
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const COLORS = [
     { name: 'rose', bg: 'bg-rose-500', text: 'text-rose-500', border: 'border-rose-500/30', shadow: 'shadow-rose-500/20' },
@@ -87,9 +89,9 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
     <div className="space-y-6">
       {showOnboarding && (
         <OnboardingInfoBlock
-          step={null} // Remove step number
-          title="Préparez les profils"
-          description="Indiquez le prénom de votre enfant et sa couleur préférée."
+          step={null}
+          title={t('onboarding.identity_title')}
+          description={t('onboarding.identity_description')}
           icon={User}
         />
       )}
@@ -204,33 +206,22 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
           >
             <Plus size={18} className={`text-indigo-400 group-hover:scale-110 transition-transform ${isAdding ? 'animate-spin' : ''}`} />
             <span className="font-black uppercase text-[10px] tracking-widest text-indigo-300">
-              {isAdding ? "Création..." : t('settings.add_child')}
+              {isAdding ? t('common.creating') : t('settings.add_child')}
             </span>
           </button>
         </div>
       </SectionCard>
 
-      {/* Next Step Button for Onboarding */}
+      {/* Profile Completion Modal */}
       {isNewUser && childProfiles.length > 0 && !childProfiles.some(p => p.child_name === "Mon enfant") && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-emerald-600/10 border border-emerald-500/20 p-6 rounded-[2.5rem] flex flex-col items-center gap-4 text-center mt-8"
-        >
-          <div className="bg-emerald-500 p-2 rounded-full text-white shadow-lg shadow-emerald-500/20">
-            <Check size={20} />
-          </div>
-          <div className="space-y-1">
-            <h4 className="text-sm font-black uppercase text-emerald-400 tracking-widest">Profil configuré !</h4>
-            <p className="text-[10px] text-slate-400 uppercase tracking-widest">Maintenant, passons aux choses sérieuses.</p>
-          </div>
-          <button
-            onClick={() => onNextStep('missions')}
-            className="bg-emerald-500 hover:bg-emerald-400 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/10 transition-all active:scale-95"
-          >
-            Étape suivante : Les missions
-          </button>
-        </motion.div>
+        <ProfileCompletionModal
+          isOpen={showProfileModal || true}
+          onClose={() => setShowProfileModal(false)}
+          onNavigateToMissions={() => {
+            setShowProfileModal(false)
+            onNextStep('missions')
+          }}
+        />
       )}
     </div>
   )

@@ -76,7 +76,12 @@
         "theme": "Thème",
         "dark": "Sombre",
         "light": "Clair",
-        "premium_status": "Version Premium"
+        "premium_status": "Version Premium",
+        "kids_management": "Gestion des Enfants",
+        "child_first_name": "Prénom de l'enfant",
+        "associated_color": "Couleur associée",
+        "preferred_theme": "Thème préféré",
+        "child_activation_code": "Code d'activation enfant"
     },
     "library": {
         "title": "Bibliothèque de Missions",
@@ -84,7 +89,9 @@
         "category_hygiene": "Hygiène & Santé",
         "category_house": "Maison & Rangement",
         "category_school": "École & Devoirs",
-        "category_behavior": "Comportement"
+        "category_behavior": "Comportement",
+        "library_button": "Bibliothèque",
+        "custom_button": "Sur mesure"
     },
     "errors": {
         "reset_failed": "Erreur lors du reset",
@@ -140,5 +147,59 @@
         "profile_configured": "Profil Configuré !",
         "profile_configured_subtitle": "Maintenant, passons aux choses sérieuses.",
         "next_step_missions": "Étape Suivante : Les Missions"
+    },
+    "common": {
+        "all": "Tous",
+        "next": "Suivant",
+        "parent_space": "Espace Parent",
+        "family_active": "Famille Active",
+        "children": "Enfants",
+        "mission_edition": "Édition des Missions",
+        "creating": "Création...",
+        "step": "Étape",
+        "validation": "Validation",
+        "settings": "Réglages",
+        "missions": "Missions",
+        "challenge": "Défi"
+    },
+    "child": {
+        "final_goal": "Objectif Final",
+        "surprise_gift": "Cadeau Surprise",
+        "to_do": "À Faire",
+        "done": "Fait",
+        "validated": "Validé",
+        "waiting_validation": "En attente de validation",
+        "my_missions": "Mes Missions",
+        "progress": "Progression",
+        "day": "Jour",
+        "days": "Jours",
+        "current_streak": "Série actuelle",
+        "request_validation": "Demander la validation",
+        "all_done": "Tout est fait !",
+        "keep_going": "Continue comme ça !",
+        "victory_title": "Bravo !",
+        "victory_message": "Tu as terminé toutes tes missions !"
+    },
+    "missions": {
+        "brush_teeth": "Se brosser les dents",
+        "take_shower": "Prendre sa douche",
+        "wash_hands": "Se laver les mains",
+        "put_pajamas": "Mettre son pyjama",
+        "comb_hair": "Se coiffer",
+        "prepare_clothes": "Préparer ses vêtements",
+        "tidy_toys": "Ranger ses jouets",
+        "make_bed": "Faire son lit",
+        "set_table": "Mettre la table",
+        "clear_table": "Débarrasser la table",
+        "help_cooking": "Aider à la cuisine",
+        "tidy_shoes": "Ranger ses chaussures",
+        "do_homework": "Faire ses devoirs",
+        "prepare_bag": "Préparer son sac",
+        "read_15min": "Lire 15 minutes",
+        "practice_instrument": "Pratiquer un instrument",
+        "draw_create": "Dessiner / Créer",
+        "be_polite": "Être poli(e)",
+        "share_toys": "Partager ses jeux",
+        "say_thanks": "Dire merci / s'il vous plaît"
     }
 }
