@@ -122,9 +122,9 @@ export function useFamily(userId, familyId = null) {
           if (!existingMissions || existingMissions.length === 0) {
             console.log("Creating default missions...")
             const defaultMissions = [
-              { title: "Faire ses devoirs", icon: "📚", family_id: fam.id, order_index: 1 },
-              { title: "Ranger sa chambre", icon: "🧸", family_id: fam.id, order_index: 2 },
-              { title: "Mettre la table", icon: "🍽️", family_id: fam.id, order_index: 3 }
+              { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
+              { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
+              { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
             ]
             await supabase.from('missions').insert(defaultMissions)
           }
