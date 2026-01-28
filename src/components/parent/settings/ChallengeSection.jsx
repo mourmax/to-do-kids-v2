@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Trophy } from 'lucide-react'
+import { Trophy, Check } from 'lucide-react'
 import { supabase } from '../../../supabaseClient'
 import SectionCard from './SectionCard'
 import { useTranslation } from 'react-i18next'
