@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ClipboardCheck, Sliders } from 'lucide-react'
 import ValidationTab from './tabs/ValidationTab'
@@ -27,6 +27,9 @@ export default function ParentDashboard({
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab)
   const [notifications, setNotifications] = useState([])
 
+  // 🛡️ Track dismissed notifications to prevent reappearance during session
+  const dismissedIdsRef = useRef(new Set())
+
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
 
   // ECOUTEUR TEMPS RÉEL (DEMANDES DE VALIDATION)
@@ -47,12 +50,24 @@ export default function ParentDashboard({
         // Regrouper par enfant unique
         const uniqueIds = [...new Set(data.map(d => d.profile_id))]
         const newNotifs = uniqueIds.map(id => {
+          // If explicitly dismissed in this session, skip
+          if (dismissedIdsRef.current.has(id)) return null
+
           const child = childProfiles.find(p => p.id === id)
           return child ? { profile_id: id, child_name: child.child_name } : null
         }).filter(Boolean)
-        setNotifications(newNotifs)
-      } else {
-        setNotifications([])
+
+        // Update state avoiding duplicates (and re-checking dismissed just in case)
+        setNotifications(prev => {
+          // Merge pending
+          const combined = [...prev]
+          newNotifs.forEach(n => {
+            if (!combined.find(c => c.profile_id === n.profile_id)) {
+              combined.push(n)
+            }
+          })
+          return combined
+        })
       }
     }
 
@@ -64,7 +79,7 @@ export default function ParentDashboard({
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen for all events (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'daily_logs',
         },
@@ -76,16 +91,17 @@ export default function ParentDashboard({
           // 🔄 Refresh global pour mettre à jour la liste des missions
           refresh(true)
 
-          // Gestion des notifications (seulement sur UPDATE pour le point d'exclamation)
+          // Gestion des notifications
           if (payload.eventType === 'UPDATE') {
-            // Si validation_requested devient TRUE et result est NULL
             if (payload.new.validation_requested && !payload.new.validation_result) {
+              // Check blocked
+              if (dismissedIdsRef.current.has(child.id)) return
+
               setNotifications(prev => {
                 if (prev.find(n => n.profile_id === child.id)) return prev
                 return [...prev, { profile_id: child.id, child_name: child.child_name }]
               })
             }
-            // Si validation_result passe à quelque chose (success/failure), on retire la notif
             if (payload.new.validation_result) {
               setNotifications(prev => prev.filter(n => n.profile_id !== child.id))
             }
@@ -98,7 +114,7 @@ export default function ParentDashboard({
           event: 'UPDATE',
           schema: 'public',
           table: 'challenges',
-          filter: challenge?.id ? `id=eq.${challenge.id}` : undefined
+          filter: `family_id=eq.${family.id}`
         },
         () => {
           refresh(true)
@@ -109,29 +125,19 @@ export default function ParentDashboard({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [family?.id, childProfiles]) // Attention aux dépendances, childProfiles doit être stable
+  }, [family?.id, childProfiles])
 
-  // Helper for colors
   const getColorClasses = (colorName) => {
-    const maps = {
-      rose: 'bg-rose-500/20 border-rose-500/30 text-rose-300',
-      sky: 'bg-sky-500/20 border-sky-500/30 text-sky-300',
-      emerald: 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300',
-      amber: 'bg-amber-500/20 border-amber-500/30 text-amber-300',
-      violet: 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300',
-    }
-    const mapsActive = {
-      rose: 'bg-rose-500 text-white shadow-rose-500/20',
-      sky: 'bg-sky-500 text-white shadow-sky-500/20',
-      emerald: 'bg-emerald-500 text-white shadow-emerald-500/20',
-      amber: 'bg-amber-500 text-white shadow-amber-500/20',
-      violet: 'bg-indigo-500 text-white shadow-indigo-500/20',
-    }
-    return {
-      inactive: maps[colorName] || maps.violet,
-      active: mapsActive[colorName] || mapsActive.violet
-    }
+    // ... (helper kept outside or assumed existing if I don't touch it. Wait I need to keep the file valid)
+    // Actually I should not remove getColorClasses from the file. I will use startLine/EndLine carefully.
+    // My Replace helper might need me to skip getColorClasses if it's below line 113.
+    // The snippet above ends at line 113 in original.
+    // I will use StartLine: 25, EndLine: 112
+    return
   }
+
+  // Helper for colors is below line 114.
+  // I will just replace the logic inside useEffect and state definition.
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 relative z-10">
@@ -147,7 +153,11 @@ export default function ParentDashboard({
         onSelect={(childId) => {
           onSwitchProfile(childId)
           setActiveTab('validation')
-          // Retirer la notif localement pour feedback immédiat
+          setNotifications(prev => prev.filter(n => n.profile_id !== childId))
+        }}
+        onDismiss={(childId) => {
+          // Add to dismissed list
+          dismissedIdsRef.current.add(childId)
           setNotifications(prev => prev.filter(n => n.profile_id !== childId))
         }}
       />

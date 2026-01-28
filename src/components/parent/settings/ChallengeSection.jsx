@@ -10,7 +10,7 @@ import CompletionModal from '../../ui/CompletionModal'
 export default function ChallengeSection({ challenge, onShowSuccess, refresh, isNewUser, onNextStep }) {
   const { t } = useTranslation()
   const [rewardName, setRewardName] = useState('')
-  const [seriesLength, setSeriesLength] = useState(3)
+  const [seriesLength, setSeriesLength] = useState(2)
   const [malusMessage, setMalusMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [showCompletionModal, setShowCompletionModal] = useState(false)
@@ -20,18 +20,24 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
 
   useEffect(() => {
     if (challenge && !isSaving) {
-      setRewardName(challenge.reward_name || '')
-      setSeriesLength(challenge.duration_days || 7)
-      setMalusMessage(challenge.malus_message || '')
+      // Logic to translate default presets if they are in French (legacy)
+      let rName = challenge.reward_name || ''
+      if (rName === 'Cadeau Surprise' || rName === 'Surprise Gift') {
+        rName = t('completion_modal.default_reward')
+      }
+      setRewardName(rName)
+
+      setSeriesLength(challenge.duration_days || 2)
+
+      let mMsg = challenge.malus_message || ''
+      if (mMsg === 'Zut ! On recommence au début' || mMsg === 'Zut ! On recommence au début.' || mMsg === 'Oops! Back to the start.') {
+        mMsg = t('completion_modal.default_malus')
+      }
+      setMalusMessage(mMsg)
     }
   }, [challenge, isSaving])
 
-  // Show completion modal when challenge is configured during onboarding
-  useEffect(() => {
-    if (isNewUser && challenge?.reward_name && challenge?.reward_name !== t('completion_modal.default_reward')) {
-      setShowCompletionModal(true)
-    }
-  }, [isNewUser, challenge?.reward_name])
+
 
   const saveChallengeSettings = async () => {
     if (!challenge?.id || isSaving) return
@@ -50,6 +56,9 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       if (error) throw error
       onShowSuccess(t('actions.save_success'))
       refresh(true)
+      if (isNewUser) {
+        setShowCompletionModal(true)
+      }
       setTimeout(() => setIsSaving(false), 1000)
     } catch (error) {
       console.error("Update failed:", error)
@@ -103,7 +112,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
             className={`w-full py-5 rounded-2xl font-black uppercase text-[10px] shadow-xl active:scale-95 transition-all text-white mt-2 ${isSaving ? 'bg-slate-700 cursor-not-allowed opacity-50' : 'bg-orange-600 hover:bg-orange-500'
               }`}
           >
-            {isSaving ? "Enregistrement..." : t('actions.save')}
+            {isSaving ? t('actions.saving') : t('actions.save')}
           </button>
         </div>
       </SectionCard>

@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion'
 import { Flame, Gift } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // 👇 J'ai changé les noms ici pour correspondre au Dashboard : current, total, reward
 export default function ChildProgressBar({ current, total, reward }) {
-  
+  const { t } = useTranslation()
+
   // Sécurités Anti-NaN et Division par zéro
   const safeTotal = Math.max(1, Number(total) || 1)
   const safeCurrent = Math.max(0, Number(current) || 0)
-  
+
   // On limite l'affichage pour ne pas dépasser 100%
   const displayCurrent = Math.min(safeCurrent, safeTotal)
   const progress = (displayCurrent / safeTotal) * 100
@@ -19,41 +21,41 @@ export default function ChildProgressBar({ current, total, reward }) {
     <section className="bg-slate-900 p-8 rounded-[3rem] border-2 border-white/5 relative shadow-2xl">
       <div className="flex justify-between items-end mb-12 relative z-10">
         <div>
-          <p className="text-orange-500 text-[10px] font-black uppercase tracking-widest mb-1">Objectif final</p>
+          <p className="text-orange-500 text-[10px] font-black uppercase tracking-widest mb-1">{t('child.final_goal')}</p>
           <h2 className="text-white font-black text-lg flex items-center gap-2 italic uppercase tracking-tight">
             🎁 {reward || "Surprise"}
           </h2>
         </div>
         <div className="text-right">
           <span className="text-5xl font-black text-indigo-400 leading-none">{displayCurrent}</span>
-          <span className="text-slate-600 font-black uppercase ml-1">/{safeTotal}j</span>
+          <span className="text-slate-600 font-black uppercase ml-1">/{safeTotal} {t('child.days')}</span>
         </div>
       </div>
 
       {/* Container de la barre */}
       <div className="relative h-10 mt-2">
-        
+
         {/* Fond de la barre (Gris) */}
         <div className="absolute inset-0 bg-slate-800 rounded-full border border-white/5 overflow-hidden">
-          
+
           {/* Remplissage coloré (Progression) */}
-          <motion.div 
+          <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }} 
+            animate={{ width: `${progress}%` }}
             transition={{ type: "spring", stiffness: 50, damping: 20 }}
-            className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 relative z-0" 
+            className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 relative z-0"
           />
-          
+
           {/* 📏 POINTS D'ÉTAPE (Barres verticales) */}
           {steps.map((step) => {
             // Pas de barre aux extrémités pour le style
             if (step === 0 || step === safeTotal) return null
-            
+
             const positionPercent = (step / safeTotal) * 100
             const isPassed = displayCurrent >= step
 
             return (
-              <div 
+              <div
                 key={step}
                 className={`absolute top-0 bottom-0 w-[2px] z-10 transition-colors duration-500 ${isPassed ? 'bg-indigo-300/30' : 'bg-slate-950/50'}`}
                 style={{ left: `${positionPercent}%` }}
@@ -68,7 +70,7 @@ export default function ChildProgressBar({ current, total, reward }) {
           const isPassed = displayCurrent >= step
 
           return (
-            <div 
+            <div
               key={`label-${step}`}
               className="absolute top-0 h-full flex flex-col items-center justify-center pointer-events-none"
               style={{ left: `${positionPercent}%`, transform: 'translateX(-50%)' }}
@@ -82,7 +84,7 @@ export default function ChildProgressBar({ current, total, reward }) {
         })}
 
         {/* 🔥 FLAMME MOBILE (Au dessus de tout) */}
-        <motion.div 
+        <motion.div
           initial={{ left: 0 }}
           animate={{ left: `${progress}%` }}
           transition={{ type: "spring", stiffness: 50, damping: 20 }}
@@ -90,9 +92,9 @@ export default function ChildProgressBar({ current, total, reward }) {
           style={{ transform: 'translateX(-50%)' }}
         >
           <div className="relative w-1 h-full flex items-center justify-center">
-             {/* La flamme flotte au dessus de la barre */}
+            {/* La flamme flotte au dessus de la barre */}
             <div className="absolute -top-8 bg-orange-500/20 p-1.5 rounded-full animate-pulse backdrop-blur-sm border border-orange-500/30">
-               <Flame size={28} className="text-orange-500 fill-orange-500 drop-shadow-lg" />
+              <Flame size={28} className="text-orange-500 fill-orange-500 drop-shadow-lg" />
             </div>
           </div>
         </motion.div>

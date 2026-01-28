@@ -51,7 +51,8 @@
         "logout": "Déconnexion",
         "validate_all": "Tout valider",
         "add_mission": "Ajouter une mission",
-        "saving": "Enregistrement..."
+        "saving": "Enregistrement...",
+        "i_understand": "J'ai compris"
     },
     "settings": {
         "title": "Réglages",
@@ -171,6 +172,44 @@
         "day_singular": "Jour",
         "children_tab": "Enfants"
     },
+    "challenge": {
+        "days_left": "Reste {{count}} jours",
+        "no_active": "Aucun défi actif",
+        "configure_new": "Configurer un nouveau défi"
+    },
+    "validation": {
+        "verdict": "Verdict du Jour",
+        "success": "Succès",
+        "fail": "Échec",
+        "mission_control": "Contrôle des Missions",
+        "child_ok": "Enfant OK",
+        "child_waiting": "En attente enfant",
+        "to_validate": "À VALIDER",
+        "required": "Validation Requise",
+        "finished_day": "a terminé sa journée !",
+        "all_missions_done": "{{name}} a fini toutes ses missions !",
+        "validate_to_advance": "Validez sa journée pour avancer le challenge",
+        "waiting_validations": "En attente de validations",
+        "streak_finished": "Série Terminée !",
+        "reward_unlocked": "Le cadeau est débloqué",
+        "start_new": "Débuter un nouveau challenge",
+        "victory_title": "INCROYABLE !",
+        "victory_message_with_name": "Bravo {{name}}, tu as réussi le challenge !",
+        "reward_unlocked_upcase": "RÉCOMPENSE DÉBLOQUÉE",
+        "continue_to_report": "CONTINUER VERS LE BILAN",
+        "start_new_challenge_child": "Débuter le nouveau challenge {{name}}",
+        "continue_to_report": "CONTINUER VERS LE BILAN",
+        "start_new_challenge_child": "Débuter le nouveau challenge {{name}}",
+        "waiting_next_challenge": "Bravo ! En attente du prochain défi...",
+        "active_count": "{{count}} actives",
+        "duration_label": "Durée",
+        "reward_label": "Récompense",
+        "malus_label": "MALUS",
+        "failure_title": "Aïe, c'est raté...",
+        "failure_subtitle": "Le compteur retombe à zéro.",
+        "confirm_failure": "Confirmer l'échec",
+        "fail_confirmed": "Échec confirmé !"
+    },
     "child": {
         "final_goal": "Objectif Final",
         "surprise_gift": "Cadeau Surprise",
@@ -187,7 +226,23 @@
         "all_done": "Tout est fait !",
         "keep_going": "Continue comme ça !",
         "victory_title": "Bravo !",
-        "victory_message": "Tu as terminé toutes tes missions !"
+        "victory_message": "Tu as terminé toutes tes missions !",
+        "lets_go": "C'est parti !",
+        "challenge_ready": "Tes parents ont préparé un nouveau challenge pour toi !",
+        "start_challenge": "Débuter le challenge",
+        "waiting": "En attente...",
+        "waiting_msg": "Ton parent va bientôt valider ta journée !",
+        "congratulations": "FÉLICITATIONS !",
+        "oh_no": "Oh mince...",
+        "day_not_validated": "La journée n'a pas été validée. Le compteur repart à zéro.",
+        "malus_pay": "MALUS :",
+        "waiting_parent_config": "En attente de validation de tes parents pour le nouveau challenge"
+    },
+    "pin": {
+        "access_title": "Accès Parents",
+        "enter_code": "Saisis ton code secret",
+        "cancel": "Annuler",
+        "forgot_code": "Code oublié ?"
     },
     "missions": {
         "brush_teeth": "Se brosser les dents",

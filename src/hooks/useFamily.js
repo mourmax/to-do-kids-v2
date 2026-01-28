@@ -212,7 +212,7 @@ export function useFamily(userId, familyId = null) {
             family_id: fam.id,
             assigned_to: currentProfId, // 🛠️ CRUCIAL: Assigner à l'enfant actif
             reward_name: "Cadeau Surprise",
-            duration_days: 7,
+            duration_days: 2,
             is_active: true,
             current_streak: 0
           }])

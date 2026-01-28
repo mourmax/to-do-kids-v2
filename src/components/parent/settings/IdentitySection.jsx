@@ -31,6 +31,9 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
 
       setEditingId(null)
       onShowSuccess(t('actions.save_success'))
+      if (isNewUser) {
+        setShowProfileModal(true)
+      }
     } catch (err) {
       console.error("Error updating profile:", err)
       onShowSuccess("Erreur de mise à jour")
@@ -215,7 +218,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
       {/* Profile Completion Modal */}
       {isNewUser && childProfiles.length > 0 && !childProfiles.some(p => p.child_name === "Mon enfant") && (
         <ProfileCompletionModal
-          isOpen={showProfileModal || true}
+          isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
           onNavigateToMissions={() => {
             setShowProfileModal(false)

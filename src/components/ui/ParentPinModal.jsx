@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Delete, LogOut } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
+import { useTranslation } from 'react-i18next'
 
 export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
+  const { t } = useTranslation()
   const [pin, setPin] = useState('')
   const [error, setError] = useState(false)
 
@@ -35,10 +37,10 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
     if (confirm("Code oublié ?\n\nSécurité : Vous allez être déconnecté.\nReconnectez-vous avec votre email ou Google pour définir un nouveau code.")) {
       // 1. On pose le "drapeau" pour dire qu'on veut reset le PIN
       localStorage.setItem('reset_pin_mode', 'true')
-      
+
       // 2. On déconnecte
       await supabase.auth.signOut()
-      
+
       // 3. On recharge la page pour renvoyer vers l'Auth
       window.location.reload()
     }
@@ -46,35 +48,34 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0 }} 
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="relative bg-white w-full max-w-[320px] rounded-[2.5rem] p-6 shadow-2xl overflow-hidden"
       >
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 font-bold text-xs uppercase"
         >
-          Annuler
+          {t('pin.cancel')}
         </button>
 
         <div className="text-center mb-8 mt-2">
-          <h2 className="text-slate-800 font-black uppercase tracking-widest text-sm mb-1">Accès Parents</h2>
-          <p className="text-slate-400 text-[10px] font-bold uppercase">Saisis ton code secret</p>
+          <h2 className="text-slate-800 font-black uppercase tracking-widest text-sm mb-1">{t('pin.access_title')}</h2>
+          <p className="text-slate-400 text-[10px] font-bold uppercase">{t('pin.enter_code')}</p>
         </div>
 
         {/* --- INDICATEURS PIN --- */}
         <div className="flex justify-center gap-4 mb-8">
           {[0, 1, 2, 3].map((i) => (
-            <div 
+            <div
               key={i}
-              className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                error 
-                  ? 'bg-red-500 scale-110' 
-                  : pin.length > i 
-                    ? 'bg-indigo-600 scale-100' 
+              className={`w-4 h-4 rounded-full transition-all duration-300 ${error
+                  ? 'bg-red-500 scale-110'
+                  : pin.length > i
+                    ? 'bg-indigo-600 scale-100'
                     : 'bg-slate-100'
-              }`}
+                }`}
             />
           ))}
         </div>
@@ -106,11 +107,11 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
         </div>
 
         {/* --- BOUTON CODE OUBLIÉ --- */}
-        <button 
+        <button
           onClick={handleForgotPin}
           className="w-full py-3 text-center text-slate-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border-t border-slate-100 mt-2"
         >
-          <LogOut size={12} /> Code oublié ?
+          <LogOut size={12} /> {t('pin.forgot_code')}
         </button>
 
       </motion.div>

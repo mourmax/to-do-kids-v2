@@ -45,7 +45,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
           {mission.icon || '⭐'}
         </span>
         <h3 className={`font-black uppercase text-[10px] tracking-tight leading-tight px-1 text-shadow-sm ${isParentValidated ? 'text-white' : 'text-white'}`}>
-          {mission.title}
+          {t(mission.title)}
         </h3>
       </div>
 

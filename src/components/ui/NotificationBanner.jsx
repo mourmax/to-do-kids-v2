@@ -1,7 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, ArrowRight } from 'lucide-react'
+import { Bell, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-export default function NotificationBanner({ notifications, onSelect }) {
+export default function NotificationBanner({ notifications, onSelect, onDismiss }) {
+    const { t } = useTranslation()
     if (!notifications || notifications.length === 0) return null
 
     return (
@@ -20,12 +22,24 @@ export default function NotificationBanner({ notifications, onSelect }) {
                             <Bell size={20} className="text-white" />
                         </div>
                         <div className="flex-1 text-left">
-                            <h4 className="font-black uppercase text-[11px] tracking-widest">Validation Requise</h4>
+                            <h4 className="font-black uppercase text-[11px] tracking-widest">{t('validation.required')}</h4>
                             <p className="text-sm font-medium leading-tight">
-                                <span className="font-bold text-indigo-200">{notif.child_name}</span> a terminé sa journée !
+                                <span className="font-bold text-indigo-200">{notif.child_name}</span> {t('validation.finished_day')}
                             </p>
                         </div>
-                        <ArrowRight size={20} className="opacity-50" />
+                        <div className="flex items-center gap-2">
+                            {onDismiss && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onDismiss(notif.profile_id)
+                                    }}
+                                    className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                                >
+                                    <X size={20} className="text-white" />
+                                </button>
+                            )}
+                        </div>
                     </motion.button>
                 ))}
             </AnimatePresence>

@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
 import { CheckCircle2, Save } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function OnboardingInfoBlock({ step, title, description, icon: Icon }) {
+    const { t } = useTranslation()
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -19,7 +21,7 @@ export default function OnboardingInfoBlock({ step, title, description, icon: Ic
                 <div className="flex-1 text-center sm:text-left space-y-2">
                     <div className="flex items-center justify-center sm:justify-start gap-3">
                         <span className="bg-white/10 text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-white/5">
-                            Étape {step}
+                            {t('common.step_badge')} {step}
                         </span>
                         <h3 className="text-lg font-black text-white uppercase tracking-tight italic">{title}</h3>
                     </div>

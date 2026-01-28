@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../../supabaseClient'
 
@@ -22,7 +22,8 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
   const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed && m.parent_validated)
   const childFinishedAll = missions.length > 0 && missions.every(m => m.is_completed) && !allMissionsDone
-  const isChallengeFinished = challenge?.is_active === false && (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
+  // ✅ FIX: Le challenge est fini si le streak atteint la durée, PEU IMPORTE si is_active est encore true
+  const isChallengeFinished = (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
 
   // Helper for colors
   const getColorClasses = (colorName) => {
@@ -40,6 +41,32 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   const showToast = (message, type = 'success') => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
+  }
+
+  // 🔄 Force refresh on mount
+  useEffect(() => {
+    refresh(true)
+  }, [])
+
+  // 1. Setup New Challenge (Ui d'attente si pas de challenge actif)
+  if (!challenge || !challenge.is_active) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6">
+        <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center animate-pulse">
+          <ListChecks size={40} className="text-slate-600" />
+        </div>
+        <div>
+          <h3 className="text-white font-black uppercase text-xl tracking-tight">{t('challenge.no_active')}</h3>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">{t('challenge.configure_new')}</p>
+        </div>
+        <button
+          onClick={() => onEditSettings('challenge')}
+          className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:scale-105 transition-transform"
+        >
+          {t('actions.configure')}
+        </button>
+      </div>
+    )
   }
 
   // --- Logique Métier ---
@@ -74,10 +101,11 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
   const handleSuccess = async () => {
     if (!challenge?.id) return
-    if (!allMissionsDone) {
-      showToast(t('actions.validate_all'), "error")
-      return
-    }
+    // On enlève la restriction stricte pour laisser le parent décider du succès
+    // if (!allMissionsDone) {
+    //   showToast(t('actions.validate_all'), "error")
+    //   return
+    // }
     const newStreak = (challenge.current_streak || 0) + 1
     await supabase.from('challenges').update({ current_streak: newStreak }).eq('id', challenge.id)
 
@@ -85,16 +113,18 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     const missionIds = missions.map(m => m.id)
 
     // ✅ SUCCESS: On met à jour le résultat pour notifier l'enfant en temps réel
+    // Note: On NE reset PAS child_validated/parent_validated pour garder l'historique propre "Fait & Validé"
     const { error: logError } = await supabase.from('daily_logs').update({
       validation_result: 'success',
-      child_validated: false, // 🔄 Reset pour la "journée suivante" ou le prochain cycle
-      parent_validated: false, // 🔄 Reset pour la "journée suivante"
       validation_requested: false // 🔄 On libère la demande
     })
       .eq('profile_id', profile.id)
       .eq('date', today)
 
-    if (logError) console.error("Error updating logs on success:", logError)
+    if (logError) {
+      console.error("Error updating logs on success:", logError)
+      showToast("Erreur de sauvegarde de la validation", "error")
+    }
 
     if (newStreak >= (challenge?.duration_days || 1)) {
       setShowVictoryAnimation(true)
@@ -111,16 +141,25 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     const { error: challError } = await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
     if (challError) console.error("Error resetting streak:", challError)
 
-    // ❌ FAILURE: On supprime les logs du jour pour remettre Marie à zéro ("À faire")
-    const { error: logError } = await supabase.from('daily_logs').delete()
+    // ❌ FAILURE: On met à jour pour notifier l'enfant (Aïe c'est raté)
+    // L'enfant devra cliquer sur "J'ai compris" pour supprimer les logs lui-même via son dashboard
+    const { error: logError } = await supabase.from('daily_logs').update({
+      validation_result: 'failure',
+      // On garde child_validated pour qu'il voie ce qu'il avait fait ? 
+      // Non, on laisse tel quel, l'important est le statut failure.
+      // Mais on enlève validation_requested pour débloquer le parent ? 
+      // Si on enlève validation_requested, le parent ne voit plus le bouton ?
+      // Le parent a fini son action.
+      validation_requested: false
+    })
       .eq('profile_id', profile.id)
       .eq('date', today)
 
     if (logError) {
-      console.error("Error deleting logs on failure:", logError)
-      showToast("Erreur de suppression", "error")
+      console.error("Error updating logs on failure:", logError)
+      showToast("Erreur de validation (Failure)", "error")
     } else {
-      showToast(t('dashboard.counter_reset'))
+      showToast(t('validation.fail_confirmed', "Failure confirmed")) // Fallback text
     }
 
     await refresh(true)
@@ -178,10 +217,10 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
             </div>
             <div>
               <h4 className="font-black uppercase italic tracking-tighter text-lg">
-                {childName} a fini toutes ses missions !
+                {t('validation.all_missions_done', { name: childName })}
               </h4>
               <p className="text-[10px] font-black uppercase tracking-widest opacity-70">
-                Validez sa journée pour avancer le challenge
+                {t('validation.validate_to_advance')}
               </p>
             </div>
           </motion.div>

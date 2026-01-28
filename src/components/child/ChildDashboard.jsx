@@ -101,7 +101,17 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
     prevMissionsRef.current = missions
   }, [missions, challenge?.current_streak, challenge?.duration_days, hasSeenVictory, showVictoryModal])
 
-  // SUBSCRIPTION REALTIME
+  // 🔄 POLLING DE SECOURS : Si on attend une validation, on vérifie périodiquement (toutes les 5s)
+  // au cas où le socket Realtime aurait raté l'événement.
+  useEffect(() => {
+    let interval
+    if (validationRequested && !validationResult) {
+      interval = setInterval(() => {
+        refresh(true)
+      }, 5000)
+    }
+    return () => clearInterval(interval)
+  }, [validationRequested, validationResult, refresh])
   useEffect(() => {
     if (!profile?.id) return
 
@@ -119,7 +129,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
         },
         async (payload) => {
           console.log("Realtime Daily Logs update (Child):", payload)
-          refresh()
+          refresh(true)
         }
       )
       .subscribe()
@@ -254,6 +264,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
   // Sécurisation Anti-NaN
   const safeCurrent = Math.max(0, Number(challenge?.current_streak) || 0)
   const safeTotal = Math.max(1, Number(challenge?.duration_days) || 1)
+  const isVictory = safeCurrent >= safeTotal
 
   return (
     <div className="space-y-6 pb-20">
@@ -284,6 +295,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
       {/* Titre Section */}
       <div className="text-center space-y-2 relative">
+        <h2 className="text-xl font-black text-indigo-400 italic uppercase tracking-widest">{profile?.child_name}</h2>
         <h1 className="text-3xl font-black text-white italic tracking-tighter uppercase">
           {t('dashboard.child_title')}
         </h1>
@@ -352,7 +364,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-bounce">
                 <CheckCircle size={24} className="text-white" />
               </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">BRAVO !</h3>
+              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.congratulations')}</h3>
               <p className="text-sm font-medium text-emerald-100">{t('dashboard.day_validated_success')}</p>
             </div>
           </motion.div>
@@ -370,8 +382,8 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-pulse">
                 <Clock size={24} className="text-white" />
               </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">En attente...</h3>
-              <p className="text-sm font-medium text-amber-100">Ton parent va bientôt valider ta journée !</p>
+              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.waiting')}</h3>
+              <p className="text-sm font-medium text-amber-100">{t('child.waiting_msg')}</p>
             </div>
           </motion.div>
         )}
@@ -388,13 +400,13 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2">
                 <span className="text-2xl">😢</span>
               </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">Oh mince...</h3>
+              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.oh_no')}</h3>
               <p className="text-sm font-medium text-red-100">
-                La journée n'a pas été validée. Le compteur repart à zéro.
+                {t('child.day_not_validated')}
               </p>
               {challenge?.malus_message && (
                 <div className="bg-white/10 p-3 rounded-xl w-full mt-2">
-                  <p className="text-[10px] font-black uppercase opacity-70">Gage à payer :</p>
+                  <p className="text-[10px] font-black uppercase opacity-70">{t('child.malus_pay')}</p>
                   <p className="font-bold italic">"{challenge.malus_message}"</p>
                 </div>
               )}
@@ -422,7 +434,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
                 }}
                 className="w-full bg-white text-red-600 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
               >
-                J'ai compris
+                {t('actions.i_understand')}
               </button>
             </div>
           </motion.div>
@@ -438,30 +450,32 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
         />
       )}
 
-      {/* Liste des missions */}
-      <div className="grid grid-cols-2 gap-4">
-        {optimisticMissions.map((mission, index) => {
-          // 🚀 VISUEL "A FAIRE" SI VALIDÉ (pour pouvoir recommencer)
-          const displayMission = validationResult === 'success'
-            ? { ...mission, is_completed: false, parent_validated: false }
-            : mission
+      {/* Liste des missions (Masquée si challenge fini) */}
+      {!isVictory && challenge?.is_active && (
+        <div className="grid grid-cols-2 gap-4">
+          {optimisticMissions.map((mission, index) => {
+            // 🚀 VISUEL "A FAIRE" SI VALIDÉ (pour pouvoir recommencer)
+            const displayMission = validationResult === 'success'
+              ? { ...mission, is_completed: false, parent_validated: false }
+              : mission
 
-          return (
-            <MissionCard
-              key={mission.id}
-              mission={displayMission}
-              index={index}
-              onToggle={handleToggleMission}
-            />
-          )
-        })}
+            return (
+              <MissionCard
+                key={mission.id}
+                mission={displayMission}
+                index={index}
+                onToggle={handleToggleMission}
+              />
+            )
+          })}
 
-        {optimisticMissions.length === 0 && (
-          <div className="col-span-2 text-slate-500 text-center text-xs font-bold uppercase py-10">
-            {t('dashboard.missions_empty')}
-          </div>
-        )}
-      </div>
+          {optimisticMissions.length === 0 && (
+            <div className="col-span-2 text-slate-500 text-center text-xs font-bold uppercase py-10">
+              {t('dashboard.missions_empty')}
+            </div>
+          )}
+        </div>
+      )}
 
       <AnimatePresence>
         {showVictoryModal && (
@@ -499,8 +513,8 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-bounce">
                 <Trophy size={24} className="text-white" />
               </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">C'est parti !</h3>
-              <p className="text-sm font-medium text-indigo-100">Tes parents ont préparé un nouveau challenge pour toi !</p>
+              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.lets_go')}</h3>
+              <p className="text-sm font-medium text-indigo-100">{t('child.challenge_ready')}</p>
               <button
                 onClick={async () => {
                   // Optionnel: On peut marquer un début officiel ici si besoin
@@ -508,7 +522,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
                 }}
                 className="mt-4 w-full bg-white text-indigo-600 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl active:scale-95 transition-all"
               >
-                Débuter le challenge {profile?.child_name}
+                {t('child.start_challenge')} {profile?.child_name}
               </button>
             </div>
           </motion.div>
@@ -525,7 +539,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-2">
                 <Clock size={24} className="text-slate-400 animate-pulse" />
               </div>
-              <p className="text-sm font-medium text-slate-300">En attente de validation de tes parents pour le nouveau challenge</p>
+              <p className="text-sm font-medium text-slate-300">{t('child.waiting_parent_config')}</p>
             </div>
           </motion.div>
         )}

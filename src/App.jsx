@@ -111,8 +111,10 @@ export default function App() {
     console.log("[DEBUG] State:", { isLoading, session: !!session, family: !!family, profiles: profiles?.length, isParentMode })
   }
 
-  // A. Initial Loading State
-  if (isLoading && !familyError) { // Only show global loading if no family error
+  // A. Initial Loading State (Global)
+  // 💡 FIX: Only show full screen loading if we have NO data yet.
+  // This prevents flickering on silent refreshes.
+  if (isLoading && !family && !familyError) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">
         {t('auth.loading')}

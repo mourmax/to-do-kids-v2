@@ -9,6 +9,7 @@ import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 
 // Sous-composant MissionItem interne
 const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, onEditCancel, onDelete, editState, setEditState, setShowPicker, showPicker, onIconSelect }) => {
+  const { t } = useTranslation()
   const getTargetStyle = (assigned_to) => {
     if (!assigned_to) return "text-indigo-400 bg-indigo-400/10 border-indigo-400/20"
 

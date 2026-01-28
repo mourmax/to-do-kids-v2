@@ -29,6 +29,7 @@
         "good_job": "Great job today!",
         "request_validation": "Request validation",
         "day_validated": "Day validated! 🎉",
+        "day_validated_success": "Your missions have been validated, well done!",
         "counter_reset": "Counter reset to zero",
         "parent_exit": "Child Mode",
         "switch_child": "Switch child"
@@ -50,7 +51,8 @@
         "logout": "Logout",
         "validate_all": "Validate all",
         "add_mission": "Add mission",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "i_understand": "I understand"
     },
     "settings": {
         "title": "Settings",
@@ -164,7 +166,46 @@
         "missions": "Missions",
         "challenge": "Challenge",
         "day_singular": "Day",
+        "step_badge": "STEP",
         "children_tab": "Children"
+    },
+    "challenge": {
+        "days_left": "{{count}} days left",
+        "no_active": "No active challenge",
+        "configure_new": "Configure a new challenge"
+    },
+    "validation": {
+        "verdict": "Verdict of the day",
+        "success": "Success",
+        "fail": "Fail",
+        "mission_control": "Missions Control",
+        "child_ok": "Child OK",
+        "child_waiting": "Waiting for child",
+        "to_validate": "TO VALIDATE",
+        "required": "Validation Required",
+        "finished_day": "has finished their day!",
+        "all_missions_done": "{{name}} has finished all their missions!",
+        "validate_to_advance": "Validate their day to advance the challenge",
+        "waiting_validations": "Waiting for validations",
+        "streak_finished": "Series Finished!",
+        "reward_unlocked": "Reward unlocked",
+        "start_new": "Start a new challenge",
+        "victory_title": "INCREDIBLE!",
+        "victory_message_with_name": "Bravo {{name}}, you passed the challenge!",
+        "reward_unlocked_upcase": "REWARD UNLOCKED",
+        "continue_to_report": "CONTINUE TO REPORT",
+        "start_new_challenge_child": "Start the new challenge {{name}}",
+        "continue_to_report": "CONTINUE TO REPORT",
+        "start_new_challenge_child": "Start the new challenge {{name}}",
+        "waiting_next_challenge": "Well done! Waiting for the next challenge...",
+        "active_count": "{{count}} active",
+        "duration_label": "Duration",
+        "reward_label": "Reward",
+        "malus_label": "MALUS",
+        "failure_title": "Ouch, it's missed...",
+        "failure_subtitle": "The counter resets to zero.",
+        "confirm_failure": "Confirm failure",
+        "fail_confirmed": "Failure confirmed!"
     },
     "child": {
         "final_goal": "Final Goal",
@@ -182,7 +223,23 @@
         "all_done": "All done!",
         "keep_going": "Keep it up!",
         "victory_title": "Well done!",
-        "victory_message": "You've completed all your missions!"
+        "victory_message": "You've completed all your missions!",
+        "lets_go": "Let's Go!",
+        "challenge_ready": "Your parents have prepared a new challenge for you!",
+        "start_challenge": "Start the challenge",
+        "waiting": "Waiting...",
+        "waiting_msg": "Your parent will validate your day soon!",
+        "congratulations": "CONGRATULATIONS!",
+        "oh_no": "Oh no...",
+        "day_not_validated": "The day was not validated. The counter resets to zero.",
+        "malus_pay": "MALUS :",
+        "waiting_parent_config": "Waiting for parents to validate the new challenge"
+    },
+    "pin": {
+        "access_title": "Parent Access",
+        "enter_code": "Enter your secret code",
+        "cancel": "Cancel",
+        "forgot_code": "Forgot code?"
     },
     "missions": {
         "brush_teeth": "Brush your teeth",

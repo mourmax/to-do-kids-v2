@@ -1,9 +1,11 @@
 import { CheckCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function ValidationMissionList({ missions, onValidate }) {
+  const { t } = useTranslation()
   return (
     <section className="space-y-4">
-      <h3 className="text-slate-500 font-black text-[10px] uppercase tracking-widest ml-4">Contrôle des Missions</h3>
+      <h3 className="text-slate-500 font-black text-[10px] uppercase tracking-widest ml-4">{t('validation.mission_control')}</h3>
       <div className="space-y-3">
         {missions?.map((m) => {
           const isWaitingForParent = m.is_completed && !m.parent_validated
@@ -12,15 +14,15 @@ export default function ValidationMissionList({ missions, onValidate }) {
               <div className="flex items-center gap-4">
                 <span className="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-xl">{m.icon}</span>
                 <div>
-                  <span className="text-white font-bold text-sm block">{m.title}</span>
+                  <span className="text-white font-bold text-sm block">{t(m.title)}</span>
                   <div className="flex gap-2 mt-1">
-                    <span className={`text-[8px] font-black uppercase ${m.is_completed ? 'text-emerald-400' : 'text-slate-600'}`}>{m.is_completed ? '● Enfant OK' : '○ En attente enfant'}</span>
-                    {isWaitingForParent && <span className="text-[8px] font-black uppercase text-indigo-400 animate-pulse">| À VALIDER</span>}
+                    <span className={`text-[8px] font-black uppercase ${m.is_completed ? 'text-emerald-400' : 'text-slate-600'}`}>{m.is_completed ? `● ${t('validation.child_ok')}` : `○ ${t('validation.child_waiting')}`}</span>
+                    {isWaitingForParent && <span className="text-[8px] font-black uppercase text-indigo-400 animate-pulse">| {t('validation.to_validate')}</span>}
                   </div>
                 </div>
               </div>
-              <button 
-                onClick={() => onValidate(m.id, m.parent_validated)} 
+              <button
+                onClick={() => onValidate(m.id, m.parent_validated)}
                 className={`p-3 rounded-xl transition-all ${m.parent_validated ? 'bg-emerald-500 text-white shadow-lg' : isWaitingForParent ? 'bg-indigo-600 text-white shadow-lg animate-bounce-subtle' : 'bg-slate-800 text-slate-500'}`}
               >
                 <CheckCircle size={18} />

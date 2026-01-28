@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Trophy, Sparkles } from 'lucide-react'
 import confetti from 'canvas-confetti'
+import { useTranslation } from 'react-i18next'
 
 export default function ParentVictoryModal({ childName, rewardName, onClose, isParent = true, isReady = false }) {
+  const { t } = useTranslation()
 
   // Explosion de confettis "Premium" à l'ouverture
   useEffect(() => {
@@ -32,9 +34,9 @@ export default function ParentVictoryModal({ childName, rewardName, onClose, isP
   }, [])
 
   const getButtonText = () => {
-    if (isParent) return "Continuer vers le bilan"
-    if (isReady) return `Débuter le nouveau challenge ${childName}`
-    return "Bravo ! En attente du prochain défi..."
+    if (isParent) return t('validation.continue_to_report')
+    if (isReady) return t('validation.start_new_challenge_child', { name: childName })
+    return t('validation.waiting_next_challenge')
   }
 
   return (
@@ -70,7 +72,7 @@ export default function ParentVictoryModal({ childName, rewardName, onClose, isP
               transition={{ delay: 0.4 }}
               className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-white to-yellow-200 uppercase italic tracking-tighter"
             >
-              Incroyable !
+              {t('validation.victory_title')}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
@@ -78,7 +80,7 @@ export default function ParentVictoryModal({ childName, rewardName, onClose, isP
               transition={{ delay: 0.6 }}
               className="text-indigo-200 text-sm font-bold uppercase tracking-widest leading-relaxed"
             >
-              Bravo {childName}, tu as réussi le challenge !
+              {t('validation.victory_message_with_name', { name: childName })}
             </motion.p>
           </div>
 
@@ -88,7 +90,7 @@ export default function ParentVictoryModal({ childName, rewardName, onClose, isP
             transition={{ delay: 0.8 }}
             className="bg-indigo-600/30 border border-indigo-400/30 p-5 rounded-3xl w-full backdrop-blur-sm"
           >
-            <p className="text-indigo-300 text-[10px] font-black uppercase mb-1 tracking-wider">Récompense débloquée</p>
+            <p className="text-indigo-300 text-[10px] font-black uppercase mb-1 tracking-wider">{t('validation.reward_unlocked_upcase')}</p>
             <p className="text-2xl font-black text-white uppercase italic text-shadow">{rewardName}</p>
           </motion.div>
 
