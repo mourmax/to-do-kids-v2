@@ -116,7 +116,8 @@
         "parent_text": "Fini de répéter les consignes en boucle !\nL'app guide l'enfant, vous n'avez plus qu'à féliciter.",
         "reward_title": "La Récompense",
         "reward_text": "Un objectif clair, une motivation forte.\nLe moteur idéal pour son autonomie !",
-        "start": "C'est parti !"
+        "start": "C'est parti !",
+        "next": "Suivant"
     },
     "completion_modal": {
         "title": "Configuration Terminée !",
@@ -132,7 +133,10 @@
         "step2_text": "Rendez-vous dans",
         "step2_text_bold": "Paramètres → Enfants",
         "step2_text_end": "pour copier le code unique de chaque enfant.",
-        "button": "Voir les codes enfants"
+        "button": "Voir les codes enfants",
+        "default_child_name": "Mon enfant",
+        "default_reward": "Cadeau surprise",
+        "default_malus": "Zut ! On recommence au début."
     },
     "onboarding": {
         "missions_title": "Configurez les Missions",
@@ -160,7 +164,9 @@
         "validation": "Validation",
         "settings": "Réglages",
         "missions": "Missions",
-        "challenge": "Défi"
+        "challenge": "Défi",
+        "day_singular": "Jour",
+        "children_tab": "Enfants"
     },
     "child": {
         "final_goal": "Objectif Final",

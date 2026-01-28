@@ -115,7 +115,7 @@ export default function App() {
   if (isLoading && !familyError) { // Only show global loading if no family error
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">
-        Chargement...
+        {t('auth.loading')}
       </div>
     )
   }

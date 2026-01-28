@@ -16,7 +16,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
   const [showCompletionModal, setShowCompletionModal] = useState(false)
 
   // Show onboarding if streak is 0 and no reward set
-  const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === "Cadeau Surprise"))
+  const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === t('completion_modal.default_reward')))
 
   useEffect(() => {
     if (challenge && !isSaving) {
@@ -28,7 +28,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
 
   // Show completion modal when challenge is configured during onboarding
   useEffect(() => {
-    if (isNewUser && challenge?.reward_name && challenge?.reward_name !== "Cadeau Surprise") {
+    if (isNewUser && challenge?.reward_name && challenge?.reward_name !== t('completion_modal.default_reward')) {
       setShowCompletionModal(true)
     }
   }, [isNewUser, challenge?.reward_name])
@@ -63,8 +63,8 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       {showOnboarding && (
         <OnboardingInfoBlock
           step={null} // Remove step number
-          title="Le Grand Défi"
-          description="Choisissez la durée du challenge, la récompense et le malus... Pensez à sauvegarder !"
+          title={t('onboarding.challenge_title')}
+          description={t('onboarding.challenge_description')}
           icon={Trophy}
         />
       )}
@@ -88,7 +88,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
             </div>
             <div className="py-3 px-4 bg-slate-900/50 rounded-2xl text-center font-black text-indigo-400 flex flex-col justify-center leading-none border border-white/5 shadow-inner">
               <span className="text-[8px] uppercase mb-1 opacity-60 text-slate-400">{t('settings.current_streak')}</span>
-              Jour {challenge?.current_streak || 0}
+              {t('common.day_singular')} {challenge?.current_streak || 0}
             </div>
           </div>
 

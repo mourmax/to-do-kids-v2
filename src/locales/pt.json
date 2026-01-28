@@ -18,7 +18,8 @@
         "signup_button": "Criar uma conta",
         "already_account": "Já tem uma conta? Entrar",
         "no_account": "Não tem uma conta? Registre-se",
-        "forgot_pin": "Esqueceu o PIN?"
+        "forgot_pin": "Esqueceu o PIN?",
+        "loading": "Carregando..."
     },
     "dashboard": {
         "child_title": "Tuas missões",
@@ -74,7 +75,8 @@
         "parent_text": "Chega de repetir instruções!\nO aplicativo guia a criança, você só precisa parabenizar.",
         "reward_title": "A Recompensa",
         "reward_text": "Um objetivo claro, motivação forte.\nO motor ideal para sua autonomia!",
-        "start": "Vamos lá!"
+        "start": "Vamos lá!",
+        "next": "Seguinte"
     },
     "completion_modal": {
         "title": "Configuração Concluída!",
@@ -90,7 +92,10 @@
         "step2_text": "Vá para",
         "step2_text_bold": "Definições → Crianças",
         "step2_text_end": "para copiar o código único de cada criança.",
-        "button": "Ver códigos das crianças"
+        "button": "Ver códigos das crianças",
+        "default_child_name": "Meu filho",
+        "default_reward": "Presente surpresa",
+        "default_malus": "Ops! Voltamos ao início."
     },
     "onboarding": {
         "missions_title": "Configurar Missões",
@@ -118,7 +123,9 @@
         "validation": "Validação",
         "settings": "Configurações",
         "missions": "Missões",
-        "challenge": "Desafio"
+        "challenge": "Desafio",
+        "day_singular": "Dia",
+        "children_tab": "Crianças"
     },
     "child": {
         "final_goal": "Objetivo Final",

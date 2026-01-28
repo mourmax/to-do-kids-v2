@@ -203,7 +203,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
             onClick={() => setActiveTab('all')}
             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            Tous
+            {t('common.all')}
           </button>
           {childProfiles.map(p => {
             const colorClass = getColorClasses(p.color)
@@ -228,7 +228,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
               className="bg-indigo-600/10 border border-indigo-500/20 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-indigo-600/20 transition-all active:scale-[0.98] shadow-lg shadow-indigo-600/5"
             >
               <Sparkles size={24} className="text-indigo-400 group-hover:rotate-12 transition-transform" />
-              <span className="font-black uppercase text-[10px] tracking-widest text-indigo-100">Bibliothèque</span>
+              <span className="font-black uppercase text-[10px] tracking-widest text-indigo-100">{t('library.library_button')}</span>
             </button>
 
             {/* Custom */}
@@ -237,7 +237,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
               className="bg-slate-900/60 border border-white/5 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-slate-800 transition-all active:scale-[0.98] shadow-lg"
             >
               <Plus size={24} className="text-slate-400 group-hover:scale-110 transition-transform" />
-              <span className="font-black uppercase text-[10px] tracking-widest text-slate-300">Sur mesure</span>
+              <span className="font-black uppercase text-[10px] tracking-widest text-slate-300">{t('library.custom_button')}</span>
             </button>
           </div>
 

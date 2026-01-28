@@ -18,7 +18,8 @@
         "signup_button": "Crea un account",
         "already_account": "Hai già un account? Accedi",
         "no_account": "Non hai un account? Registrati",
-        "forgot_pin": "PIN dimenticato?"
+        "forgot_pin": "PIN dimenticato?",
+        "loading": "Caricamento..."
     },
     "dashboard": {
         "child_title": "Le tue missioni",
@@ -74,7 +75,8 @@
         "parent_text": "Niente più ripetere le istruzioni!\nL'app guida il bambino, devi solo congratularti.",
         "reward_title": "La Ricompensa",
         "reward_text": "Un obiettivo chiaro, motivazione forte.\nIl motore ideale per la loro autonomia!",
-        "start": "Andiamo!"
+        "start": "Andiamo!",
+        "next": "Avanti"
     },
     "completion_modal": {
         "title": "Configurazione Completata!",
@@ -90,7 +92,10 @@
         "step2_text": "Vai a",
         "step2_text_bold": "Impostazioni → Bambini",
         "step2_text_end": "per copiare il codice univoco di ogni bambino.",
-        "button": "Visualizza codici bambini"
+        "button": "Visualizza codici bambini",
+        "default_child_name": "Mio figlio",
+        "default_reward": "Regalo sorpresa",
+        "default_malus": "Ops! Si ricomincia dall'inizio."
     },
     "onboarding": {
         "missions_title": "Configura Missioni",
@@ -118,7 +123,9 @@
         "validation": "Validazione",
         "settings": "Impostazioni",
         "missions": "Missioni",
-        "challenge": "Sfida"
+        "challenge": "Sfida",
+        "day_singular": "Giorno",
+        "children_tab": "Bambini"
     },
     "child": {
         "final_goal": "Obiettivo Finale",

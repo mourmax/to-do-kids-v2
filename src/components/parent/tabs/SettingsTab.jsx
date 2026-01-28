@@ -34,9 +34,9 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
   }
 
   const subTabs = [
-    { id: 'missions', label: "Missions", icon: <Sparkles size={16} /> },
-    { id: 'challenge', label: "Défi", icon: <Trophy size={16} /> },
-    { id: 'children', label: "Enfants", icon: <Users size={16} /> },
+    { id: 'missions', label: t('common.missions'), icon: <Sparkles size={16} /> },
+    { id: 'challenge', label: t('common.challenge'), icon: <Trophy size={16} /> },
+    { id: 'children', label: t('common.children_tab'), icon: <Users size={16} /> },
   ]
 
   return (
