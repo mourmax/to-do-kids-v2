@@ -24,6 +24,8 @@ export default function App() {
 
   // État du tutoriel
   const [showTutorial, setShowTutorial] = useState(false)
+  const [isNewUser, setIsNewUser] = useState(false)
+  const [pinSuccessfullySet, setPinSuccessfullySet] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -43,6 +45,7 @@ export default function App() {
     // Vérification du tutoriel au chargement (seulement si pas vu)
     const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1')
     if (!hasSeenTuto) {
+      setIsNewUser(true)
       setTimeout(() => setShowTutorial(true), 1000) // Petit délai pour l'effet d'arrivée
     }
 
@@ -105,7 +108,7 @@ export default function App() {
 
   // 3. Condition for PIN Setup (Only for Parent)
   const parentProfile = profiles.find(p => p.is_parent)
-  const needsPinSetup = parentProfile && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
+  const needsPinSetup = parentProfile && !pinSuccessfullySet && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
 
   if (parentProfile && needsPinSetup) {
     return (
@@ -113,7 +116,8 @@ export default function App() {
         profileId={parentProfile.id}
         onComplete={() => {
           localStorage.removeItem('reset_pin_mode')
-          refresh() // Important: will set isLoading to true and avoid flickering
+          setPinSuccessfullySet(true)
+          refresh() // will set isLoading to true
         }}
       />
     )
@@ -226,6 +230,9 @@ export default function App() {
                 onExit={() => setIsParentMode(false)}
                 onSwitchProfile={switchProfile}
                 refresh={refresh}
+                isNewUser={isNewUser}
+                initialTab={isNewUser ? 'settings' : 'validation'}
+                initialSubTab={isNewUser ? 'children' : 'missions'}
               />
             ) : (
               <ChildDashboard

@@ -7,10 +7,10 @@ import NotificationBanner from '../ui/NotificationBanner'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
-export default function ParentDashboard({ family, profile, profiles, challenge, missions, allMissions, onExit, refresh, onSwitchProfile }) {
+export default function ParentDashboard({ family, profile, profiles, challenge, missions, allMissions, onExit, refresh, onSwitchProfile, initialTab = 'validation', initialSubTab = 'missions' }) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState('validation')
-  const [activeSubTab, setActiveSubTab] = useState('missions')
+  const [activeTab, setActiveTab] = useState(initialTab)
+  const [activeSubTab, setActiveSubTab] = useState(initialSubTab)
   const [notifications, setNotifications] = useState([])
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
