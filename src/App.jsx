@@ -21,6 +21,7 @@ export default function App() {
   const [showAuth, setShowAuth] = useState(false)
   const [isParentMode, setIsParentMode] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
+  const [error, setError] = useState(null)
 
   // État du tutoriel
   const [showTutorial, setShowTutorial] = useState(false)
@@ -48,7 +49,7 @@ export default function App() {
   }, [])
 
   // 2. Data loading (Call this BEFORE using its values)
-  const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, refresh, switchProfile } = useFamily(
+  const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, error: familyError, refresh: loadFamilyData, switchProfile } = useFamily(
     session?.user?.id,
     childFamilyId
   )
@@ -82,7 +83,7 @@ export default function App() {
     setChildFamilyId(profileData.family_id)
     localStorage.setItem('child_family_id', profileData.family_id)
     localStorage.setItem('active_profile_id', profileData.id)
-    refresh()
+    loadFamilyData()
   }
 
   const handleCloseTutorial = () => {
@@ -97,7 +98,7 @@ export default function App() {
   }
 
   // A. Initial Loading State
-  if (isLoading) {
+  if (isLoading && !familyError) { // Only show global loading if no family error
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">
         Chargement...
@@ -126,7 +127,7 @@ export default function App() {
         onComplete={() => {
           localStorage.removeItem('reset_pin_mode')
           setPinSuccessfullySet(true)
-          refresh()
+          loadFamilyData()
         }}
       />
     )
@@ -164,7 +165,7 @@ export default function App() {
                 .from('profiles')
                 .update({ preferred_theme: newTheme })
                 .eq('id', activeProfile.id)
-              if (!error) refresh()
+              if (!error) loadFamilyData()
             }}
             className="bg-slate-900 border border-white/10 p-2 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg shadow-black/20"
             title="Changer de thème"
@@ -238,23 +239,27 @@ export default function App() {
                 profiles={profiles}
                 onExit={() => setIsParentMode(false)}
                 onSwitchProfile={switchProfile}
-                refresh={refresh}
+                refresh={loadFamilyData}
                 isNewUser={isOnboardingSession}
                 initialTab={isOnboardingSession ? 'settings' : 'validation'}
                 initialSubTab={isOnboardingSession ? 'children' : 'missions'}
               />
-            ) : (
+            ) : familyError ? (
               <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">
                 <div className="bg-rose-500/10 p-4 rounded-full">
                   <Lock className="text-rose-500" size={32} />
                 </div>
                 <h2 className="text-xl font-black uppercase text-white">Erreur de chargement</h2>
                 <p className="text-slate-400 text-sm max-w-xs uppercase tracking-widest leading-loose">
-                  Impossible de charger les données de votre famille. Vérifiez vos permissions ou réessayez.
+                  {familyError === "Missing family" ? "Impossible de trouver votre famille." : "Un problème est survenu lors du chargement."}
                 </p>
-                <button onClick={() => refresh()} className="px-6 py-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all font-black uppercase text-[10px]">
+                <button onClick={() => loadFamilyData()} className="px-6 py-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all font-black uppercase text-[10px]">
                   Réessayer
                 </button>
+              </div>
+            ) : (
+              <div className="min-h-[200px] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-indigo-500" />
               </div>
             )
           ) : (
