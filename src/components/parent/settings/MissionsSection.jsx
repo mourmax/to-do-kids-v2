@@ -50,7 +50,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
                 onClick={() => setEditState({ ...editState, assigned_to: null })}
                 className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${!editState.assigned_to ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500'}`}
               >
-                Tous
+                {t('common.all')}
               </button>
               {profiles?.filter(p => !p.is_parent).map(p => (
                 <button
@@ -74,10 +74,10 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
           <div className="flex items-center gap-3">
             <span className="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-xl">{mission.icon}</span>
             <div className="flex flex-col">
-              <span className="text-white font-bold text-sm">{mission.title}</span>
+              <span className="text-white font-bold text-sm">{t(mission.title)}</span>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${targetStyle}`}>
-                  {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : "Tous"}
+                  {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : t('common.all')}
                 </span>
               </div>
             </div>
@@ -186,9 +186,9 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     <div className="space-y-6">
       {showOnboarding && (
         <OnboardingInfoBlock
-          step={null} // Remove step number
-          title="Configurez les missions"
-          description="Choisissez des missions dans la bibliothèque de missions ou configurez votre mission sur mesure... Pensez à sauvegarder !"
+          step={t('common.step_badge')}
+          title={t('onboarding.missions_title')}
+          description={t('onboarding.missions_description')}
           icon={Library}
         />
       )}
@@ -279,7 +279,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                         type="text"
                         value={newMissionTitle}
                         onChange={(e) => setNewMissionTitle(e.target.value)}
-                        placeholder="Nom de la mission..."
+                        placeholder={t('actions.add_placeholder')}
                         className="flex-1 bg-slate-950 border border-white/10 rounded-2xl px-5 py-3 outline-none font-bold focus:border-indigo-500 transition-colors text-white text-sm"
                         autoFocus
                       />
@@ -292,7 +292,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                           onClick={() => setTargetId(null)}
                           className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all border ${!targetId ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-slate-950 border-white/5 text-slate-600'}`}
                         >
-                          Tous
+                          {t('common.all')}
                         </button>
                         {childProfiles.map(p => (
                           <button

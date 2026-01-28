@@ -114,7 +114,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
         onClose={() => setShowCompletionModal(false)}
         onNavigateToChildren={() => {
           setShowCompletionModal(false)
-          onNextStep('identity')
+          onNextStep('children')
         }}
       />
     </div>

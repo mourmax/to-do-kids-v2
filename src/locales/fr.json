@@ -49,7 +49,8 @@
         "cancel": "Annuler",
         "logout": "Déconnexion",
         "validate_all": "Tout valider",
-        "add_mission": "Ajouter une mission"
+        "add_mission": "Ajouter une mission",
+        "saving": "Enregistrement..."
     },
     "settings": {
         "title": "Réglages",
@@ -161,6 +162,7 @@
         "mission_edition": "Édition des Missions",
         "creating": "Création...",
         "step": "Étape",
+        "step_badge": "ÉTAPE",
         "validation": "Validation",
         "settings": "Réglages",
         "missions": "Missions",

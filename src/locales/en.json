@@ -49,7 +49,8 @@
         "cancel": "Cancel",
         "logout": "Logout",
         "validate_all": "Validate all",
-        "add_mission": "Add mission"
+        "add_mission": "Add mission",
+        "saving": "Saving..."
     },
     "settings": {
         "title": "Settings",
@@ -155,6 +156,7 @@
         "creating": "Creating...",
         "day": "Day",
         "step": "Step",
+        "step_badge": "STEP",
         "validation": "Validation",
         "settings": "Settings",
         "missions": "Missions",
@@ -201,5 +203,22 @@
         "be_polite": "Be polite",
         "share_toys": "Share your toys",
         "say_thanks": "Say thank you / please"
+    },
+    "completion_modal": {
+        "title": "Setup Complete!",
+        "subtitle": "Everything is ready! Follow the steps below to connect your children.",
+        "step1_title": "On your child's device",
+        "step1_item1": "Open the app",
+        "step1_item2": "Click on",
+        "step1_item2_bold": "I am a child",
+        "step1_item3": "Enter the",
+        "step1_item3_bold": "activation code",
+        "step1_item3_end": "of the child",
+        "step2_title": "Where to find the activation code?",
+        "step2_text": "Go to",
+        "step2_text_bold": "Settings → Children",
+        "step2_text_end": "to copy each child's unique code.",
+        "button": "Got it!",
+        "default_reward": "Surprise Gift"
     }
 }
