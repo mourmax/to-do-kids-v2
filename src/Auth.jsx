@@ -71,8 +71,8 @@ export default function Auth({ onBack }) {
         </button>
 
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">{isSignUp ? t('CREER UN COMPTE') || "Créer un compte" : t('auth.login_title')}</h1>
-          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{isSignUp ? "L'aventure commence ici" : t('auth.login_subtitle')}</p>
+          <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">{isSignUp ? t('auth.signup_title') : t('auth.login_title')}</h1>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{isSignUp ? t('auth.signup_subtitle') : t('auth.login_subtitle')}</p>
         </div>
 
         {/* --- TOGGLE PROMINENT CREER COMPTE / SE CONNECTER --- */}

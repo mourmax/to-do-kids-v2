@@ -3,6 +3,8 @@
         "welcome": "Ciao {{name}}",
         "login_title": "TO DO KIDS",
         "login_subtitle": "L'avventura inizia qui",
+        "signup_title": "Crea un account",
+        "signup_subtitle": "L'avventura inizia qui",
         "i_am_child": "Sono un bambino",
         "i_am_parent": "Sono un genitore",
         "invite_code": "Codice invito",
