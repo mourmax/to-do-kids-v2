@@ -271,7 +271,7 @@ export default function App() {
               missions={missions}
               onParentMode={() => setShowPinModal(true)}
               onSwitchProfile={switchProfile}
-              refresh={refresh}
+              refresh={loadFamilyData}
               isChildSession={!session && !!childFamilyId}
             />
           )}
