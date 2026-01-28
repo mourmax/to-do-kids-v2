@@ -103,7 +103,7 @@ export default function TutorialModal({ onClose }) {
             onClick={nextSlide}
             className="w-full bg-white text-slate-900 py-5 rounded-2xl font-black uppercase text-lg tracking-widest hover:bg-slate-100 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-xl"
           >
-            {index === slides.length - 1 ? t('tutorial.start') : "Suivant"}
+            {index === slides.length - 1 ? t('tutorial.start') : t('tutorial.next')}
             {index < slides.length - 1 && <ChevronRight size={20} />}
           </button>
         </div>
