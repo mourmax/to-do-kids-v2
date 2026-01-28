@@ -18,17 +18,17 @@ export default function ChildProgressBar({ current, total, reward }) {
   const steps = Array.from({ length: safeTotal + 1 }, (_, i) => i)
 
   return (
-    <section className="bg-slate-900 p-8 rounded-[3rem] border-2 border-white/5 relative shadow-2xl">
+    <section className="bg-slate-900 [.light-theme_&]:bg-orange-600 p-8 rounded-[3rem] border-2 border-white/5 [.light-theme_&]:border-white/10 relative shadow-2xl transition-colors">
       <div className="flex justify-between items-end mb-12 relative z-10">
         <div>
-          <p className="text-orange-500 text-[10px] font-black uppercase tracking-widest mb-1">{t('child.final_goal')}</p>
+          <p className="text-orange-500 [.light-theme_&]:text-orange-100 text-[10px] font-black uppercase tracking-widest mb-1">{t('child.final_goal')}</p>
           <h2 className="text-white font-black text-lg flex items-center gap-2 italic uppercase tracking-tight">
             🎁 {reward || "Surprise"}
           </h2>
         </div>
         <div className="text-right">
-          <span className="text-5xl font-black text-indigo-400 leading-none">{displayCurrent}</span>
-          <span className="text-slate-600 font-black uppercase ml-1">/{safeTotal} {t('child.days')}</span>
+          <span className="text-5xl font-black text-indigo-400 [.light-theme_&]:text-white leading-none">{displayCurrent}</span>
+          <span className="text-slate-600 [.light-theme_&]:text-orange-200 font-black uppercase ml-1">/{safeTotal} {t('child.days')}</span>
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export default function ChildProgressBar({ current, total, reward }) {
       <div className="relative h-10 mt-2">
 
         {/* Fond de la barre (Gris) */}
-        <div className="absolute inset-0 bg-slate-800 rounded-full border border-white/5 overflow-hidden">
+        <div className="absolute inset-0 bg-slate-800 [.light-theme_&]:bg-orange-700/50 rounded-full border border-white/5 overflow-hidden">
 
           {/* Remplissage coloré (Progression) */}
           <motion.div
@@ -93,8 +93,8 @@ export default function ChildProgressBar({ current, total, reward }) {
         >
           <div className="relative w-1 h-full flex items-center justify-center">
             {/* La flamme flotte au dessus de la barre */}
-            <div className="absolute -top-8 bg-orange-500/20 p-1.5 rounded-full animate-pulse backdrop-blur-sm border border-orange-500/30">
-              <Flame size={28} className="text-orange-500 fill-orange-500 drop-shadow-lg" />
+            <div className="absolute -top-8 bg-orange-500/20 [.light-theme_&]:bg-white/20 p-1.5 rounded-full animate-pulse backdrop-blur-sm border border-orange-500/30 [.light-theme_&]:border-white/30">
+              <Flame size={28} className="text-orange-500 fill-orange-500 [.light-theme_&]:text-yellow-300 [.light-theme_&]:fill-yellow-300 drop-shadow-lg" />
             </div>
           </div>
         </motion.div>

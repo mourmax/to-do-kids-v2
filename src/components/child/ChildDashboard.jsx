@@ -296,7 +296,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
       {/* Titre Section */}
       <div className="text-center space-y-2 relative">
         <h2 className="text-xl font-black text-indigo-400 italic uppercase tracking-widest">{profile?.child_name}</h2>
-        <h1 className="text-3xl font-black text-white italic tracking-tighter uppercase">
+        <h1 className="text-3xl font-black text-white [.light-theme_&]:text-slate-900 italic tracking-tighter uppercase transition-colors">
           {t('dashboard.child_title')}
         </h1>
 
@@ -310,7 +310,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               .eq('id', profile.id)
             if (!error) refresh()
           }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-slate-900/40 border border-white/5 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg shadow-black/20"
+          className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-slate-900/40 [.light-theme_&]:bg-indigo-100 border border-white/5 [.light-theme_&]:border-indigo-200 rounded-xl text-slate-400 [.light-theme_&]:text-indigo-500 hover:text-white [.light-theme_&]:hover:text-indigo-700 transition-all shadow-lg shadow-black/20 [.light-theme_&]:shadow-indigo-500/10"
           title="Changer de thème"
         >
           {profile?.preferred_theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}

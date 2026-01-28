@@ -152,7 +152,7 @@ export default function App() {
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${activeProfile?.preferred_theme === 'light' ? 'light-theme' : 'dark-theme'} ${activeProfile?.preferred_theme === 'light' ? 'bg-slate-50 text-slate-900' : 'bg-[#020617] text-slate-100'} font-sans selection:bg-indigo-500/30`}>
+    <div className={`min-h-screen transition-colors duration-300 ${activeProfile?.preferred_theme === 'light' ? 'light-theme' : 'dark'} ${activeProfile?.preferred_theme === 'light' ? 'bg-slate-50 text-slate-900' : 'bg-[#020617] text-slate-100'} font-sans selection:bg-indigo-500/30`}>
 
       {/* Tuto Modal (s'affiche par dessus tout) */}
       <AnimatePresence>

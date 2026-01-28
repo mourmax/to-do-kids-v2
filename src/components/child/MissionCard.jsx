@@ -15,7 +15,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
         ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_0_30px_rgba(251,191,36,0.3)]'
         : isDone
           ? 'bg-emerald-600 border-emerald-500'
-          : 'bg-slate-900 border-white/5 shadow-xl shadow-black/20'
+          : 'bg-slate-900 [.light-theme_&]:bg-white border-white/5 [.light-theme_&]:border-indigo-200 [.light-theme_&]:border-b-[6px] shadow-xl shadow-black/20 [.light-theme_&]:shadow-indigo-200/50'
         }`}
     >
       <AnimatePresence>
@@ -41,10 +41,10 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       </AnimatePresence>
 
       <div className={`flex flex-col items-center gap-1 mt-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''}`}>
-        <span className={`text-5xl mb-1 transition-all ${isDone ? 'scale-110 drop-shadow-md' : 'grayscale-[0.2] opacity-50'}`}>
+        <span className={`text-5xl mb-1 transition-all ${isDone ? 'scale-110 drop-shadow-md' : 'grayscale-0 opacity-100'}`}>
           {mission.icon || '⭐'}
         </span>
-        <h3 className={`font-black uppercase text-[10px] tracking-tight leading-tight px-1 text-shadow-sm ${isParentValidated ? 'text-white' : 'text-white'}`}>
+        <h3 className={`font-black uppercase text-[10px] tracking-tight leading-tight px-1 text-shadow-sm ${isParentValidated ? 'text-white' : 'text-white [.light-theme_&]:text-slate-800'}`}>
           {t(mission.title)}
         </h3>
       </div>
@@ -54,7 +54,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
           onClick={() => !disabled && onToggle(mission.id, isDone)}
           className={`w-full py-2.5 rounded-[1.5rem] font-black uppercase text-[8px] tracking-[0.1em] transition-all z-30 ${isDone
             ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
-            : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1'
+            : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1 [.light-theme_&]:bg-indigo-500 [.light-theme_&]:text-white [.light-theme_&]:border-indigo-700'
             }`}
         >
           {isDone ? (

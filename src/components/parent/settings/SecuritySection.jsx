@@ -29,7 +29,7 @@ export default function SecuritySection({ profile, onShowSuccess }) {
             placeholder="••••"
             value={newPin}
             onChange={(e) => setNewPin(e.target.value.replace(/[^0-9]/g, ''))}
-            className="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3 mt-1 font-bold outline-none text-white focus:border-red-500 transition-colors tracking-[0.5em] text-center"
+            className="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3 mt-1 font-bold outline-none text-white focus:border-red-500 transition-colors tracking-[0.5em] text-center [.light-theme_&]:bg-white [.light-theme_&]:text-slate-900 [.light-theme_&]:border-red-200"
           />
         </div>
         <button

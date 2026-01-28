@@ -21,7 +21,7 @@ export default function FamilySection({ family }) {
                     {t('settings.family_access_title')}
                 </p>
 
-                <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-4 flex items-center justify-between group hover:border-indigo-500/30 transition-all">
+                <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-4 flex items-center justify-between group hover:border-indigo-500/30 transition-all [.light-theme_&]:bg-orange-600 [.light-theme_&]:border-transparent">
                     <div className="space-y-1">
                         <span className="text-3xl font-black text-white tracking-[0.2em] italic uppercase">
                             {family?.invite_code || '------'}
@@ -30,7 +30,7 @@ export default function FamilySection({ family }) {
 
                     <button
                         onClick={handleCopy}
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-90 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-90 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 [.light-theme_&]:bg-white/20 [.light-theme_&]:text-white/80 [.light-theme_&]:hover:bg-white/30'
                             }`}
                     >
                         {copied ? <Check size={20} /> : <Copy size={20} />}

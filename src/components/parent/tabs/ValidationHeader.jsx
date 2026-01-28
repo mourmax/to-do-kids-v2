@@ -21,7 +21,7 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
   )
 
   return (
-    <section className={`rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden transition-all duration-500 ${isChallengeFinished ? 'bg-gradient-to-br from-orange-500 to-red-600' : allMissionsDone ? 'bg-indigo-600' : 'bg-slate-900 border border-white/5'}`}>
+    <section className={`rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden transition-all duration-500 ${isChallengeFinished ? 'bg-gradient-to-br from-orange-500 to-red-600' : allMissionsDone ? 'bg-indigo-600' : 'bg-slate-900 [.light-theme_&]:bg-indigo-500/15 border border-white/5 [.light-theme_&]:border-indigo-500/10 [.light-theme_&]:shadow-indigo-500/10'}`}>
 
       {isChallengeFinished ? (
         // --- UI FIN DE SÉRIE ---
@@ -51,15 +51,16 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
       ) : (
         // --- UI VERDICT JOUR ---
         <div className="relative z-10 flex flex-col gap-4 text-center">
-          <h3 className="text-white/70 text-[10px] font-black uppercase tracking-widest">{t('validation.verdict')}</h3>
+
+          <h3 className="text-white/90 dark:text-white/70 text-[10px] font-black uppercase tracking-widest [.light-theme_&]:text-slate-400">{t('validation.verdict')}</h3>
           {!allMissionsDone && (
-            <div className="flex items-center justify-center gap-2 text-orange-400 text-[8px] font-black uppercase bg-orange-400/10 py-2 rounded-xl">
+            <div className="flex items-center justify-center gap-2 text-white dark:text-orange-400 [.light-theme_&]:text-orange-500 text-[8px] font-black uppercase bg-white/20 dark:bg-orange-400/10 [.light-theme_&]:bg-orange-50 py-2 rounded-xl">
               <AlertCircle size={12} /> {t('validation.waiting_validations')}
             </div>
           )}
           <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => onDayResult(true)} className={`py-4 rounded-2xl font-black uppercase text-[10px] shadow-xl transition-all ${allMissionsDone ? 'bg-white text-indigo-600 active:scale-95' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>{t('validation.success')}</button>
-            <button onClick={() => onDayResult(false)} className="bg-red-500 text-white py-4 rounded-2xl font-black uppercase text-[10px] shadow-xl active:scale-95 transition-all">{t('validation.fail')}</button>
+            <button onClick={() => onDayResult(true)} className={`py-4 rounded-2xl font-black uppercase text-[10px] shadow-xl transition-all ${allMissionsDone ? 'bg-white text-indigo-600 active:scale-95' : 'bg-white text-emerald-600 dark:bg-slate-800 dark:text-slate-600 cursor-not-allowed opacity-50 [.light-theme_&]:opacity-100 [.light-theme_&]:bg-emerald-500 [.light-theme_&]:text-white [.light-theme_&]:shadow-emerald-200'}`}>{t('validation.success')}</button>
+            <button onClick={() => onDayResult(false)} className="bg-white text-red-600 dark:bg-red-500 dark:text-white py-4 rounded-2xl font-black uppercase text-[10px] shadow-xl active:scale-95 transition-all [.light-theme_&]:bg-red-500 [.light-theme_&]:text-white [.light-theme_&]:shadow-red-200">{t('validation.fail')}</button>
           </div>
         </div>
       )}

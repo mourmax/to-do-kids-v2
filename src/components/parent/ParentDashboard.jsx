@@ -164,7 +164,7 @@ export default function ParentDashboard({
 
       <header className="space-y-6">
         <div className="flex flex-col items-center justify-center text-center">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white mb-2">
+          <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white [.light-theme_&]:text-slate-900 mb-2">
             {t('dashboard.parent_title')}
           </h1>
 
@@ -204,7 +204,7 @@ export default function ParentDashboard({
         </div>
 
         {/* Tab Switcher - Premium Look */}
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-white/5 p-1.5 rounded-[2.5rem] flex relative shadow-2xl max-w-md mx-auto">
+        <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/15 backdrop-blur-xl border border-white/5 [.light-theme_&]:border-indigo-500/10 p-1.5 rounded-[2.5rem] flex relative shadow-2xl max-w-md mx-auto">
           <motion.div
             className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-indigo-600 rounded-[2.2rem] shadow-[0_0_20px_rgba(79,70,229,0.4)] z-0"
             animate={{ x: activeTab === 'settings' ? '100%' : '0%' }}
