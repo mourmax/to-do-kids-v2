@@ -30,18 +30,6 @@ export default function App() {
   // Track if this is an onboarding session
   const [isOnboardingSession, setIsOnboardingSession] = useState(false)
 
-  // Update onboarding status based on data (Sticky)
-  useEffect(() => {
-    if (!isLoading && session && family && !isOnboardingSession) {
-      const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
-      const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
-
-      if (!hasSeenTuto || isDefaultFamily) {
-        setIsOnboardingSession(true)
-      }
-    }
-  }, [isLoading, !!session, !!family, profiles.length, isOnboardingSession])
-
   // 1. Session management
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -65,6 +53,18 @@ export default function App() {
     session?.user?.id,
     childFamilyId
   )
+
+  // Update onboarding status based on data (Sticky)
+  useEffect(() => {
+    if (!isLoading && session && family && !isOnboardingSession) {
+      const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
+      const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+
+      if (!hasSeenTuto || isDefaultFamily) {
+        setIsOnboardingSession(true)
+      }
+    }
+  }, [isLoading, !!session, !!family, profiles.length, isOnboardingSession])
 
   // 3. Derived states for onboarding (Safe to use profiles here)
   const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
