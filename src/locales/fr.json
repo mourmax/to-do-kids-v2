@@ -18,7 +18,8 @@
         "signup_button": "Créer un compte",
         "already_account": "Déjà un compte ? Se connecter",
         "no_account": "Pas de compte ? S'inscrire",
-        "forgot_pin": "Code PIN oublié ?"
+        "forgot_pin": "Code PIN oublié ?",
+        "loading": "Chargement..."
     },
     "dashboard": {
         "child_title": "Tes Missions",
@@ -126,17 +127,17 @@
         "step1_title": "Sur l'appareil de votre enfant",
         "step1_item1": "Ouvrez l'application",
         "step1_item2": "Cliquez sur",
-        "step1_item2_bold": "\"Je suis un enfant\"",
+        "step1_item2_bold": "Je suis un enfant",
         "step1_item3": "Entrez le",
         "step1_item3_bold": "code d'activation",
         "step1_item3_end": "de l'enfant",
         "step2_title": "Où trouver le code d'activation ?",
-        "step2_text": "Rendez-vous dans",
-        "step2_text_bold": "Paramètres → Enfants",
+        "step2_text": "Allez dans",
+        "step2_text_bold": "Réglages → Enfants",
         "step2_text_end": "pour copier le code unique de chaque enfant.",
         "button": "Voir les codes enfants",
         "default_child_name": "Mon enfant",
-        "default_reward": "Cadeau surprise",
+        "default_reward": "Cadeau Surprise",
         "default_malus": "Zut ! On recommence au début."
     },
     "onboarding": {

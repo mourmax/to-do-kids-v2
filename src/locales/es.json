@@ -45,7 +45,8 @@
         "cancel": "Cancelar",
         "logout": "Cerrar sesión",
         "validate_all": "Validar todo",
-        "add_mission": "Añadir misión"
+        "add_mission": "Añadir misión",
+        "saving": "Guardando..."
     },
     "settings": {
         "language": "Idioma",
@@ -120,6 +121,7 @@
         "mission_edition": "Edición de Misiones",
         "creating": "Creando...",
         "step": "Paso",
+        "step_badge": "PASO",
         "validation": "Validación",
         "settings": "Ajustes",
         "missions": "Misiones",

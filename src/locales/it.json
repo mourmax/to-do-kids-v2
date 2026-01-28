@@ -45,7 +45,8 @@
         "cancel": "Annulla",
         "logout": "Esci",
         "validate_all": "Valida tutto",
-        "add_mission": "Aggiungi missione"
+        "add_mission": "Aggiungi missione",
+        "saving": "Salvataggio..."
     },
     "settings": {
         "language": "Lingua",
@@ -120,6 +121,7 @@
         "mission_edition": "Modifica Missioni",
         "creating": "Creazione...",
         "step": "Passo",
+        "step_badge": "PASSO",
         "validation": "Validazione",
         "settings": "Impostazioni",
         "missions": "Missioni",
