@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { Trophy } from 'lucide-react'
 import { supabase } from '../../../supabaseClient'
 import SectionCard from './SectionCard'
