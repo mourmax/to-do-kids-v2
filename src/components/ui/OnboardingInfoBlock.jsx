@@ -26,13 +26,6 @@ export default function OnboardingInfoBlock({ step, title, description, icon: Ic
                     <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
                         {description}
                     </p>
-
-                    <div className="flex items-center justify-center sm:justify-start gap-2 pt-2">
-                        <div className="bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border border-emerald-500/20 flex items-center gap-2">
-                            <Save size={12} />
-                            Pensez à sauvegarder vos modifications !
-                        </div>
-                    </div>
                 </div>
             </div>
         </motion.div>

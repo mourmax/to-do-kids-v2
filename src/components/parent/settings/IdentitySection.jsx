@@ -89,7 +89,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
         <OnboardingInfoBlock
           step={null} // Remove step number
           title="Préparez les profils"
-          description="Indiquez le prénom de votre enfant et sa couleur... Pensez à sauvegarder !"
+          description="Indiquez le prénom de votre enfant et sa couleur préférée."
           icon={User}
         />
       )}
@@ -176,10 +176,10 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
               </div>
 
               {/* Invite Code for this child */}
-              <div className="flex items-center justify-between bg-slate-950/50 rounded-xl px-4 py-2 border border-white/5 mt-2">
-                <div className="flex flex-col">
+              <div className="flex items-center justify-between bg-slate-950/50 rounded-xl px-5 py-4 border border-white/5 mt-2">
+                <div className="flex flex-col gap-1">
                   <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{t('settings.invite_code_description')}</span>
-                  <span className="text-sm font-black text-indigo-400 tracking-widest font-mono">
+                  <span className="text-2xl font-black text-indigo-400 tracking-widest font-mono">
                     {p.invite_code || '------'}
                   </span>
                 </div>
@@ -191,7 +191,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                   className="text-slate-500 hover:text-white transition-colors p-2"
                   title="Copier le code"
                 >
-                  <Copy size={16} />
+                  <Copy size={20} />
                 </button>
               </div>
             </div>
