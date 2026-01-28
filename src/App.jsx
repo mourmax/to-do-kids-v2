@@ -24,8 +24,10 @@ export default function App() {
 
   // État du tutoriel
   const [showTutorial, setShowTutorial] = useState(false)
-  const [isNewUser, setIsNewUser] = useState(false)
   const [pinSuccessfullySet, setPinSuccessfullySet] = useState(false)
+
+  // Track if this is an onboarding session (stays constant during the session)
+  const [isOnboardingSession] = useState(!localStorage.getItem('hasSeenTutorial_v1'))
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -42,14 +44,7 @@ export default function App() {
       }
     })
 
-    // Vérification du tutoriel au chargement (seulement si pas vu)
-    const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1')
-    if (!hasSeenTuto) {
-      setIsNewUser(true)
-      setTimeout(() => setShowTutorial(true), 1000) // Petit délai pour l'effet d'arrivée
-    }
-
-    return () => subscription.unsubscribe()
+    // Supprimé : on gère ça via un useEffect réactif plus bas pour éviter les conflits avec le PIN
   }, [])
 
   const { family, profiles, activeProfile, challenge, missions, allMissions, isLoading, refresh, switchProfile } = useFamily(
@@ -122,6 +117,18 @@ export default function App() {
       />
     )
   }
+
+  // 4. Force Onboarding for new parents
+  const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
+  const needsTutorial = !hasSeenTuto
+
+  // Ensure tutorial shows up if it's a new user and we are NOT in PIN setup anymore
+  useEffect(() => {
+    if (needsTutorial && !needsPinSetup && !isLoading && session) {
+      const timer = setTimeout(() => setShowTutorial(true), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [needsTutorial, needsPinSetup, isLoading, !!session])
 
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
 
@@ -220,7 +227,7 @@ export default function App() {
           <AnimatePresence mode="wait">
             {isParentMode ? (
               <ParentDashboard
-                key="parent"
+                key={isOnboardingSession ? 'onboarding' : 'classic'}
                 family={family}
                 profile={activeProfile}
                 challenge={challenge}
@@ -230,9 +237,9 @@ export default function App() {
                 onExit={() => setIsParentMode(false)}
                 onSwitchProfile={switchProfile}
                 refresh={refresh}
-                isNewUser={isNewUser}
-                initialTab={isNewUser ? 'settings' : 'validation'}
-                initialSubTab={isNewUser ? 'children' : 'missions'}
+                isNewUser={isOnboardingSession}
+                initialTab={isOnboardingSession ? 'settings' : 'validation'}
+                initialSubTab={isOnboardingSession ? 'children' : 'missions'}
               />
             ) : (
               <ChildDashboard
