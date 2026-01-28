@@ -103,7 +103,7 @@ export default function App() {
     )
   }
 
-  // 🔥 INTERCEPTION POUR LE "CODE OUBLIÉ" OU PREMIÈRE CONNEXION
+  // 3. Condition for PIN Setup (Only for Parent)
   const parentProfile = profiles.find(p => p.is_parent)
   const needsPinSetup = parentProfile && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
 
@@ -112,9 +112,8 @@ export default function App() {
       <PinSetup
         profileId={parentProfile.id}
         onComplete={() => {
-          // Une fois le nouveau PIN défini, on supprime le drapeau de reset
           localStorage.removeItem('reset_pin_mode')
-          refresh() // On rafraîchit les données pour passer à l'écran suivant
+          refresh() // Important: will set isLoading to true and avoid flickering
         }}
       />
     )

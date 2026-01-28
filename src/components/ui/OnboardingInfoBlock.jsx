@@ -1,0 +1,40 @@
+import { motion } from 'framer-motion'
+import { CheckCircle2, Save } from 'lucide-react'
+
+export default function OnboardingInfoBlock({ step, title, description, icon: Icon }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-indigo-600/10 border-2 border-indigo-500/20 rounded-[2.5rem] p-6 mb-8 relative overflow-hidden group shadow-2xl shadow-indigo-600/5"
+        >
+            {/* Decorative Gradient */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-colors" />
+
+            <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+                <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/20 shrink-0">
+                    <Icon size={32} className="text-white" />
+                </div>
+
+                <div className="flex-1 text-center sm:text-left space-y-2">
+                    <div className="flex items-center justify-center sm:justify-start gap-3">
+                        <span className="bg-white/10 text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-white/5">
+                            Étape {step}
+                        </span>
+                        <h3 className="text-lg font-black text-white uppercase tracking-tight italic">{title}</h3>
+                    </div>
+                    <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
+                        {description}
+                    </p>
+
+                    <div className="flex items-center justify-center sm:justify-start gap-2 pt-2">
+                        <div className="bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border border-emerald-500/20 flex items-center gap-2">
+                            <Save size={12} />
+                            Pensez à sauvegarder vos modifications !
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    )
+}

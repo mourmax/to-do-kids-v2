@@ -70,16 +70,28 @@ export function useFamily(userId, familyId = null) {
         .eq('family_id', fam.id)
 
       if (!profs || profs.length === 0) {
-        // This should only happen for new parents
+        console.log("Creating initial profiles for family:", fam.id)
+        // 🛠️ FIX: Ensure we wait for the insert to finish and return the data
         const { data: newProfs, error: profError } = await supabase
           .from('profiles')
           .insert([
-            { family_id: fam.id, child_name: "Parent", role: 'parent', is_parent: true },
-            { family_id: fam.id, child_name: "Mon enfant", role: 'child', is_parent: false, invite_code: Math.random().toString(36).substring(2, 8).toUpperCase() }
+            { family_id: fam.id, child_name: "Parent", role: 'parent', is_parent: true, preferred_theme: 'dark' },
+            {
+              family_id: fam.id,
+              child_name: "Mon enfant",
+              role: 'child',
+              is_parent: false,
+              color: 'violet',
+              invite_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+              preferred_theme: 'dark'
+            }
           ])
           .select()
 
-        if (profError) throw profError
+        if (profError) {
+          console.error("Critical error creating profiles:", profError)
+          throw profError
+        }
         profs = newProfs || []
 
         // Create Default Missions ONLY if none exist
@@ -90,6 +102,7 @@ export function useFamily(userId, familyId = null) {
           .limit(1)
 
         if (!existingMissions || existingMissions.length === 0) {
+          console.log("Creating default missions...")
           const defaultMissions = [
             { title: "Faire ses devoirs", icon: "📚", family_id: fam.id, order_index: 1 },
             { title: "Ranger sa chambre", icon: "🧸", family_id: fam.id, order_index: 2 },

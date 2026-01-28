@@ -11,16 +11,23 @@ export default function PinSetup({ profileId, onComplete }) {
     if (pin.length !== 4) return alert("Le code doit faire 4 chiffres")
 
     setLoading(true)
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .update({ pin_code: pin })
       .eq('id', profileId)
+      .select()
 
     if (error) {
+      console.error("PIN Update Error:", error)
       alert("Erreur: " + error.message)
       setLoading(false)
+    } else if (!data || data.length === 0) {
+      console.error("PIN Update failed: No rows affected. ProfileID:", profileId)
+      alert("Erreur: Impossible de mettre à jour votre profil parent. Vérifiez vos permissions.")
+      setLoading(false)
     } else {
-      onComplete() // On prévient App.jsx que c'est fini
+      console.log("PIN updated successfully for profile:", profileId)
+      onComplete()
     }
   }
 

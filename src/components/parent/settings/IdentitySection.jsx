@@ -3,6 +3,7 @@ import { Check, User, Copy, Plus } from 'lucide-react'
 import { supabase } from '../../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 import SectionCard from './SectionCard'
+import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 
 export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh }) {
   const { t } = useTranslation()
@@ -82,123 +83,134 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   }
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
+  const isOnboarding = childProfiles.length === 1 && childProfiles[0].child_name === "Mon enfant"
 
   return (
-    <SectionCard icon={User} colorClass="text-indigo-400" title={t('settings.identity_title')}>
-      <div className="space-y-4">
-        {childProfiles.map(p => (
-          <div key={p.id} className="bg-slate-900/40 p-5 rounded-[2.5rem] border border-white/5 space-y-4 shadow-xl">
-            <div className="flex gap-4 items-start">
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center justify-between px-1">
-                  <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">
-                    {t('settings.child_name_label')}
-                  </label>
-                  <span className="text-[10px] text-indigo-400/50 font-black font-mono tracking-widest uppercase">
-                    ID: {p.invite_code || '---'}
+    <div className="space-y-6">
+      {isOnboarding && (
+        <OnboardingInfoBlock
+          step={3}
+          title="Préparez les profils"
+          description="Indiquez le prénom de votre enfant et sa couleur... Pensez à sauvegarder !"
+          icon={User}
+        />
+      )}
+      <SectionCard icon={User} colorClass="text-indigo-400" title={t('settings.identity_title')}>
+        <div className="space-y-4">
+          {childProfiles.map(p => (
+            <div key={p.id} className="bg-slate-900/40 p-5 rounded-[2.5rem] border border-white/5 space-y-4 shadow-xl">
+              <div className="flex gap-4 items-start">
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-center justify-between px-1">
+                    <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">
+                      {t('settings.child_name_label')}
+                    </label>
+                    <span className="text-[10px] text-indigo-400/50 font-black font-mono tracking-widest uppercase">
+                      ID: {p.invite_code || '---'}
+                    </span>
+                  </div>
+
+                  <div className="relative">
+                    <input
+                      value={editingId === p.id ? editName : p.child_name}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onFocus={() => {
+                        setEditingId(p.id)
+                        setEditName(p.child_name)
+                      }}
+                      className={`w-full bg-slate-950 border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]' : 'border-white/5 text-slate-300'
+                        }`}
+                    />
+
+                    {editingId === p.id && (
+                      <button
+                        onClick={() => handleUpdateProfile(p.id, { child_name: editName })}
+                        className="absolute right-2 top-2 bottom-2 bg-indigo-600 px-5 rounded-xl text-white font-black text-[10px] uppercase shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
+                      >
+                        {t('actions.save')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Color Selector */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Couleur associée</label>
+                  <div className="flex gap-2">
+                    {COLORS.map(color => (
+                      <button
+                        key={color.name}
+                        disabled={updatingId === p.id}
+                        onClick={() => handleUpdateProfile(p.id, { color: color.name })}
+                        className={`w-10 h-10 rounded-full transition-all border-4 ${(p.color || 'violet') === color.name
+                          ? `${color.bg} border-white/20 scale-110 shadow-lg ${color.shadow}`
+                          : 'bg-slate-950 border-white/5 hover:border-white/10'
+                          } ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
+                      >
+                        {(p.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-20`} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Theme Selector */}
+                <div className="space-y-2">
+                  <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Thème préféré</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdateProfile(p.id, { preferred_theme: 'dark' })}
+                      className={`flex-1 py-2 px-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${p.preferred_theme !== 'light' ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/10'}`}
+                    >
+                      <div className="w-3 h-3 rounded-full bg-slate-950 border border-white/20" />
+                      <span className="text-[9px] font-black uppercase tracking-widest">Dark</span>
+                    </button>
+                    <button
+                      onClick={() => handleUpdateProfile(p.id, { preferred_theme: 'light' })}
+                      className={`flex-1 py-2 px-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${p.preferred_theme === 'light' ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/10'}`}
+                    >
+                      <div className="w-3 h-3 rounded-full bg-white border border-slate-200" />
+                      <span className="text-[9px] font-black uppercase tracking-widest">Light</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Invite Code for this child */}
+              <div className="flex items-center justify-between bg-slate-950/50 rounded-xl px-4 py-2 border border-white/5 mt-2">
+                <div className="flex flex-col">
+                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{t('settings.invite_code_description')}</span>
+                  <span className="text-sm font-black text-indigo-400 tracking-widest font-mono">
+                    {p.invite_code || '------'}
                   </span>
                 </div>
-
-                <div className="relative">
-                  <input
-                    value={editingId === p.id ? editName : p.child_name}
-                    onChange={(e) => setEditName(e.target.value)}
-                    onFocus={() => {
-                      setEditingId(p.id)
-                      setEditName(p.child_name)
-                    }}
-                    className={`w-full bg-slate-950 border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]' : 'border-white/5 text-slate-300'
-                      }`}
-                  />
-
-                  {editingId === p.id && (
-                    <button
-                      onClick={() => handleUpdateProfile(p.id, { child_name: editName })}
-                      className="absolute right-2 top-2 bottom-2 bg-indigo-600 px-5 rounded-xl text-white font-black text-[10px] uppercase shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
-                    >
-                      {t('actions.save')}
-                    </button>
-                  )}
-                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(p.invite_code)
+                    onShowSuccess("Code copié !")
+                  }}
+                  className="text-slate-500 hover:text-white transition-colors p-2"
+                  title="Copier le code"
+                >
+                  <Copy size={16} />
+                </button>
               </div>
             </div>
+          ))}
 
-            {/* Color Selector */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Couleur associée</label>
-                <div className="flex gap-2">
-                  {COLORS.map(color => (
-                    <button
-                      key={color.name}
-                      disabled={updatingId === p.id}
-                      onClick={() => handleUpdateProfile(p.id, { color: color.name })}
-                      className={`w-10 h-10 rounded-full transition-all border-4 ${(p.color || 'violet') === color.name
-                        ? `${color.bg} border-white/20 scale-110 shadow-lg ${color.shadow}`
-                        : 'bg-slate-950 border-white/5 hover:border-white/10'
-                        } ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
-                    >
-                      {(p.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-20`} />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Theme Selector */}
-              <div className="space-y-2">
-                <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Thème préféré</label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleUpdateProfile(p.id, { preferred_theme: 'dark' })}
-                    className={`flex-1 py-2 px-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${p.preferred_theme !== 'light' ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/10'}`}
-                  >
-                    <div className="w-3 h-3 rounded-full bg-slate-950 border border-white/20" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Dark</span>
-                  </button>
-                  <button
-                    onClick={() => handleUpdateProfile(p.id, { preferred_theme: 'light' })}
-                    className={`flex-1 py-2 px-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${p.preferred_theme === 'light' ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/10'}`}
-                  >
-                    <div className="w-3 h-3 rounded-full bg-white border border-slate-200" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Light</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Invite Code for this child */}
-            <div className="flex items-center justify-between bg-slate-950/50 rounded-xl px-4 py-2 border border-white/5 mt-2">
-              <div className="flex flex-col">
-                <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{t('settings.invite_code_description')}</span>
-                <span className="text-sm font-black text-indigo-400 tracking-widest font-mono">
-                  {p.invite_code || '------'}
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(p.invite_code)
-                  onShowSuccess("Code copié !")
-                }}
-                className="text-slate-500 hover:text-white transition-colors p-2"
-                title="Copier le code"
-              >
-                <Copy size={16} />
-              </button>
-            </div>
-          </div>
-        ))}
-
-        <button
-          onClick={handleAddChild}
-          disabled={isAdding}
-          className={`w-full bg-indigo-500/10 border border-indigo-500/20 border-dashed py-4 rounded-2xl flex items-center justify-center gap-2 group hover:bg-indigo-500/20 transition-all active:scale-[0.98] mt-2 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <Plus size={18} className={`text-indigo-400 group-hover:scale-110 transition-transform ${isAdding ? 'animate-spin' : ''}`} />
-          <span className="font-black uppercase text-[10px] tracking-widest text-indigo-300">
-            {isAdding ? "Création..." : t('settings.add_child')}
-          </span>
-        </button>
-      </div>
-    </SectionCard>
+          <button
+            onClick={handleAddChild}
+            disabled={isAdding}
+            className={`w-full bg-indigo-500/10 border border-indigo-500/20 border-dashed py-4 rounded-2xl flex items-center justify-center gap-2 group hover:bg-indigo-500/20 transition-all active:scale-[0.98] mt-2 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Plus size={18} className={`text-indigo-400 group-hover:scale-110 transition-transform ${isAdding ? 'animate-spin' : ''}`} />
+            <span className="font-black uppercase text-[10px] tracking-widest text-indigo-300">
+              {isAdding ? "Création..." : t('settings.add_child')}
+            </span>
+          </button>
+        </div>
+      </SectionCard>
+    </div>
   )
 }
