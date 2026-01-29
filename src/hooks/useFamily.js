@@ -111,29 +111,37 @@ export function useFamily(userId, familyId = null) {
         profs = newProfs || []
         console.log("[useFamily] Profiles created successfully")
 
-        // Default Missions creation - ONLY if no missions exist yet
-        try {
-          const { count } = await supabase
-            .from('missions')
-            .select('*', { count: 'exact', head: true })
-            .eq('family_id', fam.id)
-
-          if (!count || count === 0) {
-            console.log("No missions found, creating default missions...")
-            const defaultMissions = [
-              { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
-              { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
-              { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
-            ]
-            await supabase.from('missions').insert(defaultMissions)
-          } else {
-            console.log("[useFamily] Missions already exist, skipping default creation")
-          }
-        } catch (mErr) {
-          console.warn("Default missions creation check failed (non-critical):", mErr)
-        }
       }
       setProfiles(profs || [])
+
+      // 2.2 Default Missions creation recovery - ONLY if no missions exist yet
+      // (Moved outside profile check to be more resilient)
+      try {
+        const { count } = await supabase
+          .from('missions')
+          .select('*', { count: 'exact', head: true })
+          .eq('family_id', fam.id)
+
+        if (count === 0) {
+          console.log("[useFamily] No missions found, creating default missions...")
+          const defaultMissions = [
+            { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
+            { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
+            { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
+          ]
+          await supabase.from('missions').insert(defaultMissions)
+          // Re-fetch missions right after creation
+          const { data: refreshedMissions } = await supabase
+            .from('missions')
+            .select('*')
+            .eq('family_id', fam.id)
+            .order('order_index')
+          if (refreshedMissions) curMissions = refreshedMissions
+        }
+      } catch (mErr) {
+        console.warn("Default missions creation check failed:", mErr)
+      }
+
       console.log("[useFamily] All data loaded successfully for family:", fam.id)
 
       // 2.5 Patch ALL existing profiles without invite codes
@@ -225,12 +233,20 @@ export function useFamily(userId, familyId = null) {
       }
       setChallenge(chall)
 
-      // 6. Merge & Filter Missions
+      // 6. Merge & Filter Missions + Deduplicate UI (Safety net)
       const filteredMissions = (curMissions || []).filter(m =>
         !m.assigned_to || m.assigned_to === currentProfId
       )
 
-      const mergedMissions = filteredMissions.map(m => {
+      const seenMissions = new Set()
+      const dedupedMissions = filteredMissions.filter(m => {
+        const key = `${m.title}-${m.icon}-${m.order_index}`
+        if (seenMissions.has(key)) return false
+        seenMissions.add(key)
+        return true
+      })
+
+      const mergedMissions = dedupedMissions.map(m => {
         const log = todayLogs?.find(l => l.mission_id === m.id)
         return {
           ...m,
@@ -242,8 +258,15 @@ export function useFamily(userId, familyId = null) {
       })
       setMissions(mergedMissions)
 
-      // 7. Save the raw list for management
-      setFamilyMissions(curMissions || [])
+      // 7. Save the raw list for management (also deduped)
+      const seenRaw = new Set()
+      const dedupedRaw = (curMissions || []).filter(m => {
+        const key = `${m.title}-${m.icon}-${m.order_index}`
+        if (seenRaw.has(key)) return false
+        seenRaw.add(key)
+        return true
+      })
+      setFamilyMissions(dedupedRaw)
 
     } catch (e) {
       console.error("Erreur useFamily (catch):", e)
