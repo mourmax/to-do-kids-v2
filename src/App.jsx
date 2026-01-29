@@ -86,7 +86,7 @@ export default function App() {
 
   // Tutorial should show if hasn't been seen in this session OR not in localStorage
   // AND PIN setup is NOT active. New families ALWAYS get a chance to see it.
-  const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+  const isDefaultFamily = (profiles || []).length <= 2 && (profiles || []).some(p => p.child_name === "Mon enfant")
   const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !isLoading && !!session
 
   // Calculate current onboarding step based on completion status
