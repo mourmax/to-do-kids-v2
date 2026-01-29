@@ -34,7 +34,12 @@ export default function RoleSelection({ onSelectParent, onSelectChild }) {
                         exit={{ opacity: 0, y: -20 }}
                         className="w-full max-w-md space-y-6"
                     >
-                        <div className="text-center space-y-2">
+                        <div className="text-center space-y-4">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 p-2 bg-slate-900">
+                                    <img src="/icon-192.png" alt="Logo" className="w-full h-full object-contain" />
+                                </div>
+                            </div>
                             <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">
                                 {t('auth.login_title')}
                             </h1>

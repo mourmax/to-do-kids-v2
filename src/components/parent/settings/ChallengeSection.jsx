@@ -59,8 +59,8 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       if (error) throw error
       onShowSuccess(t('actions.save_success'))
       refresh(true)
-      if (isNewUser) {
-        setShowInviteGuide(true)
+      if (isNewUser && setOnboardingStep) {
+        setOnboardingStep('invite')
       }
       setTimeout(() => setIsSaving(false), 1000)
     } catch (error) {
@@ -134,20 +134,6 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
         }}
       />
 
-      {/* Onboarding Completion Modal */}
-      {isNewUser && profiles && (
-        <OnboardingCompletionModal
-          isOpen={showCompletionModal}
-          onClose={() => setShowCompletionModal(false)}
-          inviteCode={profiles.find(p => !p.is_parent)?.invite_code || ''}
-          childName={profiles.find(p => !p.is_parent)?.child_name || 'votre enfant'}
-          onComplete={() => {
-            localStorage.setItem('onboarding_invite_dismissed', 'true')
-            if (setOnboardingStep) setOnboardingStep('done')
-            setActiveTab('validation')
-          }}
-        />
-      )}
     </div>
   )
 }

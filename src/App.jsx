@@ -87,7 +87,7 @@ export default function App() {
   // Tutorial should show if hasn't been seen in this session OR not in localStorage
   // AND PIN setup is NOT active. New families ALWAYS get a chance to see it.
   const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
-  const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !needsPinSetup && !isLoading && !!session
+  const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !isLoading && !!session
 
   // Calculate current onboarding step based on completion status
   useEffect(() => {
@@ -181,7 +181,9 @@ export default function App() {
   }
 
   // C. Condition for PIN Setup (Only for Parent)
-  if (isParentMode && parentProfile && needsPinSetup) {
+  // 💡 Note: TutorialModal will render on top of Dashboard if triggered.
+  // We allow rendering the main dashboard structure but keep PIN setup as a priority early return IF tutorial is NOT active.
+  if (isParentMode && parentProfile && needsPinSetup && !showTutorial) {
     return (
       <PinSetup
         profileId={parentProfile.id}
@@ -189,17 +191,6 @@ export default function App() {
           localStorage.removeItem('reset_pin_mode')
           setPinSuccessfullySet(true)
           loadFamilyData()
-
-          // Explicitly trigger tutorial for new families after PIN setup
-          const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
-          const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
-
-          if (!hasSeenTuto || isDefaultFamily) {
-            setTimeout(() => {
-              setShowTutorial(true)
-              setTutorialShownInSession(true)
-            }, 800) // Delay to allow UI to settle
-          }
         }}
       />
     )
