@@ -223,23 +223,31 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
         <div className="space-y-4">
           {/* 🟣 ACTIONS PRINCIPALES : BIBLIOTHÈQUE & CUSTOM */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Bibliothèque */}
+            {/* Bibliothèque - Orange pulsant */}
             <button
               onClick={() => setShowLibrary(true)}
-              className="bg-indigo-600/10 border border-indigo-500/20 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-indigo-600/20 [.light-theme_&]:bg-orange-500/10 [.light-theme_&]:border-orange-500/20 [.light-theme_&]:hover:bg-orange-500/20 transition-all active:scale-[0.98] shadow-lg shadow-indigo-600/5 [.light-theme_&]:shadow-orange-500/5"
+              className="bg-orange-500/20 border-2 border-orange-500 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-orange-500/30 transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20 animate-orange-pulse"
             >
-              <Sparkles size={24} className="text-indigo-400 group-hover:rotate-12 transition-transform [.light-theme_&]:text-orange-500" />
-              <span className="font-black uppercase text-[10px] tracking-widest text-indigo-100 [.light-theme_&]:text-orange-600">{t('library.library_button')}</span>
+              <Sparkles size={24} className="text-orange-400 group-hover:rotate-12 transition-transform" />
+              <span className="font-black uppercase text-[10px] tracking-widest text-orange-100">{t('library.library_button')}</span>
             </button>
 
-            {/* Custom */}
+            {/* Custom - Contour orange */}
             <button
               onClick={() => setShowCustomModal(true)}
-              className="bg-slate-900/60 [.light-theme_&]:bg-white border border-white/5 [.light-theme_&]:border-orange-200 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-slate-800 [.light-theme_&]:hover:bg-orange-50 transition-all active:scale-[0.98] shadow-lg [.light-theme_&]:shadow-orange-500/5"
+              className="bg-slate-900/60 border-2 border-orange-500/50 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-slate-800 hover:border-orange-500 transition-all active:scale-[0.98] shadow-lg"
             >
-              <Plus size={24} className="text-slate-400 group-hover:scale-110 transition-transform [.light-theme_&]:text-orange-500" />
-              <span className="font-black uppercase text-[10px] tracking-widest text-slate-300 [.light-theme_&]:text-orange-600">{t('library.custom_button')}</span>
+              <Plus size={24} className="text-orange-400 group-hover:scale-110 transition-transform" />
+              <span className="font-black uppercase text-[10px] tracking-widest text-orange-300">{t('library.custom_button')}</span>
             </button>
+          </div>
+
+          {/* Notice: 5 missions maximum */}
+          <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl flex items-center gap-2">
+            <Crown size={16} className="text-amber-400 shrink-0" />
+            <p className="text-[9px] text-amber-200 font-bold uppercase tracking-tight">
+              5 missions maximum en version gratuite
+            </p>
           </div>
 
           <AnimatePresence>
