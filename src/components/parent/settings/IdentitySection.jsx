@@ -163,7 +163,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
 
                     <div className="relative">
                       <input
-                        value={editingId === p.id ? editName : draft.child_name}
+                        value={editingId === p.id ? editName : (draft.child_name === "Mon enfant" ? "" : draft.child_name)}
                         onChange={(e) => {
                           const val = e.target.value
                           setEditName(val)
@@ -173,17 +173,19 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                         }}
                         onFocus={() => {
                           setEditingId(p.id)
-                          setEditName(draft.child_name)
+                          setEditName(draft.child_name === "Mon enfant" ? "" : draft.child_name)
                         }}
                         onBlur={() => {
                           if (!isNewUser) {
-                            handleUpdateProfile(p.id, { child_name: editName })
+                            handleUpdateProfile(p.id, { child_name: editName || "Mon enfant" })
                           }
                           setEditingId(null)
                         }}
-                        placeholder="Ex: Lola"
-                        className={`w-full bg-slate-950 border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]' : 'border-white/5 text-slate-300'
-                          } [.light-theme_&]:bg-white [.light-theme_&]:text-slate-900 [.light-theme_&]:border-indigo-200`}
+                        placeholder="Ex: Arthur"
+                        className={`w-full bg-slate-950 border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
+                            ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]'
+                            : 'border-orange-500/50 text-slate-300 animate-orange-pulse'
+                          }`}
                       />
 
                       {editingId === p.id && !isNewUser && (
@@ -199,7 +201,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                 </div>
 
                 {/* Color Selector */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-4">
                   <div className="space-y-2">
                     <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Couleur associée</label>
                     <div className="flex gap-2">
@@ -210,33 +212,12 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                           onClick={() => handleUpdateProfile(p.id, { color: color.name })}
                           className={`w-10 h-10 rounded-full transition-all border-4 ${(draft.color || 'violet') === color.name
                             ? `${color.bg} border-white/20 scale-110 shadow-lg ${color.shadow}`
-                            : 'bg-slate-950 border-white/5 hover:border-white/10 [.light-theme_&]:bg-white [.light-theme_&]:border-indigo-200'
+                            : 'bg-slate-950 border-white/5 hover:border-white/10'
                             } ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
                         >
                           {(draft.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-20`} />}
                         </button>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Theme Selector */}
-                  <div className="space-y-2">
-                    <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Thème préféré</label>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleUpdateProfile(p.id, { preferred_theme: 'dark' })}
-                        className={`flex-1 py-2 px-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${draft.preferred_theme !== 'light' ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/10 [.light-theme_&]:bg-white [.light-theme_&]:border-indigo-200 [.light-theme_&]:text-indigo-400'}`}
-                      >
-                        <div className="w-3 h-3 rounded-full bg-slate-950 border border-white/20" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Dark</span>
-                      </button>
-                      <button
-                        onClick={() => handleUpdateProfile(p.id, { preferred_theme: 'light' })}
-                        className={`flex-1 py-2 px-3 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${draft.preferred_theme === 'light' ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/10 [.light-theme_&]:bg-white [.light-theme_&]:border-indigo-200 [.light-theme_&]:text-indigo-400'}`}
-                      >
-                        <div className="w-3 h-3 rounded-full bg-white border border-slate-200" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Light</span>
-                      </button>
                     </div>
                   </div>
                 </div>

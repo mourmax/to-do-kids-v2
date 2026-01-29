@@ -206,9 +206,8 @@ export default function App() {
   }
 
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
-
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${activeProfile?.preferred_theme === 'light' ? 'light-theme' : 'dark'} ${activeProfile?.preferred_theme === 'light' ? 'bg-slate-50 text-slate-900' : 'bg-[#020617] text-slate-100'} font-sans selection:bg-indigo-500/30`}>
+    <div className="min-h-screen transition-colors duration-300 bg-[#020617] text-slate-100 dark font-sans selection:bg-indigo-500/30">
 
       {/* Tuto Modal (s'affiche par dessus tout) */}
       <AnimatePresence>
@@ -228,22 +227,6 @@ export default function App() {
 
         {/* Actions à droite */}
         <div className="flex items-center gap-3">
-
-          {/* Theme Toggle */}
-          <button
-            onClick={async () => {
-              const newTheme = activeProfile?.preferred_theme === 'light' ? 'dark' : 'light'
-              const { error } = await supabase
-                .from('profiles')
-                .update({ preferred_theme: newTheme })
-                .eq('id', activeProfile.id)
-              if (!error) loadFamilyData()
-            }}
-            className="bg-slate-900 border border-white/10 p-2 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg shadow-black/20"
-            title="Changer de thème"
-          >
-            {activeProfile?.preferred_theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
 
           {/* Toggle Parent/Child (Uniquement si Parent Loggé) */}
           {session && (

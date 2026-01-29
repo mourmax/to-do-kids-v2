@@ -10,7 +10,7 @@ export default function Auth({ onBack }) {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isSignUp, setIsSignUp] = useState(false) // Pour basculer entre Connexion et Inscription
+  const [isSignUp, setIsSignUp] = useState(true) // Pour basculer entre Connexion et Inscription
 
   // 1. Connexion via Google
   const handleGoogleLogin = async () => {
@@ -45,22 +45,27 @@ export default function Auth({ onBack }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 font-sans relative">
+    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 font-sans relative overflow-hidden">
+      {/* Background Decorative Blur */}
+      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[120px] pointer-events-none" />
+
       <div className="absolute top-4 right-4 z-50">
         <LanguageSelector />
       </div>
 
-      {/* Logo Animé */}
+      {/* Logo Image */}
       <motion.div
-        initial={{ scale: 0 }} animate={{ scale: 1 }}
-        className="bg-indigo-600 p-4 rounded-3xl shadow-[0_0_30px_rgba(79,70,229,0.3)] mb-8"
+        initial={{ scale: 0, rotate: -10 }} animate={{ scale: 1, rotate: 0 }}
+        className="w-24 h-24 mb-8 relative"
       >
-        <Trophy size={40} className="text-white" />
+        <div className="absolute inset-0 bg-white/10 blur-xl rounded-full" />
+        <img src="/icon-192.png" alt="Logo" className="w-full h-full object-contain relative z-10" />
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm space-y-6"
+        className="w-full max-w-sm space-y-6 relative z-10"
       >
         <button
           onClick={onBack}
@@ -79,25 +84,25 @@ export default function Auth({ onBack }) {
         <div className="bg-slate-900/80 p-1.5 rounded-2xl border border-white/5 flex gap-1 relative overflow-hidden">
           <motion.div
             layoutId="activeTab"
-            className="absolute inset-y-1.5 rounded-xl bg-indigo-600 shadow-lg shadow-indigo-600/20"
+            className={`absolute inset-y-1.5 rounded-xl shadow-lg transition-colors duration-300 ${isSignUp ? 'bg-orange-500 shadow-orange-500/20' : 'bg-indigo-600 shadow-indigo-600/20'}`}
             initial={false}
             animate={{
-              x: isSignUp ? '100%' : '0%',
+              left: isSignUp ? '1.5px' : 'calc(50% + 1.5px)',
               width: 'calc(50% - 3px)'
             }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
           />
           <button
-            onClick={() => setIsSignUp(false)}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest relative z-10 transition-colors ${!isSignUp ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            {t('auth.login_button')}
-          </button>
-          <button
             onClick={() => setIsSignUp(true)}
             className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest relative z-10 transition-colors ${isSignUp ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
           >
             {t('auth.signup_button') || "S'inscrire"}
+          </button>
+          <button
+            onClick={() => setIsSignUp(false)}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest relative z-10 transition-colors ${!isSignUp ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            {t('auth.login_button')}
           </button>
         </div>
 
@@ -159,11 +164,11 @@ export default function Auth({ onBack }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-900/20 hover:bg-indigo-500 active:scale-95 transition-all flex items-center justify-center gap-2"
+            className={`w-full text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${isSignUp ? 'bg-orange-600 shadow-orange-900/20 hover:bg-orange-500' : 'bg-indigo-600 shadow-indigo-900/20 hover:bg-indigo-500'}`}
           >
             {loading ? <Loader2 className="animate-spin" /> : (
               <>
-                {isSignUp ? t('auth.signup_button_submit') : t('auth.login_button')} <ArrowRight size={16} />
+                {isSignUp ? (t('auth.signup_button_submit') || "S'inscrire") : t('auth.login_button')} <ArrowRight size={16} />
               </>
             )}
           </button>
