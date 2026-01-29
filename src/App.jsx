@@ -148,14 +148,11 @@ export default function App() {
     }
   }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession, onboardingStep])
 
-  // 4. Tutorial trigger
+  // 4. Tutorial trigger - NO DELAY to prevent dashboard flash
   useEffect(() => {
     if (shouldShowTutorial) {
-      const timer = setTimeout(() => {
-        setShowTutorial(true)
-        setTutorialShownInSession(true) // Mark as shown for this session
-      }, 500)
-      return () => clearTimeout(timer)
+      setShowTutorial(true)
+      setTutorialShownInSession(true)
     }
   }, [shouldShowTutorial])
 
@@ -181,6 +178,12 @@ export default function App() {
   const handleCloseTutorial = () => {
     setShowTutorial(false)
     localStorage.setItem('hasSeenTutorial_v1', 'true')
+    // Reset onboarding flags to ensure fresh start after tutorial
+    localStorage.removeItem('onboarding_invite_dismissed')
+    localStorage.removeItem('onboarding_missions_confirmed')
+    // Force onboarding mode and start at step 1
+    setIsOnboardingSession(true)
+    setOnboardingStep('pin')
   }
 
   // --- LOGIQUE D'AFFICHAGE ET SÉCURITÉ ---
@@ -330,8 +333,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* CONTENU PRINCIPAL (Dashboard) - Don't render at all during tutorial */}
-      {!showTutorial && (
+      {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
+      {!showTutorial && !shouldShowTutorial && (
         <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
           <AnimatePresence mode="wait">
             {isParentMode ? (
