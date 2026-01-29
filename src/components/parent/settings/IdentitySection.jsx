@@ -7,7 +7,7 @@ import SectionCard from './SectionCard'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 import ProfileCompletionModal from '../../ui/ProfileCompletionModal'
 
-export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh, updateProfile, isNewUser, onNextStep }) {
+export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh, updateProfile, isNewUser, onNextStep, onboardingStep }) {
   const { t } = useTranslation()
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
@@ -241,8 +241,8 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
         </div>
       </SectionCard>
 
-      {/* Profile Completion Modal */}
-      {isNewUser && childProfiles.length > 0 && !childProfiles.some(p => p.child_name === "Mon enfant") && (
+      {/* Profile Completion Modal - Hide at step 5 (invite) */}
+      {isNewUser && childProfiles.length > 0 && !childProfiles.some(p => p.child_name === "Mon enfant") && onboardingStep !== 'invite' && (
         <ProfileCompletionModal
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}

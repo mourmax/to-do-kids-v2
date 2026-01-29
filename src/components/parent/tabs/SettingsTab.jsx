@@ -92,6 +92,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                 refresh={refresh}
                 updateProfile={updateProfile}
                 isNewUser={isNewUser}
+                onboardingStep={onboardingStep}
                 onNextStep={(step) => {
                   handleNextStep(step)
                   if (setOnboardingStep && step === 'missions') {
@@ -128,6 +129,13 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
+              profiles={profiles}
+              onNavigateToValidation={() => {
+                // Navigate to validation tab
+                if (onTabChange) {
+                  onTabChange('validation')
+                }
+              }}
               onNextStep={(step) => {
                 if (step === 'done') {
                   // After challenge setup, show invite guide and navigate to children tab

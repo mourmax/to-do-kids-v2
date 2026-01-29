@@ -159,7 +159,12 @@
         "step_mission": "Missions",
         "step_challenge": "Défi",
         "step_invite": "Code Invitation",
-        "step": "Étape"
+        "step": "Étape",
+        "setup_complete": "Paramétrage Terminé !",
+        "setup_complete_subtitle": "Félicitations ! Votre espace parent est prêt.",
+        "child_invite_code": "Code d'activation pour {{name}}",
+        "transmit_code_message": "Transmettez ce code à votre enfant pour qu'il puisse l'activer sur son appareil",
+        "finish_setup": "Terminer le Paramétrage"
     },
     "common": {
         "all": "Tous",

@@ -6,14 +6,16 @@ import SectionCard from './SectionCard'
 import { useTranslation } from 'react-i18next'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 import InviteCodeGuideModal from '../../ui/InviteCodeGuideModal'
+import OnboardingCompletionModal from '../../ui/OnboardingCompletionModal'
 
-export default function ChallengeSection({ challenge, onShowSuccess, refresh, isNewUser, onNextStep }) {
+export default function ChallengeSection({ challenge, onShowSuccess, refresh, isNewUser, onNextStep, profiles, onNavigateToValidation }) {
   const { t } = useTranslation()
   const [rewardName, setRewardName] = useState('')
   const [seriesLength, setSeriesLength] = useState(2)
   const [malusMessage, setMalusMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [showInviteGuide, setShowInviteGuide] = useState(false)
+  const [showCompletionModal, setShowCompletionModal] = useState(false)
 
   // Show onboarding if streak is 0 and no reward set
   const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === t('completion_modal.default_reward')))
@@ -122,13 +124,30 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
         isOpen={showInviteGuide}
         onNavigateToChildren={() => {
           setShowInviteGuide(false)
-          onNextStep('done')
+          setShowCompletionModal(true)
         }}
         onClose={() => {
           setShowInviteGuide(false)
-          onNextStep('done')
+          setShowCompletionModal(true)
         }}
       />
+
+      {/* Onboarding Completion Modal */}
+      {isNewUser && profiles && (
+        <OnboardingCompletionModal
+          isOpen={showCompletionModal}
+          onClose={() => setShowCompletionModal(false)}
+          inviteCode={profiles.find(p => !p.is_parent)?.invite_code || ''}
+          childName={profiles.find(p => !p.is_parent)?.child_name || 'votre enfant'}
+          onComplete={() => {
+            setShowCompletionModal(false)
+            onNextStep('done')
+            if (onNavigateToValidation) {
+              onNavigateToValidation()
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

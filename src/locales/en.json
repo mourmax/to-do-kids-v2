@@ -154,7 +154,12 @@
         "step_mission": "Mission Setup",
         "step_challenge": "Challenge Setup",
         "step_invite": "Invite Code",
-        "step": "Step"
+        "step": "Step",
+        "setup_complete": "Setup Complete!",
+        "setup_complete_subtitle": "Congratulations! Your parent space is ready.",
+        "child_invite_code": "Activation code for {{name}}",
+        "transmit_code_message": "Share this code with your child so they can activate it on their device",
+        "finish_setup": "Finish Setup"
     },
     "common": {
         "all": "All",
