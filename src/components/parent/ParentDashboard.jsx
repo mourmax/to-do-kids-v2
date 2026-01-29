@@ -172,6 +172,13 @@ export default function ParentDashboard({
     }
   }, [onboardingStep, isNewUser, activeTab])
 
+  // 🛡️ SÉCURITÉ : Forcer l'onglet settings tant que l'onboarding n'est pas "done"
+  useEffect(() => {
+    if (isNewUser && activeTab !== 'settings' && onboardingStep !== 'done' && onboardingStep !== 'invite') {
+      setActiveTab('settings')
+    }
+  }, [isNewUser, activeTab, onboardingStep])
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 relative z-10">

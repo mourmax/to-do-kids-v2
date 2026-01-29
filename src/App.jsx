@@ -62,17 +62,20 @@ export default function App() {
   useEffect(() => {
     if (!isLoading && session && family) {
       const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
-      const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+      const profilesList = profiles || []
+      const isDefaultFamily = profilesList.length === 0 || (profilesList.length <= 2 && profilesList.some(p => p.child_name === "Mon enfant"))
       const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
 
-      if ((!hasSeenTuto || isDefaultFamily) && !dismissed) {
+      if (isOnboardingSession && !isDefaultFamily && hasSeenTuto && !dismissed) {
+        // Sticky onboarding if already started
+      } else if ((!hasSeenTuto || isDefaultFamily) && !dismissed) {
         if (!isOnboardingSession) setIsOnboardingSession(true)
       } else if (dismissed && isOnboardingSession) {
         // Force exit if dismissed
         setIsOnboardingSession(false)
       }
     }
-  }, [isLoading, !!session, !!family, profiles.length, isOnboardingSession])
+  }, [isLoading, !!session, !!family, (profiles || []).length, isOnboardingSession])
 
   // Force exit onboarding when step becomes done
   useEffect(() => {
