@@ -180,6 +180,21 @@ export default function App() {
     )
   }
 
+  // B.5 Prevent Flicker: If we are about to show the tutorial but it hasn't triggered yet
+  // This avoids seeing the PIN setup for 500ms.
+  if (shouldShowTutorial && !showTutorial) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center">
+            <img src="/icon-192.png" className="w-8 h-8 opacity-50" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">To-Do Kids</span>
+        </div>
+      </div>
+    )
+  }
+
   // C. Condition for PIN Setup (Only for Parent)
   // 💡 Note: During onboarding (isNewUser), we render PIN setup INSIDE ParentDashboard to keep the stepper.
   if (isParentMode && parentProfile && needsPinSetup && !showTutorial && !isOnboardingSession) {
@@ -277,7 +292,6 @@ export default function App() {
           {isParentMode ? (
             family ? (
               <ParentDashboard
-                key={isOnboardingSession ? 'onboarding' : 'classic'}
                 family={family}
                 profile={activeProfile}
                 challenge={challenge}
