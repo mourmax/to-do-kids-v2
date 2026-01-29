@@ -102,11 +102,16 @@ export default function App() {
   const STEP_ORDER = { 'pin': 1, 'child': 2, 'mission': 3, 'challenge': 4, 'invite': 5, 'done': 6 }
 
   // Calculate current onboarding step based on completion status
-  // CRITICAL: This logic NEVER goes backwards - it only advances or stays
+  // CRITICAL: This logic NEVER goes backwards AND never auto-advances to 'done'
   useEffect(() => {
     // Skip auto-calculation if a manual step change just happened
     if (manualStepChangeRef.current) {
       manualStepChangeRef.current = false
+      return
+    }
+
+    // Don't recalculate if already at invite or done - user must explicitly complete
+    if (onboardingStep === 'invite' || onboardingStep === 'done') {
       return
     }
 
@@ -116,9 +121,9 @@ export default function App() {
       const hasMissions = allMissions && allMissions.length > 0
       const missionsConfirmed = localStorage.getItem('onboarding_missions_confirmed') === 'true'
       const hasConfiguredChallenge = challenge && challenge.reward_name && challenge.reward_name !== 'Cadeau Surprise' && challenge.reward_name !== 'Surprise Gift'
-      const inviteDismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
 
       // Calculate what step SHOULD be based on completion
+      // NEVER auto-calculate to 'done' - max is 'invite'
       let targetStep = 'pin'
       if (parentProfile?.pin_code || pinSuccessfullySet) {
         targetStep = 'child'
@@ -127,7 +132,7 @@ export default function App() {
           if (hasMissions && missionsConfirmed) {
             targetStep = 'challenge'
             if (hasConfiguredChallenge) {
-              targetStep = inviteDismissed ? 'done' : 'invite'
+              targetStep = 'invite' // MAX - never auto to 'done'
             }
           }
         }
