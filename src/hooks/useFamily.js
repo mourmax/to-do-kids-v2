@@ -111,23 +111,15 @@ export function useFamily(userId, familyId = null) {
         profs = newProfs || []
         console.log("[useFamily] Profiles created successfully")
 
-        // Default Missions creation (keep as is but maybe wrap in try/catch if critical)
+        // Default Missions creation - ONLY when profiles are first created
         try {
-          const { data: existingMissions } = await supabase
-            .from('missions')
-            .select('id')
-            .eq('family_id', fam.id)
-            .limit(1)
-
-          if (!existingMissions || existingMissions.length === 0) {
-            console.log("Creating default missions...")
-            const defaultMissions = [
-              { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
-              { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
-              { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
-            ]
-            await supabase.from('missions').insert(defaultMissions)
-          }
+          console.log("Creating default missions...")
+          const defaultMissions = [
+            { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
+            { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
+            { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
+          ]
+          await supabase.from('missions').insert(defaultMissions)
         } catch (mErr) {
           console.warn("Default missions creation failed (non-critical):", mErr)
         }

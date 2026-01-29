@@ -31,8 +31,31 @@ export default function App() {
   const [isOnboardingSession, setIsOnboardingSession] = useState(false)
   const [tutorialShownInSession, setTutorialShownInSession] = useState(false)
 
-  // Onboarding stepper state
+  // Onboarding stepper state (will be calculated dynamically)
   const [onboardingStep, setOnboardingStep] = useState('pin')
+
+  // Calculate current onboarding step based on completion status
+  useEffect(() => {
+    if (!isLoading && profiles && isOnboardingSession) {
+      const childProfiles = profiles.filter(p => !p.is_parent)
+      const hasConfiguredChild = childProfiles.some(p => p.child_name !== "Mon enfant")
+      const hasMissions = allMissions && allMissions.length > 0
+      const hasConfiguredChallenge = challenge && challenge.reward_name && challenge.reward_name !== 'Cadeau Surprise' && challenge.reward_name !== 'Surprise Gift'
+
+      // Determine current step based on what's completed
+      if (!parentProfile?.pin_code && !pinSuccessfullySet) {
+        setOnboardingStep('pin')
+      } else if (!hasConfiguredChild) {
+        setOnboardingStep('child')
+      } else if (!hasMissions) {
+        setOnboardingStep('mission')
+      } else if (!hasConfiguredChallenge) {
+        setOnboardingStep('challenge')
+      } else {
+        setOnboardingStep('invite')
+      }
+    }
+  }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession])
 
   // 1. Session management
   useEffect(() => {
