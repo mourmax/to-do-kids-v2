@@ -116,8 +116,11 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                       const { error } = await supabase.from('profiles').update({ pin_code: localPin }).eq('id', profile.id)
                       if (error) throw error
                       showSuccess(t('actions.save_success'))
+                      // Wait for refresh to complete BEFORE advancing to next step
                       await refresh(true)
-                      handleNextStep('children')
+                      // Now advance to the next step
+                      if (setOnboardingStep) setOnboardingStep('child')
+                      setActiveSubMenu('children')
                     } catch (err) {
                       console.error("PIN Save Error:", err)
                       showSuccess("Erreur lors de l'enregistrement")
