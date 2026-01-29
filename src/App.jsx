@@ -71,18 +71,21 @@ export default function App() {
 
       // Simplified logic: If invite code isn't dismissed, you are in onboarding.
       // This handles reloads, "stuck" users, and new users correctly.
-      if (!dismissed) {
-        if (!isOnboardingSession) setIsOnboardingSession(true)
-      } else if (dismissed && isOnboardingSession) {
-        // Force exit if dismissed
-        setIsOnboardingSession(false)
+      // CRITICAL: Once dismissed, NEVER re-enter onboarding
+      if (dismissed) {
+        if (isOnboardingSession) setIsOnboardingSession(false)
+      } else if (!isOnboardingSession) {
+        setIsOnboardingSession(true)
       }
     }
-  }, [isLoading, !!session, !!family, (profiles || []).length, isOnboardingSession])
+  }, [isLoading, !!session, !!family, isOnboardingSession])
 
   // Force exit onboarding when step becomes done
   useEffect(() => {
-    if (onboardingStep === 'done') setIsOnboardingSession(false)
+    if (onboardingStep === 'done') {
+      localStorage.setItem('onboarding_invite_dismissed', 'true')
+      setIsOnboardingSession(false)
+    }
   }, [onboardingStep])
 
   // 3. Derived states for onboarding (Safe to use profiles here)
@@ -322,67 +325,69 @@ export default function App() {
         </div>
       </div>
 
-      {/* CONTENU PRINCIPAL (Dashboard) - Hidden during tutorial to prevent flash */}
-      <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'} ${showTutorial ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <AnimatePresence mode="wait">
-          {isParentMode ? (
-            family ? (
-              <ParentDashboard
-                family={family}
+      {/* CONTENU PRINCIPAL (Dashboard) - Don't render at all during tutorial */}
+      {!showTutorial && (
+        <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
+          <AnimatePresence mode="wait">
+            {isParentMode ? (
+              family ? (
+                <ParentDashboard
+                  family={family}
+                  profile={activeProfile}
+                  challenge={challenge}
+                  missions={missions}
+                  allMissions={allMissions}
+                  profiles={profiles}
+                  onExit={() => setIsParentMode(false)}
+                  onSwitchProfile={switchProfile}
+                  refresh={loadFamilyData}
+                  updateProfile={updateProfile}
+                  isNewUser={isOnboardingSession}
+                  initialTab={isOnboardingSession ? 'settings' : 'validation'}
+                  initialSubTab={isOnboardingSession && onboardingStep === 'pin' ? 'pin' : (isOnboardingSession ? 'children' : 'missions')}
+                  onboardingStep={onboardingStep}
+                  setOnboardingStep={handleManualStepChange}
+                  preventStepRecalc={preventStepRecalc}
+                />
+              ) : familyError ? (
+                <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">
+                  <div className="bg-rose-500/10 p-4 rounded-full">
+                    <Lock className="text-rose-500" size={32} />
+                  </div>
+                  <h2 className="text-xl font-black uppercase text-white">Erreur de chargement</h2>
+                  <p className="text-slate-400 text-sm max-w-xs uppercase tracking-widest leading-loose">
+                    {familyError && (
+                      <span className="block text-[10px] text-rose-400/70 mb-2 font-mono">CODE: {familyError}</span>
+                    )}
+                    {familyError === "Missing family"
+                      ? "Impossible de créer votre espace famille. Vérifiez vos permissions SQL."
+                      : "Un problème est survenu lors de la récupération des données."}
+                  </p>
+                  <button onClick={() => loadFamilyData()} className="px-6 py-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all font-black uppercase text-[10px]">
+                    Réessayer
+                  </button>
+                </div>
+              ) : (
+                <div className="min-h-[200px] flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-indigo-500" />
+                </div>
+              )
+            ) : (
+              <ChildDashboard
+                key="child"
                 profile={activeProfile}
+                profiles={profiles}
                 challenge={challenge}
                 missions={missions}
-                allMissions={allMissions}
-                profiles={profiles}
-                onExit={() => setIsParentMode(false)}
+                onParentMode={() => setShowPinModal(true)}
                 onSwitchProfile={switchProfile}
                 refresh={loadFamilyData}
-                updateProfile={updateProfile}
-                isNewUser={isOnboardingSession}
-                initialTab={isOnboardingSession ? 'settings' : 'validation'}
-                initialSubTab={isOnboardingSession && onboardingStep === 'pin' ? 'pin' : (isOnboardingSession ? 'children' : 'missions')}
-                onboardingStep={onboardingStep}
-                setOnboardingStep={handleManualStepChange}
-                preventStepRecalc={preventStepRecalc}
+                isChildSession={!session && !!childFamilyId}
               />
-            ) : familyError ? (
-              <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">
-                <div className="bg-rose-500/10 p-4 rounded-full">
-                  <Lock className="text-rose-500" size={32} />
-                </div>
-                <h2 className="text-xl font-black uppercase text-white">Erreur de chargement</h2>
-                <p className="text-slate-400 text-sm max-w-xs uppercase tracking-widest leading-loose">
-                  {familyError && (
-                    <span className="block text-[10px] text-rose-400/70 mb-2 font-mono">CODE: {familyError}</span>
-                  )}
-                  {familyError === "Missing family"
-                    ? "Impossible de créer votre espace famille. Vérifiez vos permissions SQL."
-                    : "Un problème est survenu lors de la récupération des données."}
-                </p>
-                <button onClick={() => loadFamilyData()} className="px-6 py-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all font-black uppercase text-[10px]">
-                  Réessayer
-                </button>
-              </div>
-            ) : (
-              <div className="min-h-[200px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-indigo-500" />
-              </div>
-            )
-          ) : (
-            <ChildDashboard
-              key="child"
-              profile={activeProfile}
-              profiles={profiles}
-              challenge={challenge}
-              missions={missions}
-              onParentMode={() => setShowPinModal(true)}
-              onSwitchProfile={switchProfile}
-              refresh={loadFamilyData}
-              isChildSession={!session && !!childFamilyId}
-            />
-          )}
-        </AnimatePresence>
-      </div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* FOOTER DISCRET */}
       <footer className="pb-8 px-4 text-center">
