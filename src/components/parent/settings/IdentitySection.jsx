@@ -119,13 +119,16 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
 
   // LOGIQUE DE VISIBILITÉ :
-  // Pendant l'onboarding, on ne veut pas de confusion.
-  // S'il n'y a QUE des profils "Mon enfant", on n'en montre qu'un.
-  // Dès qu'un profil a été modifié localement ou en DB, on le considère comme "configuré".
-  const hasConfiguredAny = childProfiles.some(p => p.child_name !== "Mon enfant" || onboardingDrafts[p.id]?.child_name)
+  // On considère un profil "configuré" s'il a un prénom différent de "Mon enfant" ou s'il y a un brouillon local.
+  const isConfigured = (p) => p.child_name !== "Mon enfant" || onboardingDrafts[p.id]?.child_name
+  const hasConfiguredAny = childProfiles.some(isConfigured)
 
-  const displayedChildren = (isNewUser && !hasConfiguredAny)
-    ? childProfiles.slice(0, 1)
+  // Pendant l'onboarding, on ne montre que :
+  // 1. Les profils déjà configurés (ou en cours de saisie)
+  // 2. Le tout premier profil si absolument rien n'a encore été commencé (état initial)
+  // Cela permet de cacher les doublons "Mon enfant" hérités de sessions précédentes.
+  const displayedChildren = isNewUser
+    ? childProfiles.filter((p, index) => isConfigured(p) || (index === 0 && !hasConfiguredAny))
     : childProfiles
 
   const showOnboardingHeader = isNewUser && !hasConfiguredAny
@@ -240,7 +243,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
             )
           })}
 
-          {!isNewUser && (
+          {(!isNewUser || (hasConfiguredAny && !childProfiles.some(p => !isConfigured(p)))) && (
             <button
               onClick={handleAddChild}
               disabled={isAdding}
