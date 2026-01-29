@@ -226,9 +226,15 @@ export default function App() {
     )
   }
 
+  // Wrapper to handle manual step changes
   const handleManualStepChange = (step) => {
     manualStepChangeRef.current = true
     setOnboardingStep(step)
+  }
+
+  // Function to prevent automatic step recalculation (for mission/challenge operations)
+  const preventStepRecalc = () => {
+    manualStepChangeRef.current = true
   }
 
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
@@ -328,6 +334,7 @@ export default function App() {
                 initialSubTab={isOnboardingSession && onboardingStep === 'pin' ? 'pin' : (isOnboardingSession ? 'children' : 'missions')}
                 onboardingStep={onboardingStep}
                 setOnboardingStep={handleManualStepChange}
+                preventStepRecalc={preventStepRecalc}
               />
             ) : familyError ? (
               <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">

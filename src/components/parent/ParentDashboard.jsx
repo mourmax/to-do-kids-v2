@@ -45,7 +45,8 @@ export default function ParentDashboard({
   initialTab = 'validation',
   initialSubTab = 'missions',
   onboardingStep = 'child',
-  setOnboardingStep
+  setOnboardingStep,
+  preventStepRecalc
 }) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -349,6 +350,7 @@ export default function ParentDashboard({
                 onTabChange={setActiveTab}
                 onboardingStep={onboardingStep}
                 setOnboardingStep={setOnboardingStep}
+                preventStepRecalc={preventStepRecalc}
               />
             </motion.div>
           )}

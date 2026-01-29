@@ -12,7 +12,7 @@ import FamilySection from '../settings/FamilySection'
 import ChallengeSection from '../settings/ChallengeSection'
 import MissionsSection from '../settings/MissionsSection'
 
-export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange, onboardingStep, setOnboardingStep }) {
+export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange, onboardingStep, setOnboardingStep, preventStepRecalc }) {
   const { t } = useTranslation()
   const [toastMessage, setToastMessage] = useState(null)
   const [localPin, setLocalPin] = useState('')
@@ -179,6 +179,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
+              preventStepRecalc={preventStepRecalc}
               onNextStep={(step) => {
                 handleNextStep(step)
                 if (setOnboardingStep && step === 'challenge') {

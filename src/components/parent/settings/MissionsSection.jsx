@@ -93,7 +93,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
   )
 }
 
-export default function MissionsSection({ missions, profiles, familyId, onShowSuccess, refresh, isNewUser, onNextStep }) {
+export default function MissionsSection({ missions, profiles, familyId, onShowSuccess, refresh, isNewUser, onNextStep, preventStepRecalc }) {
   const { t } = useTranslation()
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
 
@@ -148,13 +148,18 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     } else {
       setNewMissionTitle(''); setSelectedIcon('✨'); setShowPickerForAdd(false); setShowLibrary(false); setShowCustomModal(false);
       onShowSuccess(t('actions.add_success'));
+      if (preventStepRecalc) preventStepRecalc();
       refresh(true);
     }
   }
 
   const deleteMission = async (id) => {
     const { error } = await supabase.from('missions').delete().eq('id', id)
-    if (!error) { onShowSuccess("Mission supprimée"); refresh(true); }
+    if (!error) {
+      onShowSuccess("Mission supprimée");
+      if (preventStepRecalc) preventStepRecalc();
+      refresh(true);
+    }
   }
 
   const saveMissionEdit = async (id) => {
@@ -165,7 +170,9 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     }).eq('id', id)
     if (!error) {
       setEditingId(null); setShowPickerForEdit(false);
-      onShowSuccess("Mission modifiée !"); refresh(true);
+      onShowSuccess("Mission modifiée !");
+      if (preventStepRecalc) preventStepRecalc();
+      refresh(true);
     }
   }
 
@@ -328,13 +335,23 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                       </div>
                     )}
 
-                    <button
-                      onClick={() => addMission()}
-                      disabled={isLimitReached || !newMissionTitle.trim()}
-                      className={`w-full py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-lg active:scale-95 transition-all text-white disabled:opacity-30 disabled:grayscale ${targetId ? getColorClasses(childProfiles.find(p => p.id === targetId)?.color) : 'bg-indigo-600 shadow-indigo-600/30'}`}
-                    >
-                      Valider la mission
-                    </button>
+                    <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 p-6 rounded-2xl flex flex-col items-center gap-4 text-center">
+                      <Crown size={32} className="text-indigo-400" />
+                      <div>
+                        <p className="text-sm font-black text-white uppercase tracking-wide mb-2">
+                          Fonctionnalité Premium Uniquement
+                        </p>
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          Créez des missions personnalisées illimitées avec la version Premium
+                        </p>
+                      </div>
+                      <button
+                        disabled
+                        className="w-full py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] bg-slate-700 text-slate-500 cursor-not-allowed"
+                      >
+                        Valider la mission
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               </div>
