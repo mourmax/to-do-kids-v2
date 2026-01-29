@@ -226,7 +226,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
             {/* Bibliothèque - Orange pulsant */}
             <button
               onClick={() => setShowLibrary(true)}
-              className="bg-orange-500/20 border-2 border-orange-500 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-orange-500/30 transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20 animate-orange-pulse"
+              className="bg-orange-500/80 border-2 border-orange-400 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-orange-500/90 transition-all active:scale-[0.98] shadow-xl shadow-orange-500/40 animate-heartbeat"
             >
               <Sparkles size={24} className="text-orange-400 group-hover:rotate-12 transition-transform" />
               <span className="font-black uppercase text-[10px] tracking-widest text-orange-100">{t('library.library_button')}</span>
