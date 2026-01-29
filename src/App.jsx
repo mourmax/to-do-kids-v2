@@ -116,7 +116,11 @@ export default function App() {
       } else if (!hasConfiguredChild) {
         setOnboardingStep('child')
       } else if (!hasMissions || !missionsConfirmed) {
-        setOnboardingStep('mission')
+        // Only auto-advance to mission step if we're not already there
+        // This prevents jumping back from challenge step when adding missions
+        if (onboardingStep !== 'mission' && onboardingStep !== 'challenge') {
+          setOnboardingStep('mission')
+        }
       } else if (!hasConfiguredChallenge) {
         setOnboardingStep('challenge')
       } else {
