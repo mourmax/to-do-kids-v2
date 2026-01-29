@@ -54,24 +54,26 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
         {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       </AnimatePresence>
 
-      {/* 🟢 SUB-NAVIGATION PERSISTANTE */}
-      <div className="flex justify-center -mt-4 mb-8">
-        <div className="inline-flex items-center gap-1 p-1 bg-slate-900/60 [.light-theme_&]:bg-indigo-500/15 backdrop-blur-md border border-white/5 [.light-theme_&]:border-indigo-500/10 rounded-2xl shadow-xl">
-          {subTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSubMenu(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ${activeSubMenu === tab.id
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'text-slate-500 [.light-theme_&]:text-slate-600 hover:text-white [.light-theme_&]:hover:text-indigo-800 hover:bg-white/5 [.light-theme_&]:hover:bg-indigo-500/5'
-                }`}
-            >
-              <span className={`${activeSubMenu === tab.id ? 'opacity-100' : 'opacity-60'}`}>{tab.icon}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
-            </button>
-          ))}
+      {/* 🟢 SUB-NAVIGATION PERSISTANTE - Masquée pendant l'onboarding */}
+      {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
+        <div className="flex justify-center -mt-4 mb-8">
+          <div className="inline-flex items-center gap-1 p-1 bg-slate-900/60 [.light-theme_&]:bg-indigo-500/15 backdrop-blur-md border border-white/5 [.light-theme_&]:border-indigo-500/10 rounded-2xl shadow-xl">
+            {subTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSubMenu(tab.id)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ${activeSubMenu === tab.id
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                  : 'text-slate-500 [.light-theme_&]:text-slate-600 hover:text-white [.light-theme_&]:hover:text-indigo-800 hover:bg-white/5 [.light-theme_&]:hover:bg-indigo-500/5'
+                  }`}
+              >
+                <span className={`${activeSubMenu === tab.id ? 'opacity-100' : 'opacity-60'}`}>{tab.icon}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -100,8 +102,12 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                   }
                 }}
               />
-              <FamilySection family={family} />
-              <SecuritySection profile={profile} onShowSuccess={showSuccess} />
+              {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
+                <>
+                  <FamilySection family={family} />
+                  <SecuritySection profile={profile} onShowSuccess={showSuccess} />
+                </>
+              )}
             </div>
           )}
 

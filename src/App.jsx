@@ -219,8 +219,8 @@ export default function App() {
 
         {/* Logo/Title (Discret) */}
         <div className="flex items-center gap-2">
-          <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg">
-            <Baby size={18} className="text-white" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-lg border border-white/10">
+            <img src="/icon-192.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-sm font-black uppercase italic tracking-tighter text-white">To-Do Kids</span>
         </div>

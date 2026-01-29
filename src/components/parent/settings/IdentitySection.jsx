@@ -153,7 +153,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                 <div className="flex gap-4 items-start">
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between px-1">
-                      <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none">
+                      <label className="text-[10px] text-orange-500 uppercase font-black tracking-widest leading-none">
                         {t('settings.child_name_label')}
                       </label>
                       <span className="text-[10px] text-indigo-400/50 font-black font-mono tracking-widest uppercase">
@@ -182,9 +182,9 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                           setEditingId(null)
                         }}
                         placeholder="Ex: Arthur"
-                        className={`w-full bg-slate-950 border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
-                            ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]'
-                            : 'border-orange-500/50 text-slate-300 animate-orange-pulse'
+                        className={`w-full bg-slate-950 border-2 rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
+                          ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]'
+                          : 'border-orange-500 text-slate-300 animate-orange-pulse'
                           }`}
                       />
 
