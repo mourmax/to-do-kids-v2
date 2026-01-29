@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentions Légales - TO DO KIDS</title>
+    <title data-i18n="page_title">Mentions Légales - TO DO KIDS</title>
     <style>
         :root {
             --primary: #4F46E5;
@@ -34,16 +34,30 @@
             padding: 1rem;
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 20px;
             position: sticky;
             top: 0;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            flex-wrap: wrap;
         }
 
         nav a {
             text-decoration: none;
             color: var(--primary);
             font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .lang-selector {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 0.8rem;
+            color: var(--text);
+            background: white;
+            cursor: pointer;
         }
 
         .container {
@@ -91,77 +105,342 @@
 <body>
 
     <header>
-        <h1>TO DO KIDS</h1>
-        <p>L'autonomie n'est pas un don, c'est une habitude.</p>
+        <h1 data-i18n="app_name">TO DO KIDS</h1>
+        <p data-i18n="slogan">L'autonomie n'est pas un don, c'est une habitude.</p>
     </header>
 
     <nav>
-        <a href="#cgu">Conditions d'Utilisation</a>
-        <a href="#privacy">Confidentialité</a>
+        <a href="#cgu" data-i18n="nav_cgu">Conditions d'Utilisation</a>
+        <a href="#privacy" data-i18n="nav_privacy">Confidentialité</a>
+        <select class="lang-selector" id="langSelect" onchange="changeLanguage(this.value)">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+        </select>
     </nav>
 
     <div class="container">
-        <p class="last-update">Dernière mise à jour : 29 janvier 2026</p>
+        <p class="last-update" data-i18n="last_update">Dernière mise à jour : 29 janvier 2026</p>
 
         <section id="cgu">
-            <h2>1. Conditions Générales d'Utilisation (CGU)</h2>
-            <p>Bienvenue sur TO DO KIDS. En utilisant notre application, vous acceptez les présentes conditions.</p>
+            <h2 data-i18n="cgu_title">1. Conditions Générales d'Utilisation (CGU)</h2>
+            <p data-i18n="cgu_intro">Bienvenue sur TO DO KIDS. En utilisant notre application, vous acceptez les
+                présentes conditions.</p>
 
-            <h3>Objet du service</h3>
-            <p>TO DO KIDS est une plateforme de gamification destinée à aider les parents à accompagner leurs enfants
-                vers l'autonomie à travers des listes de missions quotidiennes.</p>
+            <h3 data-i18n="cgu_obj_title">Objet du service</h3>
+            <p data-i18n="cgu_obj_text">TO DO KIDS est une plateforme de gamification destinée à aider les parents à
+                accompagner leurs enfants vers l'autonomie à travers des listes de missions quotidiennes.</p>
 
-            <h3>Comptes et Responsabilité</h3>
+            <h3 data-i18n="cgu_resp_title">Comptes et Responsabilité</h3>
             <ul>
-                <li>Le compte doit être créé par un parent ou un tuteur légal majeur.</li>
-                <li>L'utilisateur est responsable de la supervision de l'enfant lors de l'utilisation de l'application.
-                </li>
-                <li>L'application est un outil d'accompagnement et ne remplace pas la vigilance parentale.</li>
+                <li data-i18n="cgu_resp_1">Le compte doit être créé par un parent ou un tuteur légal majeur.</li>
+                <li data-i18n="cgu_resp_2">L'utilisateur est responsable de la supervision de l'enfant lors de
+                    l'utilisation de l'application.</li>
+                <li data-i18n="cgu_resp_3">L'application est un outil d'accompagnement et ne remplace pas la vigilance
+                    parentale.</li>
             </ul>
 
-            <h3>Abonnements et Paiements</h3>
-            <p>L'accès complet aux fonctionnalités nécessite un abonnement (mensuel ou annuel). Le paiement est géré par
-                la plateforme de téléchargement (App Store ou Google Play). Le renouvellement est automatique sauf
-                résiliation 24h avant la fin de la période en cours.</p>
+            <h3 data-i18n="cgu_sub_title">Abonnements et Paiements</h3>
+            <p data-i18n="cgu_sub_text">L'accès complet aux fonctionnalités nécessite un abonnement (mensuel ou annuel).
+                Le paiement est géré par la plateforme de téléchargement (App Store ou Google Play). Le renouvellement
+                est automatique sauf résiliation 24h avant la fin de la période en cours.</p>
 
-            <h3>Propriété Intellectuelle</h3>
-            <p>Tous les éléments (logos, personnages, interface) sont la propriété exclusive de TO DO KIDS. Toute
-                reproduction est interdite.</p>
+            <h3 data-i18n="cgu_prop_title">Propriété Intellectuelle</h3>
+            <p data-i18n="cgu_prop_text">Tous les éléments (logos, personnages, interface) sont la propriété exclusive
+                de TO DO KIDS. Toute reproduction est interdite.</p>
         </section>
 
         <section id="privacy">
-            <h2>2. Politique de Confidentialité</h2>
-            <p>La protection de votre vie privée et celle de vos enfants est notre priorité absolue.</p>
+            <h2 data-i18n="privacy_title">2. Politique de Confidentialité</h2>
+            <p data-i18n="privacy_intro">La protection de votre vie privée et celle de vos enfants est notre priorité
+                absolue.</p>
 
-            <h3>Données collectées</h3>
+            <h3 data-i18n="privacy_data_title">Données collectées</h3>
             <ul>
-                <li><strong>Parents :</strong> Adresse email (pour le compte et la gestion de l'abonnement).</li>
-                <li><strong>Enfants :</strong> Prénom ou pseudonyme (au choix du parent) pour personnaliser l'interface.
-                </li>
-                <li><strong>Usage :</strong> Statistiques de réussite des missions pour afficher la progression.</li>
+                <li data-i18n="privacy_data_1"><strong>Parents :</strong> Adresse email (pour le compte et la gestion de
+                    l'abonnement).</li>
+                <li data-i18n="privacy_data_2"><strong>Enfants :</strong> Prénom ou pseudonyme (au choix du parent) pour
+                    personnaliser l'interface.</li>
+                <li data-i18n="privacy_data_3"><strong>Usage :</strong> Statistiques de réussite des missions pour
+                    afficher la progression.</li>
             </ul>
 
-            <h3>Protection des mineurs (COPPA/RGPD)</h3>
-            <p>Nous ne collectons aucune donnée personnelle permettant d'identifier directement un enfant sans le
-                consentement explicite des parents. Nous n'utilisons aucun traceur publicitaire comportemental.</p>
+            <h3 data-i18n="privacy_coppa_title">Protection des mineurs (COPPA/RGPD)</h3>
+            <p data-i18n="privacy_coppa_text">Nous ne collectons aucune donnée personnelle permettant d'identifier
+                directement un enfant sans le consentement explicite des parents. Nous n'utilisons aucun traceur
+                publicitaire comportemental.</p>
 
-            <h3>Utilisation et Partage</h3>
-            <p>Vos données ne sont <strong>jamais vendues à des tiers</strong>. Elles sont utilisées uniquement pour :
+            <h3 data-i18n="privacy_share_title">Utilisation et Partage</h3>
+            <p data-i18n="privacy_share_intro">Vos données ne sont <strong>jamais vendues à des tiers</strong>. Elles
+                sont utilisées uniquement pour :</p>
             <ul>
-                <li>Faire fonctionner l'application.</li>
-                <li>Synchroniser vos données entre vos différents appareils.</li>
-                <li>Améliorer l'expérience utilisateur.</li>
+                <li data-i18n="privacy_share_1">Faire fonctionner l'application.</li>
+                <li data-i18n="privacy_share_2">Synchroniser vos données entre vos différents appareils.</li>
+                <li data-i18n="privacy_share_3">Améliorer l'expérience utilisateur.</li>
             </ul>
 
-            <h3>Sécurité et Stockage</h3>
-            <p>Les données sont chiffrées et stockées sur des serveurs sécurisés. Vous disposez d'un droit d'accès, de
-                rectification et de suppression totale de vos données sur simple demande à notre support.</p>
+            <h3 data-i18n="privacy_sec_title">Sécurité et Stockage</h3>
+            <p data-i18n="privacy_sec_text">Les données sont chiffrées et stockées sur des serveurs sécurisés. Vous
+                disposez d'un droit d'accès, de rectification et de suppression totale de vos données sur simple demande
+                à notre support.</p>
         </section>
     </div>
 
     <footer>
-        &copy; 2026 TO DO KIDS. Tous droits réservés.
+        <span data-i18n="footer_text">&copy; 2026 TO DO KIDS. Tous droits réservés.</span>
     </footer>
+
+    <script>
+        const translations = {
+            fr: {
+                page_title: "Mentions Légales - TO DO KIDS",
+                app_name: "TO DO KIDS",
+                slogan: "L'autonomie n'est pas un don, c'est une habitude.",
+                nav_cgu: "Conditions d'Utilisation",
+                nav_privacy: "Confidentialité",
+                last_update: "Dernière mise à jour : 29 janvier 2026",
+                cgu_title: "1. Conditions Générales d'Utilisation (CGU)",
+                cgu_intro: "Bienvenue sur TO DO KIDS. En utilisant notre application, vous acceptez les présentes conditions.",
+                cgu_obj_title: "Objet du service",
+                cgu_obj_text: "TO DO KIDS est une plateforme de gamification destinée à aider les parents à accompagner leurs enfants vers l'autonomie à travers des listes de missions quotidiennes.",
+                cgu_resp_title: "Comptes et Responsabilité",
+                cgu_resp_1: "Le compte doit être créé par un parent ou un tuteur légal majeur.",
+                cgu_resp_2: "L'utilisateur est responsable de la supervision de l'enfant lors de l'utilisation de l'application.",
+                cgu_resp_3: "L'application est un outil d'accompagnement et ne remplace pas la vigilance parentale.",
+                cgu_sub_title: "Abonnements et Paiements",
+                cgu_sub_text: "L'accès complet aux fonctionnalités nécessite un abonnement (mensuel ou annuel). Le paiement est géré par la plateforme de téléchargement (App Store ou Google Play). Le renouvellement est automatique sauf résiliation 24h avant la fin de la période en cours.",
+                cgu_prop_title: "Propriété Intellectuelle",
+                cgu_prop_text: "Tous les éléments (logos, personnages, interface) sont la propriété exclusive de TO DO KIDS. Toute reproduction est interdite.",
+                privacy_title: "2. Politique de Confidentialité",
+                privacy_intro: "La protection de votre vie privée et celle de vos enfants est notre priorité absolue.",
+                privacy_data_title: "Données collectées",
+                privacy_data_1: "Parents : Adresse email (pour le compte et la gestion de l'abonnement).",
+                privacy_data_2: "Enfants : Prénom ou pseudonyme (au choix du parent) pour personnaliser l'interface.",
+                privacy_data_3: "Usage : Statistiques de réussite des missions pour afficher la progression.",
+                privacy_coppa_title: "Protection des mineurs (COPPA/RGPD)",
+                privacy_coppa_text: "Nous ne collectons aucune donnée personnelle permettant d'identifier directement un enfant sans le consentement explicite des parents. Nous n'utilisons aucun traceur publicitaire comportemental.",
+                privacy_share_title: "Utilisation et Partage",
+                privacy_share_intro: "Vos données ne sont jamais vendues à des tiers. Elles sont utilisées uniquement pour :",
+                privacy_share_1: "Faire fonctionner l'application.",
+                privacy_share_2: "Synchroniser vos données entre vos différents appareils.",
+                privacy_share_3: "Améliorer l'expérience utilisateur.",
+                privacy_sec_title: "Sécurité et Stockage",
+                privacy_sec_text: "Les données sont chiffrées et stockées sur des serveurs sécurisés. Vous disposez d'un droit d'accès, de rectification et de suppression totale de vos données sur simple demande à notre support.",
+                footer_text: "© 2026 TO DO KIDS. Tous droits réservés."
+            },
+            en: {
+                page_title: "Legal Notice - TO DO KIDS",
+                app_name: "TO DO KIDS",
+                slogan: "Autonomy is not a gift, it's a habit.",
+                nav_cgu: "Terms of Use",
+                nav_privacy: "Privacy Policy",
+                last_update: "Last updated: January 29, 2026",
+                cgu_title: "1. General Terms of Use (GTU)",
+                cgu_intro: "Welcome to TO DO KIDS. By using our application, you agree to these terms.",
+                cgu_obj_title: "Service Purpose",
+                cgu_obj_text: "TO DO KIDS is a gamification platform designed to help parents support their children towards autonomy through daily mission lists.",
+                cgu_resp_title: "Accounts and Responsibility",
+                cgu_resp_1: "The account must be created by a parent or legal guardian of legal age.",
+                cgu_resp_2: "The user is responsible for supervising the child while using the application.",
+                cgu_resp_3: "The application is a support tool and does not replace parental vigilance.",
+                cgu_sub_title: "Subscriptions and Payments",
+                cgu_sub_text: "Full access to features requires a subscription (monthly or annual). Payment is managed by the download platform (App Store or Google Play). Renewal is automatic unless cancelled 24 hours before the end of the current period.",
+                cgu_prop_title: "Intellectual Property",
+                cgu_prop_text: "All elements (logos, characters, interface) are the exclusive property of TO DO KIDS. Any reproduction is prohibited.",
+                privacy_title: "2. Privacy Policy",
+                privacy_intro: "The protection of your privacy and that of your children is our top priority.",
+                privacy_data_title: "Data Collected",
+                privacy_data_1: "Parents: Email address (for account and subscription management).",
+                privacy_data_2: "Children: First name or nickname (at the parent's choice) to personalize the interface.",
+                privacy_data_3: "Usage: Mission success statistics to display progress.",
+                privacy_coppa_title: "Protection of Minors (COPPA/GDPR)",
+                privacy_coppa_text: "We do not collect any personal data that allows direct identification of a child without explicit parental consent. We do not use any behavioral advertising trackers.",
+                privacy_share_title: "Use and Sharing",
+                privacy_share_intro: "Your data is never sold to third parties. It is used only to:",
+                privacy_share_1: "Operate the application.",
+                privacy_share_2: "Synchronize your data between your different devices.",
+                privacy_share_3: "Improve User Experience.",
+                privacy_sec_title: "Security and Storage",
+                privacy_sec_text: "Data is encrypted and stored on secure servers. You have the right to access, correct, and completely delete your data upon request to our support.",
+                footer_text: "© 2026 TO DO KIDS. All rights reserved."
+            },
+            es: {
+                page_title: "Aviso Legal - TO DO KIDS",
+                app_name: "TO DO KIDS",
+                slogan: "La autonomía no es un don, es un hábito.",
+                nav_cgu: "Condiciones de Uso",
+                nav_privacy: "Privacidad",
+                last_update: "Última actualización: 29 de enero de 2026",
+                cgu_title: "1. Condiciones Generales de Uso (CGU)",
+                cgu_intro: "Bienvenido a TO DO KIDS. Al utilizar nuestra aplicación, usted acepta estas condiciones.",
+                cgu_obj_title: "Objetivo del servicio",
+                cgu_obj_text: "TO DO KIDS es una plataforma de gamificación diseñada para ayudar a los padres a acompañar a sus hijos hacia la autonomía a través de listas de misiones diarias.",
+                cgu_resp_title: "Cuentas y Responsabilidad",
+                cgu_resp_1: "La cuenta debe ser creada por un padre o tutor legal mayor de edad.",
+                cgu_resp_2: "El usuario es responsable de supervisar al niño durante el uso de la aplicación.",
+                cgu_resp_3: "La aplicación es una herramienta de apoyo y no sustituye la vigilancia parental.",
+                cgu_sub_title: "Suscripciones y Pagos",
+                cgu_sub_text: "El acceso completo a las funciones requiere una suscripción (mensual o anual). El pago es gestionado por la plataforma de descarga (App Store o Google Play). La renovación es automática a menos que se cancele 24 horas antes del final del período actual.",
+                cgu_prop_title: "Propiedad Intelectual",
+                cgu_prop_text: "Todos los elementos (logotipos, personajes, interfaz) son propiedad exclusiva de TO DO KIDS. Queda prohibida cualquier reproducción.",
+                privacy_title: "2. Política de Privacidad",
+                privacy_intro: "La protección de su privacidad y la de sus hijos es nuestra máxima prioridad.",
+                privacy_data_title: "Datos recopilados",
+                privacy_data_1: "Padres: Dirección de correo electrónico (para la cuenta y la gestión de la suscripción).",
+                privacy_data_2: "Niños: Nombre o seudónimo (a elección del padre) para personalizar la interfaz.",
+                privacy_data_3: "Uso: Estadísticas de éxito de las misiones para mostrar el progreso.",
+                privacy_coppa_title: "Protección de menores (COPPA/RGPD)",
+                privacy_coppa_text: "No recopilamos ningún dato personal que permita identificar directamente a un niño sin el consentimiento explícito de los padres. No utilizamos rastreadores de publicidad conductual.",
+                privacy_share_title: "Uso y Uso compartido",
+                privacy_share_intro: "Sus datos nunca se venden a terceros. Se utilizan únicamente para:",
+                privacy_share_1: "Hacer funcionar la aplicación.",
+                privacy_share_2: "Sincronizar sus datos entre sus diferentes dispositivos.",
+                privacy_share_3: "Mejorar la experiencia del usuario.",
+                privacy_sec_title: "Seguridad y Almacenamiento",
+                privacy_sec_text: "Los datos están cifrados y se almacenan en servidores seguros. Usted tiene derecho a acceder, rectificar y eliminar totalmente sus datos previa solicitud a nuestro soporte.",
+                footer_text: "© 2026 TO DO KIDS. Todos los derechos reservados."
+            },
+            pt: {
+                page_title: "Aviso Legal - TO DO KIDS",
+                app_name: "TO DO KIDS",
+                slogan: "A autonomia não é um dom, é um hábito.",
+                nav_cgu: "Termos de Uso",
+                nav_privacy: "Privacidade",
+                last_update: "Última atualização: 29 de janeiro de 2026",
+                cgu_title: "1. Termos Gerais de Uso (TGU)",
+                cgu_intro: "Bem-vindo ao TO DO KIDS. Ao utilizar nosso aplicativo, você aceita estes termos.",
+                cgu_obj_title: "Objetivo do serviço",
+                cgu_obj_text: "TO DO KIDS é uma plataforma de gamificação projetada para ajudar os pais a acompanhar seus filhos rumo à autonomia através de listas de missões diárias.",
+                cgu_resp_title: "Contas e Responsabilidade",
+                cgu_resp_1: "A conta deve ser criada por um pai ou tutor legal maior de idade.",
+                cgu_resp_2: "O usuário é responsável pela supervisão da criança durante o uso do aplicativo.",
+                cgu_resp_3: "O aplicativo é uma ferramenta de apoio e não substitui a vigilância parental.",
+                cgu_sub_title: "Assinaturas e Pagamentos",
+                cgu_sub_text: "O acesso completo aos recursos requer uma assinatura (mensal ou anual). O pagamento é gerenciado pela plataforma de download (App Store ou Google Play). A renovação é automática, a menos que seja cancelada 24 horas antes do final do período atual.",
+                cgu_prop_title: "Propriedade Intelectual",
+                cgu_prop_text: "Todos os elementos (logotipos, personagens, interface) são de propriedade exclusiva da TO DO KIDS. Qualquer reprodução é proibida.",
+                privacy_title: "2. Política de Privacidade",
+                privacy_intro: "A proteção da sua privacidade e a de seus filhos é nossa prioridade absoluta.",
+                privacy_data_title: "Dados coletados",
+                privacy_data_1: "Pais: Endereço de e-mail (para a conta e gestão da assinatura).",
+                privacy_data_2: "Crianças: Primeiro nome ou apelido (à escolha do pai) para personalizar a interface.",
+                privacy_data_3: "Uso: Estatísticas de sucesso das missões para exibir o progresso.",
+                privacy_coppa_title: "Proteção de menores (COPPA/RGPD)",
+                privacy_coppa_text: "Não coletamos nenhum dado pessoal que permita identificar diretamente uma criança sem o consentimento explícito dos pais. Não utilizamos rastreadores de publicidade comportamental.",
+                privacy_share_title: "Uso e Compartilhamento",
+                privacy_share_intro: "Seus dados nunca são vendidos a terceiros. Eles são usados apenas para:",
+                privacy_share_1: "Operar o aplicativo.",
+                privacy_share_2: "Sincronizar seus dados entre seus diferentes dispositivos.",
+                privacy_share_3: "Melhorar a experiência do usuário.",
+                privacy_sec_title: "Segurança e Armazenamento",
+                privacy_sec_text: "Os dados são criptografados e armazenados em servidores seguros. Você tem o direito de acessar, retificar e excluir totalmente seus dados mediante solicitação ao nosso suporte.",
+                footer_text: "© 2026 TO DO KIDS. Todos os direitos reservados."
+            },
+            de: {
+                page_title: "Rechtliche Hinweise - TO DO KIDS",
+                app_name: "TO DO KIDS",
+                slogan: "Autonomie ist kein Geschenk, sondern eine Gewohnheit.",
+                nav_cgu: "Nutzungsbedingungen",
+                nav_privacy: "Datenschutz",
+                last_update: "Zuletzt aktualisiert: 29. Januar 2026",
+                cgu_title: "1. Allgemeine Nutzungsbedingungen (ANB)",
+                cgu_intro: "Willkommen bei TO DO KIDS. Durch die Nutzung unserer Anwendung erklären Sie sich mit diesen Bedingungen einverstanden.",
+                cgu_obj_title: "Zweck des Dienstes",
+                cgu_obj_text: "TO DO KIDS ist eine Gamification-Plattform, die Eltern dabei helfen soll, ihre Kinder durch tägliche Missionslisten zur Autonomie zu führen.",
+                cgu_resp_title: "Konten und Verantwortung",
+                cgu_resp_1: "Das Konto muss von einem Elternteil oder einem volljährigen Erziehungsberechtigten erstellt werden.",
+                cgu_resp_2: "Der Benutzer ist für die Beaufsichtigung des Kindes während der Nutzung der Anwendung verantwortlich.",
+                cgu_resp_3: "Die Anwendung ist ein Begleitwerkzeug und ersetzt nicht die elterliche Aufsicht.",
+                cgu_sub_title: "Abonnements und Zahlungen",
+                cgu_sub_text: "Der volle Zugriff auf die Funktionen erfordert ein Abonnement (monatlich oder jährlich). Die Zahlung wird über die Download-Plattform (App Store oder Google Play) abgewickelt. Das Abonnement verlängert sich automatisch, sofern es nicht 24 Stunden vor Ablauf des aktuellen Zeitraums gekündigt wird.",
+                cgu_prop_title: "Geistiges Eigentum",
+                cgu_prop_text: "Alle Elemente (Logos, Charaktere, Benutzeroberfläche) sind das ausschließliche Eigentum von TO DO KIDS. Jede Vervielfältigung ist untersagt.",
+                privacy_title: "2. Datenschutzerklärung",
+                privacy_intro: "Der Schutz Ihrer Privatsphäre und der Ihrer Kinder hat für uns oberste Priorität.",
+                privacy_data_title: "Erhobene Daten",
+                privacy_data_1: "Eltern: E-Mail-Adresse (für das Konto und die Abonnementverwaltung).",
+                privacy_data_2: "Kinder: Vorname oder Pseudonym (nach Wahl der Eltern), um die Benutzeroberfläche zu personalisieren.",
+                privacy_data_3: "Nutzung: Erfolgsstatistiken der Missionen zur Anzeige des Fortschritts.",
+                privacy_coppa_title: "Schutz von Minderjährigen (COPPA/DSGVO)",
+                privacy_coppa_text: "Wir erheben keine personenbezogenen Daten, die eine direkte Identifizierung eines Kindes ohne ausdrückliche Zustimmung der Eltern ermöglichen. Wir verwenden keine verhaltensbasierten Werbetracker.",
+                privacy_share_title: "Nutzung und Weitergabe",
+                privacy_share_intro: "Ihre Daten werden niemals an Dritte verkauft. Sie werden ausschließlich verwendet für:",
+                privacy_share_1: "Den Betrieb der Anwendung.",
+                privacy_share_2: "Die Synchronisierung Ihrer Daten zwischen Ihren verschiedenen Geräten.",
+                privacy_share_3: "Die Verbesserung der Benutzererfahrung.",
+                privacy_sec_title: "Sicherheit und Speicherung",
+                privacy_sec_text: "Die Daten werden verschlüsselt und auf sicheren Servern gespeichert. Sie haben das Recht auf Auskunft, Berichtigung und vollständige Löschung Ihrer Daten auf einfache Anfrage an unseren Support.",
+                footer_text: "© 2026 TO DO KIDS. Alle Rechte vorbehalten."
+            },
+            it: {
+                page_title: "Note Legali - TO DO KIDS",
+                app_name: "TO DO KIDS",
+                slogan: "L'autonomia non è un dono, è un'abitudine.",
+                nav_cgu: "Condizioni d'Uso",
+                nav_privacy: "Privacy",
+                last_update: "Ultimo aggiornamento: 29 gennaio 2026",
+                cgu_title: "1. Condizioni Generali d'Uso (CGU)",
+                cgu_intro: "Benvenuti su TO DO KIDS. Utilizzando la nostra applicazione, accettate le presenti condizioni.",
+                cgu_obj_title: "Scopo del servizio",
+                cgu_obj_text: "TO DO KIDS è una piattaforma di gamification progettata per aiutare i genitori ad accompagnare i propri figli verso l'autonomia attraverso liste di missioni quotidiane.",
+                cgu_resp_title: "Account e Responsabilità",
+                cgu_resp_1: "L'account deve essere creato da un genitore o da un tutore legale maggiorenne.",
+                cgu_resp_2: "L'utente è responsabile della supervisione del bambino durante l'uso dell'applicazione.",
+                cgu_resp_3: "L'applicazione è uno strumento di supporto e non sostituisce la vigilanza parentale.",
+                cgu_sub_title: "Abbonamenti e Pagamenti",
+                cgu_sub_text: "L'accesso completo alle funzionalità richiede un abbonamento (mensile o annuale). Il pagamento è gestito dalla piattaforma di download (App Store o Google Play). Il rinnovo è automatico a meno che non venga annullato 24 ore prima della fine del periodo corrente.",
+                cgu_prop_title: "Proprietà Intellettuale",
+                cgu_prop_text: "Tutti gli elementi (loghi, personaggi, interfaccia) sono di proprietà esclusiva di TO DO KIDS. Qualsiasi riproduzione è vietata.",
+                privacy_title: "2. Informativa sulla Privacy",
+                privacy_intro: "La protezione della vostra privacy e di quella dei vostri figli è la nostra priorità assoluta.",
+                privacy_data_title: "Dati raccolti",
+                privacy_data_1: "Genitori: Indirizzo email (per l'account e la gestione dell'abbonamento).",
+                privacy_data_2: "Bambini: Nome o pseudonimo (a scelta del genitore) per personalizzare l'interfaccia.",
+                privacy_data_3: "Utilizzo: Statistiche di successo delle missioni per visualizzare i progressi.",
+                privacy_coppa_title: "Protezione dei minori (COPPA/RGPD)",
+                privacy_coppa_text: "Non raccogliamo dati personali che permettano l'identificazione diretta di un bambino senza l'esplicito consenso dei genitori. Non utilizziamo tracciatori pubblicitari comportamentali.",
+                privacy_share_title: "Utilizzo e Condivisione",
+                privacy_share_intro: "I vostri dati non vengono mai venduti a terzi. Vengono utilizzati esclusivamente per:",
+                privacy_share_1: "Far funzionare l'applicazione.",
+                privacy_share_2: "Sincronizzare i dati tra i diversi dispositivi.",
+                privacy_share_3: "Migliorare l'esperienza dell'utente.",
+                privacy_sec_title: "Sicurezza e Archiviazione",
+                privacy_sec_text: "I dati sono crittografati e archiviati su server sicuri. Avete il diritto di accedere, rettificare e cancellare totalmente i vostri dati su semplice richiesta al nostro supporto.",
+                footer_text: "© 2026 TO DO KIDS. Tutti i diritti riservati."
+            }
+        };
+
+        function changeLanguage(lang) {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    if (el.tagName === 'TITLE') {
+                        document.title = translations[lang][key];
+                    } else if (el.innerHTML.includes('<strong>')) {
+                        // Handle HTML content if necessary (simplified here)
+                        // For this specific one, we'll keep it simple for now
+                        el.innerText = translations[lang][key];
+                    } else {
+                        el.innerText = translations[lang][key];
+                    }
+                }
+            });
+            document.documentElement.lang = lang;
+            localStorage.setItem('legal_lang', lang);
+        }
+
+        // Initialize language
+        const savedLang = localStorage.getItem('legal_lang') ||
+            navigator.language.split('-')[0] ||
+            'fr';
+        const initialLang = translations[savedLang] ? savedLang : 'fr';
+        document.getElementById('langSelect').value = initialLang;
+        changeLanguage(initialLang);
+    </script>
 
 </body>
 
