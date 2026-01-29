@@ -1,12 +1,30 @@
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, Copy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 export default function OnboardingCompletionModal({ isOpen, onClose, inviteCode, childName, onComplete }) {
     const { t } = useTranslation()
+    const [copied, setCopied] = useState(false)
 
     const handleCopyCode = () => {
-        navigator.clipboard.writeText(inviteCode)
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(inviteCode)
+            } else {
+                // Fallback for non-secure contexts
+                const textArea = document.createElement("textarea")
+                textArea.value = inviteCode
+                document.body.appendChild(textArea)
+                textArea.select()
+                document.execCommand('copy')
+                document.body.removeChild(textArea)
+            }
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        } catch (err) {
+            console.error('Failed to copy: ', err)
+        }
     }
 
     if (!isOpen) return null
@@ -65,10 +83,10 @@ export default function OnboardingCompletionModal({ isOpen, onClose, inviteCode,
                                 </span>
                                 <button
                                     onClick={handleCopyCode}
-                                    className="p-2 hover:bg-orange-500/10 rounded-lg transition-colors text-orange-400"
+                                    className={`p-2 rounded-lg transition-all ${copied ? 'bg-emerald-500/20 text-emerald-400 scale-110' : 'hover:bg-orange-500/10 text-orange-400'}`}
                                     title={t('actions.copy')}
                                 >
-                                    <Copy size={20} />
+                                    {copied ? <Check size={20} /> : <Copy size={20} />}
                                 </button>
                             </div>
                             <p className="text-[9px] text-slate-400 uppercase tracking-wide">

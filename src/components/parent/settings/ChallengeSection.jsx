@@ -142,11 +142,9 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
           inviteCode={profiles.find(p => !p.is_parent)?.invite_code || ''}
           childName={profiles.find(p => !p.is_parent)?.child_name || 'votre enfant'}
           onComplete={() => {
-            setShowCompletionModal(false)
-            onNextStep('done')
-            if (onNavigateToValidation) {
-              onNavigateToValidation()
-            }
+            localStorage.setItem('onboarding_invite_dismissed', 'true')
+            if (setOnboardingStep) setOnboardingStep('done')
+            setActiveTab('validation')
           }}
         />
       )}
