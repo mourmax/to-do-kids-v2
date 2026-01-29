@@ -149,6 +149,20 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* LIEN LÉGAL DISCRET */}
+      {!isNewUser && (
+        <div className="pt-12 text-center border-t border-white/5 [.light-theme_&]:border-indigo-500/10">
+          <a
+            href="/legal.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-600 hover:text-indigo-400 transition-colors"
+          >
+            Mentions Légales & Confidentialité
+          </a>
+        </div>
+      )}
     </div>
   )
 }

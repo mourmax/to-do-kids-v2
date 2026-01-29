@@ -299,7 +299,7 @@ export default function App() {
       </div>
 
       {/* CONTENU PRINCIPAL (Dashboard) */}
-      <div className={`pt-32 pb-12 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
+      <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
         <AnimatePresence mode="wait">
           {isParentMode ? (
             family ? (
@@ -359,6 +359,18 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* FOOTER DISCRET */}
+      <footer className="pb-8 px-4 text-center">
+        <a
+          href="/legal.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-colors"
+        >
+          Mentions Légales & Confidentialité
+        </a>
+      </footer>
 
       {/* MODAL PIN (pour passer en mode parent) */}
       <AnimatePresence>
