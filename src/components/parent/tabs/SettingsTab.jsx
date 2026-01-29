@@ -11,7 +11,7 @@ import FamilySection from '../settings/FamilySection'
 import ChallengeSection from '../settings/ChallengeSection'
 import MissionsSection from '../settings/MissionsSection'
 
-export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange }) {
+export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange, onboardingStep, setOnboardingStep }) {
   const { t } = useTranslation()
   const [toastMessage, setToastMessage] = useState(null)
 
@@ -22,9 +22,18 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
 
   const handleNextStep = (step) => {
     if (step === 'done') {
+      // Onboarding complete, switch to validation tab
       if (onTabChange) onTabChange('validation')
+      if (setOnboardingStep) setOnboardingStep('invite') // Mark as complete
     } else {
+      // Navigate to the next step
       setActiveSubMenu(step)
+      if (setOnboardingStep) {
+        // Update onboarding step based on the target
+        if (step === 'children') setOnboardingStep('child')
+        else if (step === 'missions') setOnboardingStep('mission')
+        else if (step === 'challenge') setOnboardingStep('challenge')
+      }
     }
   }
 
@@ -83,7 +92,12 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                 refresh={refresh}
                 updateProfile={updateProfile}
                 isNewUser={isNewUser}
-                onNextStep={handleNextStep}
+                onNextStep={(step) => {
+                  handleNextStep(step)
+                  if (setOnboardingStep && step === 'missions') {
+                    setOnboardingStep('mission')
+                  }
+                }}
               />
               <FamilySection family={family} />
               <SecuritySection profile={profile} onShowSuccess={showSuccess} />
@@ -99,7 +113,12 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
-              onNextStep={handleNextStep}
+              onNextStep={(step) => {
+                handleNextStep(step)
+                if (setOnboardingStep && step === 'challenge') {
+                  setOnboardingStep('challenge')
+                }
+              }}
             />
           )}
 
@@ -109,7 +128,15 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
-              onNextStep={handleNextStep}
+              onNextStep={(step) => {
+                if (step === 'done') {
+                  // After challenge setup, show invite guide and navigate to children tab
+                  setActiveSubMenu('children')
+                  if (setOnboardingStep) setOnboardingStep('invite')
+                } else {
+                  handleNextStep(step)
+                }
+              }}
             />
           )}
         </motion.div>

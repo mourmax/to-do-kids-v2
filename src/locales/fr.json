@@ -153,7 +153,13 @@
         "next_step_challenge": "Étape Suivante : Le Défi",
         "profile_configured": "Profil Configuré !",
         "profile_configured_subtitle": "Maintenant, passons aux choses sérieuses.",
-        "next_step_missions": "Étape Suivante : Les Missions"
+        "next_step_missions": "Étape Suivante : Les Missions",
+        "step_pin": "Code PIN",
+        "step_child": "Enfant",
+        "step_mission": "Missions",
+        "step_challenge": "Défi",
+        "step_invite": "Code Invitation",
+        "step": "Étape"
     },
     "common": {
         "all": "Tous",

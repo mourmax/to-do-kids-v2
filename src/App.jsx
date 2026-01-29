@@ -31,6 +31,9 @@ export default function App() {
   const [isOnboardingSession, setIsOnboardingSession] = useState(false)
   const [tutorialShownInSession, setTutorialShownInSession] = useState(false)
 
+  // Onboarding stepper state
+  const [onboardingStep, setOnboardingStep] = useState('pin')
+
   // 1. Session management
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -279,6 +282,8 @@ export default function App() {
                 isNewUser={isOnboardingSession}
                 initialTab={isOnboardingSession ? 'settings' : 'validation'}
                 initialSubTab={isOnboardingSession ? 'children' : 'missions'}
+                onboardingStep={onboardingStep}
+                setOnboardingStep={setOnboardingStep}
               />
             ) : familyError ? (
               <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">

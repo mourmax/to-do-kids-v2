@@ -110,7 +110,13 @@
         "next_step_challenge": "Próximo Passo: O Desafio",
         "profile_configured": "Perfil Configurado!",
         "profile_configured_subtitle": "Agora, vamos para as coisas sérias.",
-        "next_step_missions": "Próximo Passo: Missões"
+        "next_step_missions": "Próximo Passo: Missões",
+        "step_pin": "Código PIN",
+        "step_child": "Configuração Criança",
+        "step_mission": "Configuração Missões",
+        "step_challenge": "Configuração Desafio",
+        "step_invite": "Código Convite",
+        "step": "Passo"
     },
     "common": {
         "all": "Todos",

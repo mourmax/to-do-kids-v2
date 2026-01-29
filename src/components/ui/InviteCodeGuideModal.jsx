@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Smartphone, ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export default function InviteCodeGuideModal({ isOpen, onClose }) {
+export default function InviteCodeGuideModal({ isOpen, onClose, onNavigateToChildren }) {
     const { t } = useTranslation()
     if (!isOpen) return null
 
@@ -86,7 +86,12 @@ export default function InviteCodeGuideModal({ isOpen, onClose }) {
 
                     {/* Action Button */}
                     <button
-                        onClick={onClose}
+                        onClick={() => {
+                            if (onNavigateToChildren) {
+                                onNavigateToChildren()
+                            }
+                            onClose()
+                        }}
                         className="w-full bg-indigo-500 hover:bg-indigo-400 text-white px-10 py-4 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl shadow-indigo-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                     >
                         {t('invite_guide.button')}

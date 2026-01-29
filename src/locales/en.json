@@ -148,7 +148,13 @@
         "next_step_challenge": "Next Step: The Challenge",
         "profile_configured": "Profile Configured!",
         "profile_configured_subtitle": "Now, let's move on to serious things.",
-        "next_step_missions": "Next Step: Missions"
+        "next_step_missions": "Next Step: Missions",
+        "step_pin": "PIN Setup",
+        "step_child": "Child Setup",
+        "step_mission": "Mission Setup",
+        "step_challenge": "Challenge Setup",
+        "step_invite": "Invite Code",
+        "step": "Step"
     },
     "common": {
         "all": "All",

@@ -4,6 +4,7 @@ import { ClipboardCheck, Sliders } from 'lucide-react'
 import ValidationTab from './tabs/ValidationTab'
 import SettingsTab from './tabs/SettingsTab'
 import NotificationBanner from '../ui/NotificationBanner'
+import OnboardingStepper from '../ui/OnboardingStepper'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
@@ -41,7 +42,9 @@ export default function ParentDashboard({
   updateProfile,
   isNewUser,
   initialTab = 'validation',
-  initialSubTab = 'missions'
+  initialSubTab = 'missions',
+  onboardingStep = 'child',
+  setOnboardingStep
 }) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -173,6 +176,23 @@ export default function ParentDashboard({
       />
 
       <header className="space-y-6">
+        {/* Onboarding Stepper */}
+        {isNewUser && onboardingStep && (
+          <OnboardingStepper
+            currentStep={onboardingStep}
+            onStepClick={(step) => {
+              if (setOnboardingStep) {
+                setOnboardingStep(step)
+                setActiveTab('settings')
+                // Map step to sub-tab
+                if (step === 'child' || step === 'invite') setActiveSubTab('children')
+                else if (step === 'mission') setActiveSubTab('missions')
+                else if (step === 'challenge') setActiveSubTab('challenge')
+              }
+            }}
+          />
+        )}
+
         <div className="flex flex-col items-center justify-center text-center">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white [.light-theme_&]:text-slate-900 mb-2">
             {t('dashboard.parent_title')}
@@ -283,6 +303,8 @@ export default function ParentDashboard({
                 onSubMenuChange={setActiveSubTab}
                 isNewUser={isNewUser}
                 onTabChange={setActiveTab}
+                onboardingStep={onboardingStep}
+                setOnboardingStep={setOnboardingStep}
               />
             </motion.div>
           )}

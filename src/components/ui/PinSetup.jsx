@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { supabase } from '../../supabaseClient'
 import { Lock, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import OnboardingStepper from './OnboardingStepper'
 
 export default function PinSetup({ profileId, onComplete }) {
   const { t } = useTranslation()
@@ -35,6 +36,11 @@ export default function PinSetup({ profileId, onComplete }) {
 
   return (
     <div className="fixed inset-0 bg-[#020617] z-50 flex flex-col items-center justify-center p-6 text-white">
+      {/* Onboarding Stepper */}
+      <div className="absolute top-8 left-0 right-0">
+        <OnboardingStepper currentStep="pin" />
+      </div>
+
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
