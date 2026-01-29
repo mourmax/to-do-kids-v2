@@ -181,9 +181,8 @@ export default function App() {
   }
 
   // C. Condition for PIN Setup (Only for Parent)
-  // 💡 Note: TutorialModal will render on top of Dashboard if triggered.
-  // We allow rendering the main dashboard structure but keep PIN setup as a priority early return IF tutorial is NOT active.
-  if (isParentMode && parentProfile && needsPinSetup && !showTutorial) {
+  // 💡 Note: During onboarding (isNewUser), we render PIN setup INSIDE ParentDashboard to keep the stepper.
+  if (isParentMode && parentProfile && needsPinSetup && !showTutorial && !isOnboardingSession) {
     return (
       <PinSetup
         profileId={parentProfile.id}
@@ -291,7 +290,7 @@ export default function App() {
                 updateProfile={updateProfile}
                 isNewUser={isOnboardingSession}
                 initialTab={isOnboardingSession ? 'settings' : 'validation'}
-                initialSubTab={isOnboardingSession ? 'children' : 'missions'}
+                initialSubTab={isOnboardingSession && onboardingStep === 'pin' ? 'pin' : (isOnboardingSession ? 'children' : 'missions')}
                 onboardingStep={onboardingStep}
                 setOnboardingStep={setOnboardingStep}
               />

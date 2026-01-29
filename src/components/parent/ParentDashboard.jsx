@@ -164,7 +164,8 @@ export default function ParentDashboard({
   // Synchroniser l'onglet actif avec l'étape d'onboarding
   useEffect(() => {
     if (isNewUser && onboardingStep && activeTab === 'settings') {
-      if (onboardingStep === 'child') setActiveSubTab('children')
+      if (onboardingStep === 'pin') setActiveSubTab('pin')
+      else if (onboardingStep === 'child') setActiveSubTab('children')
       else if (onboardingStep === 'mission') setActiveSubTab('missions')
       else if (onboardingStep === 'challenge') setActiveSubTab('challenge')
       else if (onboardingStep === 'invite') setActiveSubTab('children')
