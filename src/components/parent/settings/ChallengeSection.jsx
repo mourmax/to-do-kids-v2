@@ -5,7 +5,7 @@ import { supabase } from '../../../supabaseClient'
 import SectionCard from './SectionCard'
 import { useTranslation } from 'react-i18next'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
-import CompletionModal from '../../ui/CompletionModal'
+import InviteCodeGuideModal from '../../ui/InviteCodeGuideModal'
 
 export default function ChallengeSection({ challenge, onShowSuccess, refresh, isNewUser, onNextStep }) {
   const { t } = useTranslation()
@@ -13,7 +13,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
   const [seriesLength, setSeriesLength] = useState(2)
   const [malusMessage, setMalusMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
-  const [showCompletionModal, setShowCompletionModal] = useState(false)
+  const [showInviteGuide, setShowInviteGuide] = useState(false)
 
   // Show onboarding if streak is 0 and no reward set
   const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === t('completion_modal.default_reward')))
@@ -57,7 +57,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       onShowSuccess(t('actions.save_success'))
       refresh(true)
       if (isNewUser) {
-        setShowCompletionModal(true)
+        setShowInviteGuide(true)
       }
       setTimeout(() => setIsSaving(false), 1000)
     } catch (error) {
@@ -71,7 +71,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
     <div className="space-y-6">
       {showOnboarding && (
         <OnboardingInfoBlock
-          step={null} // Remove step number
+          step="3"
           title={t('onboarding.challenge_title')}
           description={t('onboarding.challenge_description')}
           icon={Trophy}
@@ -117,13 +117,12 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
         </div>
       </SectionCard>
 
-      {/* Completion Modal */}
-      <CompletionModal
-        isOpen={showCompletionModal}
-        onClose={() => setShowCompletionModal(false)}
-        onNavigateToChildren={() => {
-          setShowCompletionModal(false)
-          onNextStep('children')
+      {/* Invite Code Guide Modal */}
+      <InviteCodeGuideModal
+        isOpen={showInviteGuide}
+        onClose={() => {
+          setShowInviteGuide(false)
+          onNextStep('done')
         }}
       />
     </div>

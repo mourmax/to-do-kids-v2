@@ -92,7 +92,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
     <div className="space-y-6">
       {showOnboarding && (
         <OnboardingInfoBlock
-          step={null}
+          step="1"
           title={t('onboarding.identity_title')}
           description={t('onboarding.identity_description')}
           icon={User}
@@ -212,6 +212,28 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
               {isAdding ? t('common.creating') : t('settings.add_child')}
             </span>
           </button>
+
+          {isNewUser && childProfiles.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-indigo-600/10 border border-indigo-500/20 p-6 rounded-[2.5rem] flex flex-col items-center gap-4 text-center mt-8"
+            >
+              <div className="bg-emerald-500 p-2 rounded-full text-white shadow-lg shadow-emerald-500/30">
+                <Check size={20} />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-black uppercase text-indigo-400 tracking-widest">{t('onboarding.profile_configured')}</h4>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest">{t('onboarding.profile_configured_subtitle')}</p>
+              </div>
+              <button
+                onClick={() => onNextStep('missions')}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95"
+              >
+                {t('onboarding.next_step_missions')}
+              </button>
+            </motion.div>
+          )}
         </div>
       </SectionCard>
 

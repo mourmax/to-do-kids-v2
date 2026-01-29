@@ -7,6 +7,27 @@ import NotificationBanner from '../ui/NotificationBanner'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
+const getColorClasses = (colorName) => {
+  const maps = {
+    rose: 'bg-rose-500/20 border-rose-500/30 text-rose-300',
+    sky: 'bg-sky-500/20 border-sky-500/30 text-sky-300',
+    emerald: 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300',
+    amber: 'bg-amber-500/20 border-amber-500/30 text-amber-300',
+    violet: 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300',
+  }
+  const mapsActive = {
+    rose: 'bg-rose-500 text-white shadow-rose-500/20',
+    sky: 'bg-sky-500 text-white shadow-sky-500/20',
+    emerald: 'bg-emerald-500 text-white shadow-emerald-500/20',
+    amber: 'bg-amber-500 text-white shadow-amber-500/20',
+    violet: 'bg-indigo-500 text-white shadow-indigo-500/20',
+  }
+  return {
+    inactive: maps[colorName] || maps.violet,
+    active: mapsActive[colorName] || mapsActive.violet
+  }
+}
+
 export default function ParentDashboard({
   family,
   profile,
@@ -127,17 +148,6 @@ export default function ParentDashboard({
     }
   }, [family?.id, childProfiles])
 
-  const getColorClasses = (colorName) => {
-    // ... (helper kept outside or assumed existing if I don't touch it. Wait I need to keep the file valid)
-    // Actually I should not remove getColorClasses from the file. I will use startLine/EndLine carefully.
-    // My Replace helper might need me to skip getColorClasses if it's below line 113.
-    // The snippet above ends at line 113 in original.
-    // I will use StartLine: 25, EndLine: 112
-    return
-  }
-
-  // Helper for colors is below line 114.
-  // I will just replace the logic inside useEffect and state definition.
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 relative z-10">
@@ -181,7 +191,7 @@ export default function ParentDashboard({
               <div className="flex gap-1.5 p-1 bg-slate-900/60 border border-white/5 rounded-xl">
                 {childProfiles.map(p => {
                   const isActive = profile?.id === p.id
-                  const colors = getColorClasses(p.color)
+                  const colors = getColorClasses(p.color) || { active: '', inactive: '' }
                   return (
                     <button
                       key={p.id}

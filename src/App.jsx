@@ -29,6 +29,7 @@ export default function App() {
 
   // Track if this is an onboarding session
   const [isOnboardingSession, setIsOnboardingSession] = useState(false)
+  const [tutorialShownInSession, setTutorialShownInSession] = useState(false)
 
   // 1. Session management
   useEffect(() => {
@@ -56,12 +57,12 @@ export default function App() {
 
   // Update onboarding status based on data (Sticky)
   useEffect(() => {
-    if (!isLoading && session && family && !isOnboardingSession) {
+    if (!isLoading && session && family) {
       const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
       const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
 
       if (!hasSeenTuto || isDefaultFamily) {
-        setIsOnboardingSession(true)
+        if (!isOnboardingSession) setIsOnboardingSession(true)
       }
     }
   }, [isLoading, !!session, !!family, profiles.length, isOnboardingSession])
@@ -71,13 +72,18 @@ export default function App() {
   const parentProfile = profiles?.find(p => p.is_parent)
   const needsPinSetup = parentProfile && !pinSuccessfullySet && (!parentProfile.pin_code || localStorage.getItem('reset_pin_mode') === 'true')
 
-  // Tutorial should show if not seen and PIN setup is NOT active
-  const shouldShowTutorial = !hasSeenTuto && !needsPinSetup && !isLoading && !!session
+  // Tutorial should show if hasn't been seen in this session OR not in localStorage
+  // AND PIN setup is NOT active. New families ALWAYS get a chance to see it.
+  const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+  const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !needsPinSetup && !isLoading && !!session
 
   // 4. Tutorial trigger
   useEffect(() => {
     if (shouldShowTutorial) {
-      const timer = setTimeout(() => setShowTutorial(true), 500)
+      const timer = setTimeout(() => {
+        setShowTutorial(true)
+        setTutorialShownInSession(true) // Mark as shown for this session
+      }, 500)
       return () => clearTimeout(timer)
     }
   }, [shouldShowTutorial])
@@ -144,6 +150,17 @@ export default function App() {
           localStorage.removeItem('reset_pin_mode')
           setPinSuccessfullySet(true)
           loadFamilyData()
+
+          // Explicitly trigger tutorial for new families after PIN setup
+          const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+          const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
+
+          if (!hasSeenTuto || isDefaultFamily) {
+            setTimeout(() => {
+              setShowTutorial(true)
+              setTutorialShownInSession(true)
+            }, 800) // Delay to allow UI to settle
+          }
         }}
       />
     )

@@ -198,8 +198,6 @@
         "reward_unlocked_upcase": "RÉCOMPENSE DÉBLOQUÉE",
         "continue_to_report": "CONTINUER VERS LE BILAN",
         "start_new_challenge_child": "Débuter le nouveau challenge {{name}}",
-        "continue_to_report": "CONTINUER VERS LE BILAN",
-        "start_new_challenge_child": "Débuter le nouveau challenge {{name}}",
         "waiting_next_challenge": "Bravo ! En attente du prochain défi...",
         "active_count": "{{count}} actives",
         "duration_label": "Durée",
@@ -265,5 +263,16 @@
         "be_polite": "Être poli(e)",
         "share_toys": "Partager ses jeux",
         "say_thanks": "Dire merci / s'il vous plaît"
+    },
+    "invite_guide": {
+        "title": "Dernière Étape !",
+        "subtitle": "Connectons l'appareil de votre enfant pour démarrer l'aventure",
+        "step1_title": "Allez dans Réglages > Enfants",
+        "step1_text": "Trouvez la carte de profil de votre enfant avec son nom et sa couleur",
+        "step2_title": "Copiez le Code d'Invitation",
+        "step2_text": "Chaque enfant a un code unique à 6 caractères affiché sur sa carte",
+        "step3_title": "Entrez sur l'Appareil de l'Enfant",
+        "step3_text": "Sur l'appareil de votre enfant, sélectionnez 'Mode Enfant' et entrez ce code pour connecter",
+        "button": "Compris, allons-y !"
     }
 }

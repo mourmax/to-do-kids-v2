@@ -194,8 +194,6 @@
         "reward_unlocked_upcase": "REWARD UNLOCKED",
         "continue_to_report": "CONTINUE TO REPORT",
         "start_new_challenge_child": "Start the new challenge {{name}}",
-        "continue_to_report": "CONTINUE TO REPORT",
-        "start_new_challenge_child": "Start the new challenge {{name}}",
         "waiting_next_challenge": "Well done! Waiting for the next challenge...",
         "active_count": "{{count}} active",
         "duration_label": "Duration",
@@ -261,5 +259,16 @@
         "be_polite": "Be polite",
         "share_toys": "Share your toys",
         "say_thanks": "Say thank you / please"
+    },
+    "invite_guide": {
+        "title": "One Last Step!",
+        "subtitle": "Let's connect your child's device to start the adventure",
+        "step1_title": "Go to Settings > Children",
+        "step1_text": "Find your child's profile card with their name and color",
+        "step2_title": "Copy the Invite Code",
+        "step2_text": "Each child has a unique 6-character code displayed on their card",
+        "step3_title": "Enter on Child's Device",
+        "step3_text": "On your child's device, select 'Child Mode' and enter this code to connect",
+        "button": "Got it, let's go!"
     }
 }
