@@ -220,8 +220,8 @@ export default function ParentDashboard({
       />
 
       <header className="space-y-6">
-        {/* Onboarding Stepper - Hide completely when done */}
-        {isNewUser && onboardingStep && onboardingStep !== 'done' && onboardingStep !== 'invite' && (
+        {/* Onboarding Stepper - Hide immediately if invite dismissed (check localStorage directly for instant hide) */}
+        {isNewUser && !localStorage.getItem('onboarding_invite_dismissed') && onboardingStep && onboardingStep !== 'done' && onboardingStep !== 'invite' && (
           <OnboardingStepper
             currentStep={onboardingStep}
             onStepClick={(step) => {
