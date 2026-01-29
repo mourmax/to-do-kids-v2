@@ -109,9 +109,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   // Optimistic UI state
   const [optimisticMissions, setOptimisticMissions] = useState(missions)
   useEffect(() => { setOptimisticMissions(missions) }, [missions])
-  const [showCustomModal, setShowCustomModal] = useState(false)
 
-  const [editingId, setEditingId] = useState(null)
   const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null })
   const [showPickerForEdit, setShowPickerForEdit] = useState(false)
 
