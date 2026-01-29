@@ -151,6 +151,16 @@ export default function ParentDashboard({
     }
   }, [family?.id, childProfiles])
 
+  // Synchroniser l'onglet actif avec l'étape d'onboarding
+  useEffect(() => {
+    if (isNewUser && onboardingStep && activeTab === 'settings') {
+      if (onboardingStep === 'child') setActiveSubTab('children')
+      else if (onboardingStep === 'mission') setActiveSubTab('missions')
+      else if (onboardingStep === 'challenge') setActiveSubTab('challenge')
+      else if (onboardingStep === 'invite') setActiveSubTab('children')
+    }
+  }, [onboardingStep, isNewUser, activeTab])
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 relative z-10">

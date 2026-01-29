@@ -379,7 +379,10 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                 <p className="text-[10px] text-slate-400 uppercase tracking-widest">{t('onboarding.missions_configured_subtitle')}</p>
               </div>
               <button
-                onClick={() => onNextStep('challenge')}
+                onClick={() => {
+                  localStorage.setItem('onboarding_missions_confirmed', 'true')
+                  onNextStep('challenge')
+                }}
                 className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95"
               >
                 {t('onboarding.next_step_challenge')}

@@ -65,7 +65,8 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
 
       await updateProfile(profileToSave.id, finalUpdates)
       await refresh(true)
-      setShowProfileModal(true)
+      // Navigate immediately to missions during onboarding
+      if (onNextStep) onNextStep('missions')
     } catch (err) {
       console.error("Error during final onboarding save:", err)
       onShowSuccess("Erreur lors de la sauvegarde")

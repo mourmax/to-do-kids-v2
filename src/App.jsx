@@ -86,6 +86,7 @@ export default function App() {
       const childProfiles = profiles.filter(p => !p.is_parent)
       const hasConfiguredChild = childProfiles.some(p => p.child_name !== "Mon enfant")
       const hasMissions = allMissions && allMissions.length > 0
+      const missionsConfirmed = localStorage.getItem('onboarding_missions_confirmed') === 'true'
       const hasConfiguredChallenge = challenge && challenge.reward_name && challenge.reward_name !== 'Cadeau Surprise' && challenge.reward_name !== 'Surprise Gift'
 
       // Determine current step based on what's completed
@@ -93,7 +94,7 @@ export default function App() {
         setOnboardingStep('pin')
       } else if (!hasConfiguredChild) {
         setOnboardingStep('child')
-      } else if (!hasMissions) {
+      } else if (!hasMissions || !missionsConfirmed) {
         setOnboardingStep('mission')
       } else if (!hasConfiguredChallenge) {
         setOnboardingStep('challenge')
