@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, User, Copy, Plus } from 'lucide-react'
+import { Check, User, Copy, Plus, Crown } from 'lucide-react'
 import { supabase } from '../../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 import SectionCard from './SectionCard'
@@ -235,6 +235,10 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
               <span className="font-black uppercase text-[10px] tracking-widest text-indigo-300 [.light-theme_&]:text-orange-600">
                 {isAdding ? t('common.creating') : t('settings.add_child')}
               </span>
+              <div className="flex items-center gap-1 bg-amber-500/20 border border-amber-500/30 px-2 py-1 rounded-full">
+                <Crown size={12} className="text-amber-400" />
+                <span className="text-[8px] font-black uppercase tracking-wider text-amber-300">Premium</span>
+              </div>
             </button>
           )}
 
