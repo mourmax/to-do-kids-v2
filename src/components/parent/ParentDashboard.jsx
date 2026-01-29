@@ -5,6 +5,7 @@ import ValidationTab from './tabs/ValidationTab'
 import SettingsTab from './tabs/SettingsTab'
 import NotificationBanner from '../ui/NotificationBanner'
 import OnboardingStepper from '../ui/OnboardingStepper'
+import OnboardingCompletionModal from '../ui/OnboardingCompletionModal'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
@@ -55,6 +56,15 @@ export default function ParentDashboard({
   const dismissedIdsRef = useRef(new Set())
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
+
+  // LOGIQUE DE FILTRAGE DES PROFILS (UI-ONLY)
+  // Cache les placeholders "Mon enfant" s'il y a déjà au moins un enfant configuré pendant l'onboarding.
+  const isConfigured = (p) => p.child_name && p.child_name !== "Mon enfant"
+  const hasConfiguredAny = childProfiles.some(isConfigured)
+
+  const filteredProfilesForUI = isNewUser && hasConfiguredAny
+    ? childProfiles.filter(isConfigured)
+    : childProfiles
 
   // ECOUTEUR TEMPS RÉEL (DEMANDES DE VALIDATION)
   useEffect(() => {
@@ -164,6 +174,20 @@ export default function ParentDashboard({
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 relative z-10">
+      {/* Onboarding Completion Modal - Step 5 */}
+      {isNewUser && onboardingStep === 'invite' && (
+        <OnboardingCompletionModal
+          isOpen={true}
+          onClose={() => {
+            if (setOnboardingStep) setOnboardingStep('done')
+          }}
+          inviteCode={childProfiles.find(isConfigured)?.invite_code || childProfiles[0]?.invite_code || ''}
+          onNavigateToValidation={() => {
+            if (setOnboardingStep) setOnboardingStep('done')
+            setActiveTab('validation')
+          }}
+        />
+      )}
 
       {/* Background Decorative Element (Subtle) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden h-screen w-screen z-[-1]">
@@ -217,9 +241,9 @@ export default function ParentDashboard({
             </div>
 
             {/* Selector Profile Child for Parent (Validation context) */}
-            {childProfiles.length > 1 && (
+            {filteredProfilesForUI.length > 1 && (
               <div className="flex gap-1.5 p-1 bg-slate-900/60 border border-white/5 rounded-xl">
-                {childProfiles.map(p => {
+                {filteredProfilesForUI.map(p => {
                   const isActive = profile?.id === p.id
                   const colors = getColorClasses(p.color) || { active: '', inactive: '' }
                   return (
