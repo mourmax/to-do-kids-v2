@@ -69,9 +69,9 @@ export default function App() {
       const isDefaultFamily = profilesList.length === 0 || (profilesList.length <= 2 && profilesList.some(p => p.child_name === "Mon enfant"))
       const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
 
-      if (isOnboardingSession && !isDefaultFamily && hasSeenTuto && !dismissed) {
-        // Sticky onboarding if already started
-      } else if ((!hasSeenTuto || isDefaultFamily) && !dismissed) {
+      // Simplified logic: If invite code isn't dismissed, you are in onboarding.
+      // This handles reloads, "stuck" users, and new users correctly.
+      if (!dismissed) {
         if (!isOnboardingSession) setIsOnboardingSession(true)
       } else if (dismissed && isOnboardingSession) {
         // Force exit if dismissed
