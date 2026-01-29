@@ -93,11 +93,11 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
   const handleSuccess = async () => {
     if (!challenge?.id) return
-    // On enlève la restriction stricte pour laisser le parent décider du succès
-    // if (!allMissionsDone) {
-    //   showToast(t('actions.validate_all'), "error")
-    //   return
-    // }
+    // Block success if not all missions are validated by parent
+    if (!allMissionsDone) {
+      showToast(t('validation.must_validate_all'), "error")
+      return
+    }
     const newStreak = (challenge.current_streak || 0) + 1
     await supabase.from('challenges').update({ current_streak: newStreak }).eq('id', challenge.id)
 

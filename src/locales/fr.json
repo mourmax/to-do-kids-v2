@@ -52,10 +52,13 @@
         "validate_all": "Tout valider",
         "add_mission": "Ajouter une mission",
         "saving": "Enregistrement...",
-        "i_understand": "J'ai compris"
+        "i_understand": "J'ai compris",
+        "start_challenge": "Démarrer le Défi"
     },
     "settings": {
         "title": "Réglages",
+        "reward_title": "Récompense",
+        "malus_title": "Malus (Sanction)",
         "identity_title": "Gestion des Enfants",
         "child_name_label": "Prénom de l'enfant",
         "add_child": "Ajouter un enfant",
@@ -179,6 +182,7 @@
         "validation": "Validation",
         "settings": "Réglages",
         "missions": "Missions",
+        "day_plural": "jours",
         "challenge": "Défi",
         "day_singular": "Jour",
         "children_tab": "Enfants"
@@ -217,7 +221,8 @@
         "failure_title": "Aïe, c'est raté...",
         "failure_subtitle": "Le compteur retombe à zéro.",
         "confirm_failure": "Confirmer l'échec",
-        "fail_confirmed": "Échec confirmé !"
+        "fail_confirmed": "Échec confirmé !",
+        "must_validate_all": "Validez d'abord toutes les missions !"
     },
     "child": {
         "final_goal": "Objectif Final",

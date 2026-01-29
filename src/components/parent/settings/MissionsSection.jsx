@@ -168,8 +168,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     const { error } = await supabase.from('missions').delete().eq('id', id)
     if (!error) {
       onShowSuccess("Mission supprimée");
-      // Silent refresh in background - optimistic state will be synced via useEffect
-      refresh(false);
+      // No refresh needed - optimistic state will sync when missions prop updates naturally
     } else {
       // Revert if error
       setOptimisticMissions(missions);
