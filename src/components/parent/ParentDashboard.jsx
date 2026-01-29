@@ -53,6 +53,14 @@ export default function ParentDashboard({
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab)
   const [notifications, setNotifications] = useState([])
 
+  // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
+  // This fixes the issue where useState captures 'validation' but user should be in 'settings'
+  useEffect(() => {
+    if (isNewUser && activeTab !== 'settings' && onboardingStep !== 'done') {
+      setActiveTab('settings')
+    }
+  }, [isNewUser, onboardingStep])
+
   // 🛡️ Track dismissed notifications to prevent reappearance during session
   const dismissedIdsRef = useRef(new Set())
 
