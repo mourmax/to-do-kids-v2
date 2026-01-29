@@ -31,6 +31,10 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
 
       setEditingId(null)
       onShowSuccess(t('actions.save_success'))
+
+      // Refresh to ensure changes are persisted
+      await refresh(true)
+
       if (isNewUser) {
         setShowProfileModal(true)
       }
@@ -85,8 +89,8 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   }
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
-  // Show onboarding block if isNewUser is true OR if there's still a "Mon enfant" profile
-  const showOnboarding = isNewUser || childProfiles.some(p => p.child_name === "Mon enfant")
+  // Show onboarding block ONLY if there's still a "Mon enfant" profile (not configured yet)
+  const showOnboarding = childProfiles.some(p => p.child_name === "Mon enfant")
 
   return (
     <div className="space-y-6">
@@ -181,7 +185,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
               </div>
 
               {/* Invite Code for this child */}
-              <div className="flex items-center justify-between bg-slate-950/50 rounded-xl px-5 py-4 border border-white/5 mt-2 [.light-theme_&]:bg-orange-600 [.light-theme_&]:border-transparent">
+              <div className={`flex items-center justify-between bg-slate-950/50 rounded-xl px-5 py-4 border mt-2 [.light-theme_&]:bg-orange-600 [.light-theme_&]:border-transparent transition-all ${isNewUser && !childProfiles.some(p => p.child_name === "Mon enfant") ? 'border-orange-500 animate-pulse shadow-lg shadow-orange-500/30' : 'border-white/5'}`}>
                 <div className="flex flex-col gap-1">
                   <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest [.light-theme_&]:text-orange-200">{t('settings.invite_code_description')}</span>
                   <span className="text-2xl font-black text-indigo-400 tracking-widest font-mono [.light-theme_&]:text-white">
