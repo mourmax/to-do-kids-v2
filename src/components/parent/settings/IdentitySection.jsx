@@ -92,6 +92,12 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   // Show onboarding block ONLY if there's still a "Mon enfant" profile (not configured yet)
   const showOnboarding = childProfiles.some(p => p.child_name === "Mon enfant")
 
+  // During onboarding, only show the first child profile (the one to configure)
+  // After onboarding, show all children
+  const displayedChildren = showOnboarding
+    ? childProfiles.filter(p => p.child_name === "Mon enfant").slice(0, 1)
+    : childProfiles
+
   return (
     <div className="space-y-6">
       {showOnboarding && (
@@ -104,7 +110,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
       )}
       <SectionCard icon={User} colorClass="text-indigo-400" title={t('settings.identity_title')}>
         <div className="space-y-4">
-          {childProfiles.map(p => (
+          {displayedChildren.map(p => (
             <div key={p.id} className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/5 p-5 rounded-[2.5rem] border border-white/5 [.light-theme_&]:border-indigo-100 space-y-4 shadow-xl">
               <div className="flex gap-4 items-start">
                 <div className="flex-1 space-y-3">
