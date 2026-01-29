@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabaseClient'
 import Auth from './Auth'
 import { useFamily } from './hooks/useFamily'
@@ -33,6 +33,9 @@ export default function App() {
 
   // Onboarding stepper state (will be calculated dynamically)
   const [onboardingStep, setOnboardingStep] = useState('pin')
+
+  // Track manual step changes to prevent auto-recalculation from overriding
+  const manualStepChangeRef = useRef(false)
 
   // 1. Session management
   useEffect(() => {
@@ -94,6 +97,12 @@ export default function App() {
 
   // Calculate current onboarding step based on completion status
   useEffect(() => {
+    // Skip auto-calculation if a manual step change just happened
+    if (manualStepChangeRef.current) {
+      manualStepChangeRef.current = false
+      return
+    }
+
     if (!isLoading && profiles && isOnboardingSession) {
       const childProfiles = profiles.filter(p => !p.is_parent)
       const hasConfiguredChild = childProfiles.some(p => p.child_name !== "Mon enfant")
@@ -213,6 +222,11 @@ export default function App() {
     )
   }
 
+  const handleManualStepChange = (step) => {
+    manualStepChangeRef.current = true
+    setOnboardingStep(step)
+  }
+
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
   return (
     <div className="min-h-screen transition-colors duration-300 bg-[#020617] text-slate-100 dark font-sans selection:bg-indigo-500/30">
@@ -309,7 +323,7 @@ export default function App() {
                 initialTab={isOnboardingSession ? 'settings' : 'validation'}
                 initialSubTab={isOnboardingSession && onboardingStep === 'pin' ? 'pin' : (isOnboardingSession ? 'children' : 'missions')}
                 onboardingStep={onboardingStep}
-                setOnboardingStep={setOnboardingStep}
+                setOnboardingStep={handleManualStepChange}
               />
             ) : familyError ? (
               <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">
