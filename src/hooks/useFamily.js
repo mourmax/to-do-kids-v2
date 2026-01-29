@@ -111,17 +111,26 @@ export function useFamily(userId, familyId = null) {
         profs = newProfs || []
         console.log("[useFamily] Profiles created successfully")
 
-        // Default Missions creation - ONLY when profiles are first created
+        // Default Missions creation - ONLY if no missions exist yet
         try {
-          console.log("Creating default missions...")
-          const defaultMissions = [
-            { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
-            { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
-            { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
-          ]
-          await supabase.from('missions').insert(defaultMissions)
+          const { count } = await supabase
+            .from('missions')
+            .select('*', { count: 'exact', head: true })
+            .eq('family_id', fam.id)
+
+          if (!count || count === 0) {
+            console.log("No missions found, creating default missions...")
+            const defaultMissions = [
+              { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
+              { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
+              { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
+            ]
+            await supabase.from('missions').insert(defaultMissions)
+          } else {
+            console.log("[useFamily] Missions already exist, skipping default creation")
+          }
         } catch (mErr) {
-          console.warn("Default missions creation failed (non-critical):", mErr)
+          console.warn("Default missions creation check failed (non-critical):", mErr)
         }
       }
       setProfiles(profs || [])
