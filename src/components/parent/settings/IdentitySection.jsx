@@ -24,6 +24,8 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   ]
 
   const handleUpdateProfile = async (id, updates) => {
+    if (updatingId === id) return // Prevent double-click
+
     try {
       setUpdatingId(id)
       // Use the injected updateProfile for optimistic UI + DB persistence
