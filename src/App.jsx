@@ -63,12 +63,21 @@ export default function App() {
     if (!isLoading && session && family) {
       const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
       const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
+      const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
 
-      if (!hasSeenTuto || isDefaultFamily) {
+      if ((!hasSeenTuto || isDefaultFamily) && !dismissed) {
         if (!isOnboardingSession) setIsOnboardingSession(true)
+      } else if (dismissed && isOnboardingSession) {
+        // Force exit if dismissed
+        setIsOnboardingSession(false)
       }
     }
   }, [isLoading, !!session, !!family, profiles.length, isOnboardingSession])
+
+  // Force exit onboarding when step becomes done
+  useEffect(() => {
+    if (onboardingStep === 'done') setIsOnboardingSession(false)
+  }, [onboardingStep])
 
   // 3. Derived states for onboarding (Safe to use profiles here)
   const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
@@ -99,7 +108,9 @@ export default function App() {
       } else if (!hasConfiguredChallenge) {
         setOnboardingStep('challenge')
       } else {
-        setOnboardingStep('invite')
+        const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
+        if (dismissed) setOnboardingStep('done')
+        else setOnboardingStep('invite')
       }
     }
   }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession])

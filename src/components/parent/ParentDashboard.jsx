@@ -183,6 +183,7 @@ export default function ParentDashboard({
           }}
           inviteCode={childProfiles.find(isConfigured)?.invite_code || childProfiles[0]?.invite_code || ''}
           onComplete={() => {
+            localStorage.setItem('onboarding_invite_dismissed', 'true')
             if (setOnboardingStep) setOnboardingStep('done')
             setActiveTab('validation')
           }}
@@ -210,8 +211,8 @@ export default function ParentDashboard({
       />
 
       <header className="space-y-6">
-        {/* Onboarding Stepper - Hide on Validation tab when onboarding is complete */}
-        {isNewUser && onboardingStep && !(activeTab === 'validation' && (onboardingStep === 'invite' || onboardingStep === 'done')) && (
+        {/* Onboarding Stepper - Hide completely when done */}
+        {isNewUser && onboardingStep && onboardingStep !== 'done' && (
           <OnboardingStepper
             currentStep={onboardingStep}
             onStepClick={(step) => {
