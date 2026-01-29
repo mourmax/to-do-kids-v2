@@ -34,29 +34,6 @@ export default function App() {
   // Onboarding stepper state (will be calculated dynamically)
   const [onboardingStep, setOnboardingStep] = useState('pin')
 
-  // Calculate current onboarding step based on completion status
-  useEffect(() => {
-    if (!isLoading && profiles && isOnboardingSession) {
-      const childProfiles = profiles.filter(p => !p.is_parent)
-      const hasConfiguredChild = childProfiles.some(p => p.child_name !== "Mon enfant")
-      const hasMissions = allMissions && allMissions.length > 0
-      const hasConfiguredChallenge = challenge && challenge.reward_name && challenge.reward_name !== 'Cadeau Surprise' && challenge.reward_name !== 'Surprise Gift'
-
-      // Determine current step based on what's completed
-      if (!parentProfile?.pin_code && !pinSuccessfullySet) {
-        setOnboardingStep('pin')
-      } else if (!hasConfiguredChild) {
-        setOnboardingStep('child')
-      } else if (!hasMissions) {
-        setOnboardingStep('mission')
-      } else if (!hasConfiguredChallenge) {
-        setOnboardingStep('challenge')
-      } else {
-        setOnboardingStep('invite')
-      }
-    }
-  }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession])
-
   // 1. Session management
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -102,6 +79,29 @@ export default function App() {
   // AND PIN setup is NOT active. New families ALWAYS get a chance to see it.
   const isDefaultFamily = profiles.length <= 2 && profiles.some(p => p.child_name === "Mon enfant")
   const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !needsPinSetup && !isLoading && !!session
+
+  // Calculate current onboarding step based on completion status
+  useEffect(() => {
+    if (!isLoading && profiles && isOnboardingSession) {
+      const childProfiles = profiles.filter(p => !p.is_parent)
+      const hasConfiguredChild = childProfiles.some(p => p.child_name !== "Mon enfant")
+      const hasMissions = allMissions && allMissions.length > 0
+      const hasConfiguredChallenge = challenge && challenge.reward_name && challenge.reward_name !== 'Cadeau Surprise' && challenge.reward_name !== 'Surprise Gift'
+
+      // Determine current step based on what's completed
+      if (!parentProfile?.pin_code && !pinSuccessfullySet) {
+        setOnboardingStep('pin')
+      } else if (!hasConfiguredChild) {
+        setOnboardingStep('child')
+      } else if (!hasMissions) {
+        setOnboardingStep('mission')
+      } else if (!hasConfiguredChallenge) {
+        setOnboardingStep('challenge')
+      } else {
+        setOnboardingStep('invite')
+      }
+    }
+  }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession])
 
   // 4. Tutorial trigger
   useEffect(() => {
