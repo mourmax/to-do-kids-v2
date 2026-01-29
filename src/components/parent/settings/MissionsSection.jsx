@@ -187,7 +187,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     <div className="space-y-6">
       {showOnboarding && (
         <OnboardingInfoBlock
-          step="2"
+          step="3"
           title={t('onboarding.missions_title')}
           description={t('onboarding.missions_description')}
           icon={Library}

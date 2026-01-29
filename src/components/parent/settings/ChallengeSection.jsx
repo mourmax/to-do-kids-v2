@@ -71,7 +71,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
     <div className="space-y-6">
       {showOnboarding && (
         <OnboardingInfoBlock
-          step="3"
+          step="4"
           title={t('onboarding.challenge_title')}
           description={t('onboarding.challenge_description')}
           icon={Trophy}
