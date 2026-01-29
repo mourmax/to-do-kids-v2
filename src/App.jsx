@@ -141,6 +141,7 @@ export default function App() {
     setChildFamilyId(profileData.family_id)
     localStorage.setItem('child_family_id', profileData.family_id)
     localStorage.setItem('active_profile_id', profileData.id)
+    setIsParentMode(false) // Force Child Mode
     loadFamilyData()
   }
 

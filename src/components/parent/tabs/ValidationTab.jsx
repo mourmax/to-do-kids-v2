@@ -8,6 +8,7 @@ import FailureModal from '../FailureModal'
 import Toast from '../Toast'
 import ValidationHeader from './ValidationHeader'
 import ValidationMissionList from './ValidationMissionList'
+import ChallengeRenewalView from './ChallengeRenewalView'
 import { useTranslation } from 'react-i18next'
 import { ListChecks } from 'lucide-react'
 
@@ -48,24 +49,15 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     refresh(true)
   }, [])
 
-  // 1. Setup New Challenge (Ui d'attente si pas de challenge actif)
+  // 1. Setup New Challenge / Renewal View
   if (!challenge || !challenge.is_active) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6">
-        <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center animate-pulse">
-          <ListChecks size={40} className="text-slate-600" />
-        </div>
-        <div>
-          <h3 className="text-white font-black uppercase text-xl tracking-tight">{t('challenge.no_active')}</h3>
-          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">{t('challenge.configure_new')}</p>
-        </div>
-        <button
-          onClick={() => onEditSettings('challenge')}
-          className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:scale-105 transition-transform"
-        >
-          {t('actions.configure')}
-        </button>
-      </div>
+      <ChallengeRenewalView
+        challenge={challenge}
+        missionsCount={missions.length}
+        onStart={(settings) => handleStartNewChallenge(settings)}
+        onEditMissions={() => onEditSettings('missions')}
+      />
     )
   }
 
@@ -172,24 +164,30 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       await supabase.from('challenges').update({ is_active: false }).eq('id', challenge.id)
     }
     refresh(true)
-    // Rediriger vers l'onglet réglages (Bilan)
-    onEditSettings()
+    // On reste ici pour afficher le ChallengeRenewalView
   }
 
-  const handleStartNewChallenge = async () => {
+  const handleStartNewChallenge = async (newSettings = {}) => {
     const today = new Date().toISOString().split('T')[0]
     try {
-      await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
+      const updates = {
+        current_streak: 0,
+        is_active: true,
+        ...newSettings
+      }
+
+      await supabase.from('challenges').update(updates).eq('id', challenge.id)
+
       const missionIds = missions.map(m => m.id)
       if (missionIds.length > 0) {
-        // �️ RESET: Là seulement on supprime pour repartir à zéro
+        // ️ RESET: Là seulement on supprime pour repartir à zéro
         await supabase.from('daily_logs').delete()
           .in('mission_id', missionIds)
           .eq('profile_id', profile.id)
           .eq('date', today)
       }
       await refresh(true)
-      onExit()
+      // showToast(t('dashboard.challenge_started')) // Optional feedback
     } catch (error) {
       console.error("Erreur reset:", error)
       showToast(t('errors.reset_failed'), "error")
