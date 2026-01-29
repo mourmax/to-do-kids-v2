@@ -322,8 +322,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* CONTENU PRINCIPAL (Dashboard) */}
-      <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
+      {/* CONTENU PRINCIPAL (Dashboard) - Hidden during tutorial to prevent flash */}
+      <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'} ${showTutorial ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <AnimatePresence mode="wait">
           {isParentMode ? (
             family ? (

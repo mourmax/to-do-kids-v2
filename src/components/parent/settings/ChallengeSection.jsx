@@ -59,7 +59,10 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       if (error) throw error
       onShowSuccess(t('actions.save_success'))
       refresh(true)
-      // Onboarding progression is handled by parent component
+      // Advance to step 5 (invite) after saving challenge
+      if (isNewUser && onNextStep) {
+        onNextStep('done')
+      }
       setTimeout(() => setIsSaving(false), 1000)
     } catch (error) {
       console.error("Update failed:", error)
