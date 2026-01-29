@@ -29,9 +29,9 @@ export function useFamily(userId, familyId = null) {
           .from('families')
           .select('*')
           .eq('parent_owner_id', userId)
-          .maybeSingle()
+          .limit(1)
 
-        fam = data
+        fam = data?.[0] || null
         famError = error
 
         if (famError) {
@@ -60,9 +60,9 @@ export function useFamily(userId, familyId = null) {
           .from('families')
           .select('*')
           .eq('id', familyId)
-          .maybeSingle()
+          .limit(1)
 
-        fam = data
+        fam = data?.[0] || null
         famError = error
       }
 
@@ -209,10 +209,10 @@ export function useFamily(userId, familyId = null) {
             current_streak: 0
           }])
           .select()
-          .single()
+          .limit(1)
 
         if (createError) console.error("Error creating default challenge:", createError)
-        chall = newChall
+        chall = newChall?.[0] || null
       }
       setChallenge(chall)
 

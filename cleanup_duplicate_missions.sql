@@ -6,7 +6,7 @@ WITH duplicates AS (
     id,
     family_id,
     title,
-    ROW_NUMBER() OVER (PARTITION BY family_id, title ORDER BY created_at) as rn
+    ROW_NUMBER() OVER (PARTITION BY family_id, title ORDER BY id) as rn
   FROM missions
   WHERE title IN ('missions.do_homework', 'missions.tidy_toys', 'missions.set_table')
 )

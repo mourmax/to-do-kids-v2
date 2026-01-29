@@ -176,8 +176,8 @@ export default function ParentDashboard({
       />
 
       <header className="space-y-6">
-        {/* Onboarding Stepper */}
-        {isNewUser && onboardingStep && (
+        {/* Onboarding Stepper - Hide on Validation tab when onboarding is complete */}
+        {isNewUser && onboardingStep && !(activeTab === 'validation' && (onboardingStep === 'invite' || onboardingStep === 'done')) && (
           <OnboardingStepper
             currentStep={onboardingStep}
             onStepClick={(step) => {
