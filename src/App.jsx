@@ -95,7 +95,11 @@ export default function App() {
   const isDefaultFamily = (profiles || []).length <= 2 && (profiles || []).some(p => p.child_name === "Mon enfant")
   const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !isLoading && !!session
 
+  // Step order for onboarding - numeric values to prevent going backwards
+  const STEP_ORDER = { 'pin': 1, 'child': 2, 'mission': 3, 'challenge': 4, 'invite': 5, 'done': 6 }
+
   // Calculate current onboarding step based on completion status
+  // CRITICAL: This logic NEVER goes backwards - it only advances or stays
   useEffect(() => {
     // Skip auto-calculation if a manual step change just happened
     if (manualStepChangeRef.current) {
@@ -109,27 +113,32 @@ export default function App() {
       const hasMissions = allMissions && allMissions.length > 0
       const missionsConfirmed = localStorage.getItem('onboarding_missions_confirmed') === 'true'
       const hasConfiguredChallenge = challenge && challenge.reward_name && challenge.reward_name !== 'Cadeau Surprise' && challenge.reward_name !== 'Surprise Gift'
+      const inviteDismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
 
-      // Determine current step based on what's completed
-      if (!parentProfile?.pin_code && !pinSuccessfullySet) {
-        setOnboardingStep('pin')
-      } else if (!hasConfiguredChild) {
-        setOnboardingStep('child')
-      } else if (!hasMissions || !missionsConfirmed) {
-        // Only auto-advance to mission step if we're not already there
-        // This prevents jumping back from challenge step when adding missions
-        if (onboardingStep !== 'mission' && onboardingStep !== 'challenge') {
-          setOnboardingStep('mission')
+      // Calculate what step SHOULD be based on completion
+      let targetStep = 'pin'
+      if (parentProfile?.pin_code || pinSuccessfullySet) {
+        targetStep = 'child'
+        if (hasConfiguredChild) {
+          targetStep = 'mission'
+          if (hasMissions && missionsConfirmed) {
+            targetStep = 'challenge'
+            if (hasConfiguredChallenge) {
+              targetStep = inviteDismissed ? 'done' : 'invite'
+            }
+          }
         }
-      } else if (!hasConfiguredChallenge) {
-        setOnboardingStep('challenge')
-      } else {
-        const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
-        if (dismissed) setOnboardingStep('done')
-        else setOnboardingStep('invite')
+      }
+
+      // CRITICAL: Only update if we're moving FORWARD, never backwards
+      const currentStepOrder = STEP_ORDER[onboardingStep] || 1
+      const targetStepOrder = STEP_ORDER[targetStep] || 1
+
+      if (targetStepOrder > currentStepOrder) {
+        setOnboardingStep(targetStep)
       }
     }
-  }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession])
+  }, [isLoading, profiles, allMissions, challenge, parentProfile, pinSuccessfullySet, isOnboardingSession, onboardingStep])
 
   // 4. Tutorial trigger
   useEffect(() => {
