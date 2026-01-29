@@ -29,7 +29,8 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       }
       setRewardName(rName)
 
-      setSeriesLength(challenge.duration_days || 2)
+      const rawDuration = challenge.duration_days || 2
+      setSeriesLength(rawDuration > 3 ? 3 : rawDuration)
 
       let mMsg = challenge.malus_message || ''
       if (mMsg === 'Zut ! On recommence au début' || mMsg === 'Zut ! On recommence au début.' || mMsg === 'Oops! Back to the start.' || mMsg === t('completion_modal.default_malus')) {
@@ -82,15 +83,25 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       <SectionCard icon={Trophy} colorClass="text-orange-500" title={t('settings.challenge_title')}>
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            <div>
+            <div className="space-y-2">
               <label className="text-[10px] text-orange-500 uppercase font-black ml-1 mb-1 block">{t('settings.duration_label')}</label>
               <input
                 type="number"
                 min="1"
+                max="3"
                 value={seriesLength}
-                onChange={(e) => setSeriesLength(e.target.value)}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1
+                  setSeriesLength(val > 3 ? 3 : val)
+                }}
                 className="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3 font-bold outline-none text-white focus:border-orange-500 transition-colors [.light-theme_&]:bg-white [.light-theme_&]:text-slate-900 [.light-theme_&]:border-indigo-200"
               />
+              <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl">
+                <Crown size={14} className="text-amber-400" />
+                <span className="text-[10px] font-bold text-amber-200/80 uppercase tracking-wide">
+                  Limité à 3 jours max en version gratuite
+                </span>
+              </div>
             </div>
           </div>
 

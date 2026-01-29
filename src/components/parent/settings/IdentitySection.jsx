@@ -75,46 +75,8 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
     }
   }
 
-  const handleAddChild = async () => {
-    if (isAdding) return
-    try {
-      setIsAdding(true)
-      const childProfiles = profiles?.filter(p => !p.is_parent) || []
-      if (childProfiles.length >= 5) {
-        onShowSuccess("Limite de profil atteinte")
-        return
-      }
-
-      if (!familyId) {
-        onShowSuccess("Erreur : Famille non identifiée")
-        return
-      }
-      const newInviteCode = Math.random().toString(36).substring(2, 8).toUpperCase()
-      const randomColor = COLORS[childProfiles.length % COLORS.length].name
-
-      const { error } = await supabase.from('profiles').insert([
-        {
-          family_id: familyId,
-          child_name: "Mon enfant",
-          role: 'child',
-          is_parent: false,
-          invite_code: newInviteCode,
-          color: randomColor
-        }
-      ])
-
-      if (error) {
-        console.error("Error adding child:", error)
-        onShowSuccess(`Erreur : ${error.message}`)
-      } else {
-        onShowSuccess("Enfant ajouté !")
-        refresh(true)
-      }
-    } catch (err) {
-      console.error("Unexpected error in handleAddChild:", err)
-    } finally {
-      setIsAdding(false)
-    }
+  const handleAddChild = () => {
+    onShowSuccess("Fonctionnalité Premium uniquement")
   }
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
@@ -258,7 +220,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
               <button
                 disabled={updatingId === 'saving-all'}
                 onClick={handleOnboardingFinalSave}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95 disabled:opacity-50"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95 disabled:opacity-50 animate-heartbeat"
               >
                 {updatingId === 'saving-all' ? t('actions.saving') : t('onboarding.next_step_missions')}
               </button>
