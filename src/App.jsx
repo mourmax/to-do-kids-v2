@@ -181,7 +181,7 @@ export default function App() {
   }
 
   // C. Condition for PIN Setup (Only for Parent)
-  if (parentProfile && needsPinSetup) {
+  if (isParentMode && parentProfile && needsPinSetup) {
     return (
       <PinSetup
         profileId={parentProfile.id}
