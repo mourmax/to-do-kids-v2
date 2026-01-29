@@ -182,7 +182,7 @@ export default function ParentDashboard({
             if (setOnboardingStep) setOnboardingStep('done')
           }}
           inviteCode={childProfiles.find(isConfigured)?.invite_code || childProfiles[0]?.invite_code || ''}
-          onNavigateToValidation={() => {
+          onComplete={() => {
             if (setOnboardingStep) setOnboardingStep('done')
             setActiveTab('validation')
           }}

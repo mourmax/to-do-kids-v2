@@ -111,7 +111,33 @@ export function useFamily(userId, familyId = null) {
         profs = newProfs || []
         console.log("[useFamily] Profiles created successfully")
 
+      } else {
+        // --- LOGIQUE AUTO-GUÉRISSEUSE (SELF-HEALING) ---
+        // Nettoyage automatique des profils "Mon enfant" en trop ou inutiles
+        const configuredChildren = profs.filter(p => !p.is_parent && p.child_name !== "Mon enfant")
+        const placeholderChildren = profs.filter(p => !p.is_parent && p.child_name === "Mon enfant")
+
+        let idsToDelete = []
+
+        if (configuredChildren.length > 0 && placeholderChildren.length > 0) {
+          // Cas 1 : On a déjà configuré un vrai enfant => supprimer TOUS les placeholders
+          console.log("[useFamily] Cleanup: Deleting placeholder profiles because a real child exists.")
+          idsToDelete = placeholderChildren.map(p => p.id)
+        } else if (placeholderChildren.length > 1) {
+          // Cas 2 : On a que des placeholders mais en double => n'en garder qu'un seul
+          console.log("[useFamily] Cleanup: removing duplicate placeholders.")
+          // On garde le premier, on supprime le reste
+          const [keep, ...remove] = placeholderChildren
+          idsToDelete = remove.map(p => p.id)
+        }
+
+        if (idsToDelete.length > 0) {
+          await supabase.from('profiles').delete().in('id', idsToDelete)
+          // Mise à jour de la liste locale pour ne pas afficher les supprimés
+          profs = profs.filter(p => !idsToDelete.includes(p.id))
+        }
       }
+
       setProfiles(profs || [])
 
       // 2.2 Default Missions creation recovery - ONLY if no missions exist yet
