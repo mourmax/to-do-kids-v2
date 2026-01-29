@@ -104,6 +104,12 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   const [showPickerForAdd, setShowPickerForAdd] = useState(false)
   const [showLibrary, setShowLibrary] = useState(false)
   const [showCustomModal, setShowCustomModal] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+
+  // Optimistic UI state
+  const [optimisticMissions, setOptimisticMissions] = useState(missions)
+  useEffect(() => { setOptimisticMissions(missions) }, [missions])
+  const [showCustomModal, setShowCustomModal] = useState(false)
 
   const [editingId, setEditingId] = useState(null)
   const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null })
@@ -114,10 +120,12 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     setTargetId(activeTab === 'all' ? null : activeTab)
   }, [activeTab])
 
-  // Filter missions for the current tab
-  const filteredMissions = activeTab === 'all'
-    ? (missions || [])
-    : (missions || []).filter(m => !m.assigned_to || m.assigned_to === activeTab)
+  // Calcul du nombre de missions pour la cible  // Filtrage
+  const filteredMissions = (optimisticMissions || []).filter(m => {
+    if (activeTab === 'all') return true
+    // Si activeTab est un ID d'enfant
+    return m.assigned_to === activeTab || m.assigned_to === null // null = pour tous
+  })
 
   // Calcul du nombre de missions pour la cible choisie
   const getMissionCountFor = (pid) => {
@@ -154,11 +162,19 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   }
 
   const deleteMission = async (id) => {
+    // Optimistic update
+    setOptimisticMissions(prev => prev.filter(m => m.id !== id));
+
+    if (preventStepRecalc) preventStepRecalc();
+
     const { error } = await supabase.from('missions').delete().eq('id', id)
     if (!error) {
       onShowSuccess("Mission supprimée");
-      if (preventStepRecalc) preventStepRecalc();
       refresh(true);
+    } else {
+      // Revert if error
+      setOptimisticMissions(missions);
+      onShowSuccess("Erreur lors de la suppression");
     }
   }
 

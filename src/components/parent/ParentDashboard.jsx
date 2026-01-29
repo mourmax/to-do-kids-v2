@@ -221,7 +221,7 @@ export default function ParentDashboard({
 
       <header className="space-y-6">
         {/* Onboarding Stepper - Hide completely when done */}
-        {isNewUser && onboardingStep && onboardingStep !== 'done' && (
+        {isNewUser && onboardingStep && onboardingStep !== 'done' && onboardingStep !== 'invite' && (
           <OnboardingStepper
             currentStep={onboardingStep}
             onStepClick={(step) => {
