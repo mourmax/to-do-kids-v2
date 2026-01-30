@@ -69,16 +69,15 @@ export default function App() {
       const isDefaultFamily = profilesList.length === 0 || (profilesList.length <= 2 && profilesList.some(p => p.child_name === "Mon enfant"))
       const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
 
-      // Simplified logic: If invite code isn't dismissed, you are in onboarding.
-      // This handles reloads, "stuck" users, and new users correctly.
       // CRITICAL: Once dismissed, NEVER re-enter onboarding
       if (dismissed) {
         if (isOnboardingSession) setIsOnboardingSession(false)
-      } else if (!isOnboardingSession) {
+        if (onboardingStep !== 'done') setOnboardingStep('done')
+      } else if (!isOnboardingSession && onboardingStep !== 'done') {
         setIsOnboardingSession(true)
       }
     }
-  }, [isLoading, !!session, !!family, isOnboardingSession])
+  }, [isLoading, !!session, !!family, isOnboardingSession, onboardingStep])
 
   // Handle manual onboarding termination
   const finishOnboarding = () => {

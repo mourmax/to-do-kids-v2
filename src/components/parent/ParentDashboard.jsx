@@ -194,10 +194,16 @@ export default function ParentDashboard({
   // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
   useEffect(() => {
     const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
+    console.log("[DEBUG] Sync Effect:", { isNewUser, onboardingStep, activeTab, dismissed })
+
     if (isNewUser && !dismissed && onboardingStep !== 'done') {
-      if (activeTab !== 'settings') setActiveTab('settings')
+      if (activeTab !== 'settings') {
+        console.log("[DEBUG] Forcing settings")
+        setActiveTab('settings')
+      }
     } else if (onboardingStep === 'done' || dismissed || !isNewUser) {
       if (activeTab !== 'validation' && !manualTabChangeRef.current) {
+        console.log("[DEBUG] Forcing validation")
         setActiveTab('validation')
       }
     }
