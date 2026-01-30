@@ -246,29 +246,51 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           <div className="grid grid-cols-2 gap-3">
             {/* Bibliothèque - Orange pulsant */}
             <button
-              onClick={() => setShowLibrary(true)}
-              className="bg-orange-500/80 border-2 border-orange-400 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-orange-500/90 transition-all active:scale-[0.98] shadow-xl shadow-orange-500/40 animate-heartbeat"
+              onClick={() => !isLimitReached && setShowLibrary(true)}
+              disabled={isLimitReached}
+              className={`border-2 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group transition-all active:scale-[0.98] ${isLimitReached
+                  ? 'bg-slate-800/50 border-slate-700 cursor-not-allowed opacity-50'
+                  : 'bg-orange-500/80 border-orange-400 hover:bg-orange-500/90 shadow-xl shadow-orange-500/40 animate-heartbeat'
+                }`}
             >
-              <Sparkles size={24} className="text-orange-400 group-hover:rotate-12 transition-transform" />
-              <span className="font-black uppercase text-[10px] tracking-widest text-orange-100">{t('library.library_button')}</span>
+              <Sparkles size={24} className={isLimitReached ? 'text-slate-500' : 'text-orange-400 group-hover:rotate-12 transition-transform'} />
+              <span className={`font-black uppercase text-[10px] tracking-widest ${isLimitReached ? 'text-slate-500' : 'text-orange-100'}`}>{t('library.library_button')}</span>
             </button>
 
             {/* Custom - Contour orange */}
             <button
-              onClick={() => setShowCustomModal(true)}
-              className="bg-slate-900/60 border-2 border-orange-500/50 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-slate-800 hover:border-orange-500 transition-all active:scale-[0.98] shadow-lg"
+              onClick={() => !isLimitReached && setShowCustomModal(true)}
+              disabled={isLimitReached}
+              className={`border-2 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group transition-all active:scale-[0.98] ${isLimitReached
+                  ? 'bg-slate-800/50 border-slate-700 cursor-not-allowed opacity-50'
+                  : 'bg-slate-900/60 border-orange-500/50 hover:bg-slate-800 hover:border-orange-500 shadow-lg'
+                }`}
             >
-              <Plus size={24} className="text-orange-400 group-hover:scale-110 transition-transform" />
-              <span className="font-black uppercase text-[10px] tracking-widest text-orange-300">{t('library.custom_button')}</span>
+              <Plus size={24} className={isLimitReached ? 'text-slate-500' : 'text-orange-400 group-hover:scale-110 transition-transform'} />
+              <span className={`font-black uppercase text-[10px] tracking-widest ${isLimitReached ? 'text-slate-500' : 'text-orange-300'}`}>{t('library.custom_button')}</span>
             </button>
           </div>
 
-          {/* Notice: 5 missions maximum */}
-          <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl flex items-center gap-2">
-            <Crown size={16} className="text-amber-400 shrink-0" />
-            <p className="text-[9px] text-amber-200 font-bold uppercase tracking-tight">
-              5 missions maximum en version gratuite
-            </p>
+          {/* Mission Counter & Limit Notice */}
+          <div className={`p-3 rounded-2xl flex items-center justify-between gap-3 transition-all ${isLimitReached
+              ? 'bg-rose-500/20 border-2 border-rose-500/50 animate-pulse'
+              : 'bg-amber-500/10 border border-amber-500/20'
+            }`}>
+            <div className="flex items-center gap-2">
+              <Crown size={16} className={isLimitReached ? 'text-rose-400' : 'text-amber-400'} />
+              <p className={`text-[9px] font-bold uppercase tracking-tight ${isLimitReached ? 'text-rose-200' : 'text-amber-200'
+                }`}>
+                {isLimitReached ? 'Limite atteinte !' : '5 missions maximum (gratuit)'}
+              </p>
+            </div>
+            <div className={`px-3 py-1 rounded-full font-black text-xs ${isLimitReached
+                ? 'bg-rose-500 text-white'
+                : currentLevelCount >= 4
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-slate-700 text-slate-300'
+              }`}>
+              {currentLevelCount}/5
+            </div>
           </div>
 
           <AnimatePresence>
