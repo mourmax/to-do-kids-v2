@@ -181,12 +181,16 @@ export default function ParentDashboard({
     }
   }, [onboardingStep, isNewUser, activeTab])
 
-  // 🛡️ SÉCURITÉ : Forcer l'onglet settings tant que l'onboarding n'est pas "done"
+  // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
+  // This fixes the issue where useState captures 'validation' but user should be in 'settings'
+  // BUT: Don't force settings if onboarding is done or at invite step (final step)
+  // ALSO: Check localStorage directly to catch completion immediately
   useEffect(() => {
-    if (isNewUser && activeTab !== 'settings' && onboardingStep !== 'done' && onboardingStep !== 'invite') {
+    const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
+    if (isNewUser && !dismissed && activeTab !== 'settings' && onboardingStep !== 'done' && onboardingStep !== 'invite') {
       setActiveTab('settings')
     }
-  }, [isNewUser, activeTab, onboardingStep])
+  }, [isNewUser, onboardingStep])
 
 
   return (
