@@ -26,7 +26,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
     if (step === 'done') {
       // Onboarding complete, switch to validation tab
       if (onTabChange) onTabChange('validation')
-      if (setOnboardingStep) setOnboardingStep('invite') // Mark as complete
+      if (setOnboardingStep) setOnboardingStep('done')
     } else {
       // Navigate to the next step
       setActiveSubMenu(step)
@@ -204,9 +204,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               }}
               onNextStep={(step) => {
                 if (step === 'done') {
-                  // After challenge setup, show invite guide and navigate to children tab
-                  setActiveSubMenu('children')
-                  if (setOnboardingStep) setOnboardingStep('invite')
+                  if (setOnboardingStep) setOnboardingStep('done')
                 } else {
                   handleNextStep(step)
                 }

@@ -336,6 +336,7 @@ export default function App() {
             {isParentMode ? (
               family ? (
                 <ParentDashboard
+                  key={isOnboardingSession ? 'onboarding' : 'normal'}
                   family={family}
                   profile={activeProfile}
                   challenge={challenge}

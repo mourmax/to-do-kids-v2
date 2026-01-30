@@ -46,7 +46,8 @@ export default function ParentDashboard({
   initialSubTab = 'missions',
   onboardingStep = 'child',
   setOnboardingStep,
-  preventStepRecalc
+  preventStepRecalc,
+  onFinishOnboarding
 }) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -55,11 +56,14 @@ export default function ParentDashboard({
 
   // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
   // This fixes the issue where useState captures 'validation' but user should be in 'settings'
+  // Resync tabs when props change (crucial for onboarding -> normal transition)
   useEffect(() => {
-    if (isNewUser && activeTab !== 'settings' && onboardingStep !== 'done') {
-      setActiveTab('settings')
-    }
-  }, [isNewUser, onboardingStep])
+    setActiveTab(initialTab)
+  }, [initialTab])
+
+  useEffect(() => {
+    setActiveSubTab(initialSubTab)
+  }, [initialSubTab])
 
   // 🛡️ Track dismissed notifications to prevent reappearance during session
   const dismissedIdsRef = useRef(new Set())
@@ -186,10 +190,12 @@ export default function ParentDashboard({
   // ALSO: Check localStorage directly to catch completion immediately
   useEffect(() => {
     const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
-    if (isNewUser && !dismissed && activeTab !== 'settings' && onboardingStep !== 'done') {
-      setActiveTab('settings')
+    if (isNewUser && !dismissed && onboardingStep !== 'done') {
+      if (activeTab !== 'settings') setActiveTab('settings')
+    } else if (onboardingStep === 'done' || dismissed) {
+      if (activeTab !== 'validation') setActiveTab('validation')
     }
-  }, [isNewUser, onboardingStep])
+  }, [isNewUser, onboardingStep, activeTab])
 
 
   return (
