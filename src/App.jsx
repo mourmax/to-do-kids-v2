@@ -347,8 +347,14 @@ export default function App() {
                   refresh={loadFamilyData}
                   updateProfile={updateProfile}
                   isNewUser={isOnboardingSession}
-                  initialTab={isOnboardingSession ? 'settings' : 'validation'}
-                  initialSubTab={isOnboardingSession && onboardingStep === 'pin' ? 'pin' : (isOnboardingSession ? 'children' : 'missions')}
+                  initialTab={(isOnboardingSession && onboardingStep !== 'done') ? 'settings' : 'validation'}
+                  initialSubTab={
+                    onboardingStep === 'pin' ? 'pin' :
+                      onboardingStep === 'child' ? 'children' :
+                        onboardingStep === 'mission' ? 'missions' :
+                          onboardingStep === 'challenge' ? 'challenge' :
+                            'missions'
+                  }
                   onboardingStep={onboardingStep}
                   setOnboardingStep={handleManualStepChange}
                   preventStepRecalc={preventStepRecalc}

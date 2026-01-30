@@ -177,7 +177,6 @@ export default function ParentDashboard({
       else if (onboardingStep === 'child') setActiveSubTab('children')
       else if (onboardingStep === 'mission') setActiveSubTab('missions')
       else if (onboardingStep === 'challenge') setActiveSubTab('challenge')
-      else if (onboardingStep === 'invite') setActiveSubTab('children')
     }
   }, [onboardingStep, isNewUser, activeTab])
 
@@ -187,7 +186,7 @@ export default function ParentDashboard({
   // ALSO: Check localStorage directly to catch completion immediately
   useEffect(() => {
     const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
-    if (isNewUser && !dismissed && activeTab !== 'settings' && onboardingStep !== 'done' && onboardingStep !== 'invite') {
+    if (isNewUser && !dismissed && activeTab !== 'settings' && onboardingStep !== 'done') {
       setActiveTab('settings')
     }
   }, [isNewUser, onboardingStep])
