@@ -229,17 +229,6 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
         </div>
       </SectionCard>
 
-      {/* Profile Completion Modal - Hide at step 5 (invite) */}
-      {isNewUser && childProfiles.length > 0 && !childProfiles.some(p => p.child_name === "Mon enfant") && onboardingStep !== 'done' && (
-        <ProfileCompletionModal
-          isOpen={showProfileModal}
-          onClose={() => setShowProfileModal(false)}
-          onNavigateToMissions={() => {
-            setShowProfileModal(false)
-            onNextStep('missions')
-          }}
-        />
-      )}
     </div>
   )
 }

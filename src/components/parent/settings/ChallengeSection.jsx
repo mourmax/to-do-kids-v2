@@ -122,19 +122,6 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
         </div>
       </SectionCard>
 
-      {/* Invite Code Guide Modal */}
-      <InviteCodeGuideModal
-        isOpen={showInviteGuide}
-        onNavigateToChildren={() => {
-          setShowInviteGuide(false)
-          setShowCompletionModal(true)
-        }}
-        onClose={() => {
-          setShowInviteGuide(false)
-          setShowCompletionModal(true)
-        }}
-      />
-
     </div>
   )
 }

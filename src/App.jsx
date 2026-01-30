@@ -185,7 +185,7 @@ export default function App() {
   // --- LOGIQUE D'AFFICHAGE ET SÉCURITÉ ---
   const debug = new URLSearchParams(window.location.search).get('debug') === 'true'
   if (debug) {
-    console.log("[DEBUG] State:", { isLoading, session: !!session, family: !!family, profiles: profiles?.length, isParentMode })
+    console.log("[DEBUG] State:", { isLoading, session: !!session, family: !!family, profiles: profiles?.length, isParentMode, onboardingStep, isOnboardingSession })
   }
 
   // A. Initial Loading State (Global)

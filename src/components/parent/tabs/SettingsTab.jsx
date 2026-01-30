@@ -154,12 +154,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                 updateProfile={updateProfile}
                 isNewUser={isNewUser}
                 onboardingStep={onboardingStep}
-                onNextStep={(step) => {
-                  handleNextStep(step)
-                  if (setOnboardingStep && step === 'missions') {
-                    setOnboardingStep('mission')
-                  }
-                }}
+                onNextStep={handleNextStep}
               />
               {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
                 <>
@@ -180,12 +175,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               refresh={refresh}
               isNewUser={isNewUser}
               preventStepRecalc={preventStepRecalc}
-              onNextStep={(step) => {
-                handleNextStep(step)
-                if (setOnboardingStep && step === 'challenge') {
-                  setOnboardingStep('challenge')
-                }
-              }}
+              onNextStep={handleNextStep}
             />
           )}
 
@@ -202,13 +192,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                   onTabChange('validation')
                 }
               }}
-              onNextStep={(step) => {
-                if (step === 'done') {
-                  if (setOnboardingStep) setOnboardingStep('done')
-                } else {
-                  handleNextStep(step)
-                }
-              }}
+              onNextStep={handleNextStep}
             />
           )}
         </motion.div>

@@ -53,6 +53,7 @@ export default function ParentDashboard({
   const [activeTab, setActiveTab] = useState(initialTab)
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab)
   const [notifications, setNotifications] = useState([])
+  const manualTabChangeRef = useRef(false)
 
   // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
   // This fixes the issue where useState captures 'validation' but user should be in 'settings'
@@ -177,23 +178,28 @@ export default function ParentDashboard({
   // Synchroniser l'onglet actif avec l'étape d'onboarding
   useEffect(() => {
     if (isNewUser && onboardingStep && activeTab === 'settings') {
-      if (onboardingStep === 'pin') setActiveSubTab('pin')
-      else if (onboardingStep === 'child') setActiveSubTab('children')
-      else if (onboardingStep === 'mission') setActiveSubTab('missions')
-      else if (onboardingStep === 'challenge') setActiveSubTab('challenge')
+      const stepToSubTab = {
+        'pin': 'pin',
+        'child': 'children',
+        'mission': 'missions',
+        'challenge': 'challenge'
+      }
+      const targetSubTab = stepToSubTab[onboardingStep]
+      if (targetSubTab && activeSubTab !== targetSubTab) {
+        setActiveSubTab(targetSubTab)
+      }
     }
   }, [onboardingStep, isNewUser, activeTab])
 
   // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
-  // This fixes the issue where useState captures 'validation' but user should be in 'settings'
-  // BUT: Don't force settings if onboarding is done or at invite step (final step)
-  // ALSO: Check localStorage directly to catch completion immediately
   useEffect(() => {
     const dismissed = localStorage.getItem('onboarding_invite_dismissed') === 'true'
     if (isNewUser && !dismissed && onboardingStep !== 'done') {
       if (activeTab !== 'settings') setActiveTab('settings')
-    } else if (onboardingStep === 'done' || dismissed) {
-      if (activeTab !== 'validation') setActiveTab('validation')
+    } else if (onboardingStep === 'done' || dismissed || !isNewUser) {
+      if (activeTab !== 'validation' && !manualTabChangeRef.current) {
+        setActiveTab('validation')
+      }
     }
   }, [isNewUser, onboardingStep, activeTab])
 
@@ -304,7 +310,10 @@ export default function ParentDashboard({
             />
 
             <button
-              onClick={() => setActiveTab('validation')}
+              onClick={() => {
+                manualTabChangeRef.current = true
+                setActiveTab('validation')
+              }}
               className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
             >
               <ClipboardCheck size={20} className={activeTab === 'validation' ? 'text-white' : 'text-slate-600'} />
@@ -312,7 +321,10 @@ export default function ParentDashboard({
             </button>
 
             <button
-              onClick={() => setActiveTab('settings')}
+              onClick={() => {
+                manualTabChangeRef.current = true
+                setActiveTab('settings')
+              }}
               className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
             >
               <Sliders size={20} className={activeTab === 'settings' ? 'text-white' : 'text-slate-600'} />
