@@ -58,13 +58,22 @@ export default function ParentDashboard({
   // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
   // This fixes the issue where useState captures 'validation' but user should be in 'settings'
   // Resync tabs when props change (crucial for onboarding -> normal transition)
+  // Resync tabs when props change (crucial for onboarding -> normal transition)
   useEffect(() => {
-    setActiveTab(initialTab)
+    if (activeTab !== initialTab) {
+      console.log("[DEBUG] Syncing activeTab:", initialTab)
+      setActiveTab(initialTab)
+    }
   }, [initialTab])
 
   useEffect(() => {
-    setActiveSubTab(initialSubTab)
-  }, [initialSubTab])
+    // ONLY sync sub-tab if we are in onboarding AND in settings tab
+    // This prevents jumping to "Gestion des enfants" when the app refreshes or completes onboarding
+    if (isNewUser && onboardingStep !== 'done' && activeTab === 'settings' && initialSubTab !== activeSubTab) {
+      console.log("[DEBUG] Syncing activeSubTab:", initialSubTab)
+      setActiveSubTab(initialSubTab)
+    }
+  }, [initialSubTab, isNewUser, onboardingStep, activeTab])
 
   // 🛡️ Track dismissed notifications to prevent reappearance during session
   const dismissedIdsRef = useRef(new Set())

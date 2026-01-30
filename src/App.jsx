@@ -348,13 +348,13 @@ export default function App() {
                   updateProfile={updateProfile}
                   isNewUser={isOnboardingSession}
                   initialTab={(isOnboardingSession && onboardingStep !== 'done') ? 'settings' : 'validation'}
-                  initialSubTab={
+                  initialSubTab={(isOnboardingSession && onboardingStep !== 'done') ? (
                     onboardingStep === 'pin' ? 'pin' :
                       onboardingStep === 'child' ? 'children' :
                         onboardingStep === 'mission' ? 'missions' :
                           onboardingStep === 'challenge' ? 'challenge' :
                             'missions'
-                  }
+                  ) : 'missions'}
                   onboardingStep={onboardingStep}
                   setOnboardingStep={handleManualStepChange}
                   preventStepRecalc={preventStepRecalc}
