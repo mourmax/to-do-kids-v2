@@ -37,17 +37,17 @@ export default function PinSetup({ profileId, onComplete }) {
   return (
     <div className="fixed inset-0 bg-[#020617] z-50 flex flex-col items-center justify-center p-6 text-white">
       {/* Onboarding Stepper */}
-      <div className="absolute top-8 left-0 right-0">
+      <div className="absolute top-4 left-0 right-0">
         <OnboardingStepper currentStep="pin" />
       </div>
 
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="w-full max-w-sm text-center space-y-6"
+        className="w-full max-w-sm text-center space-y-4"
       >
-        <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(79,70,229,0.5)]">
-          <Lock size={32} />
+        <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(79,70,229,0.5)]">
+          <Lock size={24} />
         </div>
 
         <div>

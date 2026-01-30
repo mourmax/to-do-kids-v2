@@ -194,18 +194,17 @@ export default function ParentDashboard({
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-      {/* Onboarding Completion Modal - Step 5 */}
-      {isNewUser && onboardingStep === 'invite' && (
+    <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+      {/* Onboarding Completion Modal - Final Step */}
+      {isNewUser && onboardingStep === 'done' && (
         <OnboardingCompletionModal
           isOpen={true}
           onClose={() => {
-            if (setOnboardingStep) setOnboardingStep('done')
+            if (onFinishOnboarding) onFinishOnboarding()
           }}
           inviteCode={childProfiles.find(isConfigured)?.invite_code || childProfiles[0]?.invite_code || ''}
           onComplete={() => {
-            localStorage.setItem('onboarding_invite_dismissed', 'true')
-            if (setOnboardingStep) setOnboardingStep('done')
+            if (onFinishOnboarding) onFinishOnboarding()
             setActiveTab('validation')
           }}
         />
@@ -231,9 +230,10 @@ export default function ParentDashboard({
         }}
       />
 
-      <header className="space-y-6">
+      <header className="space-y-4">
         {/* Onboarding Stepper - Hide immediately if invite dismissed (check localStorage directly for instant hide) */}
-        {isNewUser && !localStorage.getItem('onboarding_invite_dismissed') && onboardingStep && onboardingStep !== 'done' && onboardingStep !== 'invite' && (
+        {/* Onboarding Stepper - Hide if done (it shows the modal) */}
+        {isNewUser && !localStorage.getItem('onboarding_invite_dismissed') && onboardingStep && onboardingStep !== 'done' && (
           <OnboardingStepper
             currentStep={onboardingStep}
             onStepClick={(step) => {
@@ -241,7 +241,7 @@ export default function ParentDashboard({
                 setOnboardingStep(step)
                 setActiveTab('settings')
                 // Map step to sub-tab
-                if (step === 'child' || step === 'invite') setActiveSubTab('children')
+                if (step === 'child') setActiveSubTab('children')
                 else if (step === 'mission') setActiveSubTab('missions')
                 else if (step === 'challenge') setActiveSubTab('challenge')
               }
@@ -250,7 +250,7 @@ export default function ParentDashboard({
         )}
 
         <div className="flex flex-col items-center justify-center text-center">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white [.light-theme_&]:text-slate-900 mb-2">
+          <h1 className="text-3xl font-black uppercase italic tracking-tighter text-white [.light-theme_&]:text-slate-900 mb-1">
             {t('dashboard.parent_title')}
           </h1>
 
@@ -290,17 +290,17 @@ export default function ParentDashboard({
         </div>
         {/* Tab Switcher - Premium Look - Masqué pendant l'onboarding */}
         {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
-          <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/15 backdrop-blur-xl border border-white/5 [.light-theme_&]:border-indigo-500/10 p-1.5 rounded-[2.5rem] flex relative shadow-2xl max-w-md mx-auto">
+          <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/15 backdrop-blur-xl border border-white/5 [.light-theme_&]:border-indigo-500/10 p-1 rounded-2xl flex relative shadow-2xl max-w-sm mx-auto">
             <motion.div
-              className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-indigo-600 rounded-[2.2rem] shadow-[0_0_20px_rgba(79,70,229,0.4)] z-0"
+              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600 rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.4)] z-0"
               animate={{ x: activeTab === 'settings' ? '100%' : '0%' }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{ left: '6px' }}
+              style={{ left: '4px' }}
             />
 
             <button
               onClick={() => setActiveTab('validation')}
-              className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-[2.2rem] relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
             >
               <ClipboardCheck size={20} className={activeTab === 'validation' ? 'text-white' : 'text-slate-600'} />
               <span className="font-bold uppercase text-[11px] tracking-[0.15em]">{t('tabs.validation')}</span>
@@ -308,7 +308,7 @@ export default function ParentDashboard({
 
             <button
               onClick={() => setActiveTab('settings')}
-              className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-[2.2rem] relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
             >
               <Sliders size={20} className={activeTab === 'settings' ? 'text-white' : 'text-slate-600'} />
               <span className="font-bold uppercase text-[11px] tracking-[0.15em]">{t('tabs.settings')}</span>
@@ -317,7 +317,7 @@ export default function ParentDashboard({
         )}
       </header>
 
-      <main className={isNewUser && onboardingStep && onboardingStep !== 'done' ? 'mt-4' : 'mt-12'}>
+      <main className={isNewUser && onboardingStep && onboardingStep !== 'done' ? 'mt-4' : 'mt-8'}>
         <AnimatePresence mode="wait">
           {activeTab === 'validation' ? (
             <motion.div

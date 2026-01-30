@@ -97,7 +97,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   const showOnboardingHeader = isNewUser && !hasConfiguredAny
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {showOnboardingHeader && (
         <OnboardingInfoBlock
           step="1"

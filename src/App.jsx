@@ -80,13 +80,12 @@ export default function App() {
     }
   }, [isLoading, !!session, !!family, isOnboardingSession])
 
-  // Force exit onboarding when step becomes done
-  useEffect(() => {
-    if (onboardingStep === 'done') {
-      localStorage.setItem('onboarding_invite_dismissed', 'true')
-      setIsOnboardingSession(false)
-    }
-  }, [onboardingStep])
+  // Handle manual onboarding termination
+  const finishOnboarding = () => {
+    localStorage.setItem('onboarding_invite_dismissed', 'true')
+    setIsOnboardingSession(false)
+    setOnboardingStep('done')
+  }
 
   // 3. Derived states for onboarding (Safe to use profiles here)
   const hasSeenTuto = localStorage.getItem('hasSeenTutorial_v1') === 'true'
@@ -99,7 +98,7 @@ export default function App() {
   const shouldShowTutorial = (!hasSeenTuto || isDefaultFamily) && !tutorialShownInSession && !isLoading && !!session
 
   // Step order for onboarding - numeric values to prevent going backwards
-  const STEP_ORDER = { 'pin': 1, 'child': 2, 'mission': 3, 'challenge': 4, 'invite': 5, 'done': 6 }
+  const STEP_ORDER = { 'pin': 1, 'child': 2, 'mission': 3, 'challenge': 4, 'done': 5 }
 
   // Calculate current onboarding step based on completion status
   // CRITICAL: This logic NEVER goes backwards AND never auto-advances to 'done'
@@ -110,8 +109,8 @@ export default function App() {
       return
     }
 
-    // Don't recalculate if already at invite or done - user must explicitly complete
-    if (onboardingStep === 'invite' || onboardingStep === 'done') {
+    // Don't recalculate if already at done - user must explicitly complete
+    if (onboardingStep === 'done') {
       return
     }
 
@@ -131,9 +130,6 @@ export default function App() {
           targetStep = 'mission'
           if (hasMissions && missionsConfirmed) {
             targetStep = 'challenge'
-            if (hasConfiguredChallenge) {
-              targetStep = 'invite' // MAX - never auto to 'done'
-            }
           }
         }
       }
@@ -335,7 +331,7 @@ export default function App() {
 
       {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
       {!showTutorial && !shouldShowTutorial && (
-        <div className={`pt-32 pb-8 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
+        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
           <AnimatePresence mode="wait">
             {isParentMode ? (
               family ? (
@@ -356,6 +352,7 @@ export default function App() {
                   onboardingStep={onboardingStep}
                   setOnboardingStep={handleManualStepChange}
                   preventStepRecalc={preventStepRecalc}
+                  onFinishOnboarding={finishOnboarding}
                 />
               ) : familyError ? (
                 <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">

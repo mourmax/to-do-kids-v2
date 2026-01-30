@@ -9,14 +9,13 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
         { key: 'pin', label: t('onboarding.step_pin') },
         { key: 'child', label: t('onboarding.step_child') },
         { key: 'mission', label: t('onboarding.step_mission') },
-        { key: 'challenge', label: t('onboarding.step_challenge') },
-        { key: 'invite', label: t('onboarding.step_invite') }
+        { key: 'challenge', label: t('onboarding.step_challenge') }
     ]
 
-    const currentIndex = steps.findIndex(s => s.key === currentStep)
+    const currentIndex = currentStep === 'done' ? steps.length : steps.findIndex(s => s.key === currentStep)
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 py-6">
+        <div className="w-full max-w-4xl mx-auto px-4 py-3">
             {/* Desktop View - Horizontal Stepper */}
             <div className="hidden md:flex items-center justify-between">
                 {steps.map((step, index) => {
@@ -55,10 +54,10 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
                                 {/* Label */}
                                 <span
                                     className={`text-xs font-bold uppercase tracking-wider whitespace-nowrap ${isCurrent
-                                            ? 'text-white'
-                                            : isCompleted
-                                                ? 'text-emerald-400'
-                                                : 'text-slate-500'
+                                        ? 'text-white'
+                                        : isCompleted
+                                            ? 'text-emerald-400'
+                                            : 'text-slate-500'
                                         }`}
                                 >
                                     {step.label}
@@ -128,7 +127,7 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
                 {/* Current Step Label */}
                 <div className="text-center">
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">
-                        {t('onboarding.step')} {currentIndex + 1}/{steps.length}
+                        {t('onboarding.step')} {Math.min(currentIndex + 1, steps.length)}/{steps.length}
                     </p>
                     <p className="text-white text-sm font-black uppercase tracking-wider">
                         {steps[currentIndex]?.label}

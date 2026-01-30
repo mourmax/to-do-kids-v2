@@ -125,10 +125,10 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     return m.assigned_to === activeTab || m.assigned_to === null // null = pour tous
   })
 
-  // Calcul du nombre de missions pour la cible choisie
+  // Calcul du nombre de missions pour la cible choisie (Reactive version using optimistic state)
   const getMissionCountFor = (pid) => {
-    if (!pid || pid === 'all') return (missions || []).length
-    return (missions || []).filter(m => !m.assigned_to || m.assigned_to === pid).length
+    if (!pid || pid === 'all') return (optimisticMissions || []).length
+    return (optimisticMissions || []).filter(m => !m.assigned_to || m.assigned_to === pid).length
   }
 
   const currentLevelCount = getMissionCountFor(targetId)
@@ -272,24 +272,36 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           </div>
 
           {/* Mission Counter & Limit Notice */}
-          <div className={`p-2.5 rounded-xl flex items-center justify-between gap-2 transition-all ${isLimitReached
+          {/* Mission Counter & Limit Notice - Centered & Larger */}
+          <div className={`p-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all shadow-inner ${isLimitReached
             ? 'bg-rose-500/20 border-2 border-rose-500/50 animate-pulse'
-            : 'bg-amber-500/10 border border-amber-500/20'
+            : 'bg-slate-900/60 border border-white/5 shadow-black/20'
             }`}>
-            <div className="flex items-center gap-2">
-              <Crown size={16} className={isLimitReached ? 'text-rose-400' : 'text-amber-400'} />
-              <p className={`text-[9px] font-bold uppercase tracking-tight ${isLimitReached ? 'text-rose-200' : 'text-amber-200'
-                }`}>
-                {isLimitReached ? 'Limite atteinte !' : '5 missions maximum (gratuit)'}
+            <div className={`flex items-center gap-2 ${isLimitReached ? 'text-rose-400' : 'text-slate-400'}`}>
+              <Crown size={20} className={isLimitReached ? 'text-rose-400' : 'text-slate-500'} />
+              <p className={`text-xs font-black uppercase tracking-widest ${isLimitReached ? 'text-rose-200' : 'text-slate-400'}`}>
+                {isLimitReached ? 'Limite atteinte !' : 'Quota Missions Gratuites'}
               </p>
             </div>
-            <div className={`px-3 py-1 rounded-full font-black text-xs ${isLimitReached
-              ? 'bg-rose-500 text-white'
-              : currentLevelCount >= 4
-                ? 'bg-orange-500 text-white'
-                : 'bg-slate-700 text-slate-300'
-              }`}>
-              {currentLevelCount}/5
+
+            <div className="flex flex-col items-center">
+              <div className={`text-3xl font-black tabular-nums transition-colors ${isLimitReached
+                  ? 'text-rose-500'
+                  : currentLevelCount >= 4
+                    ? 'text-orange-500'
+                    : 'text-indigo-400'
+                }`}>
+                {currentLevelCount} <span className="text-lg opacity-40">/ 5</span>
+              </div>
+              {!isLimitReached && (
+                <div className="h-1.5 w-32 bg-slate-800 rounded-full mt-2 overflow-hidden border border-white/5">
+                  <motion.div
+                    initial={false}
+                    animate={{ width: `${(currentLevelCount / 5) * 100}%` }}
+                    className={`h-full transition-colors ${currentLevelCount >= 4 ? 'bg-orange-500' : 'bg-indigo-500'}`}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

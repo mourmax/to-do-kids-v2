@@ -43,7 +43,7 @@ export default function OnboardingCompletionModal({ isOpen, onClose, inviteCode,
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
                     transition={{ type: "spring", duration: 0.5 }}
-                    className="bg-gradient-to-br from-slate-900 to-slate-800 border border-indigo-500/30 rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl shadow-indigo-500/20 relative"
+                    className="bg-gradient-to-br from-slate-900 to-slate-800 border border-indigo-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl shadow-indigo-500/20 relative"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Close button */}
