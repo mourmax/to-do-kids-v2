@@ -30,11 +30,11 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
   const targetStyle = getTargetStyle(mission.assigned_to)
 
   return (
-    <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-600 p-4 rounded-[2rem] border border-white/5 [.light-theme_&]:border-transparent flex flex-col gap-4 shadow-md [.light-theme_&]:shadow-indigo-600/20">
+    <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-600 p-3 rounded-2xl border border-white/5 [.light-theme_&]:border-transparent flex flex-col gap-3 shadow-md [.light-theme_&]:shadow-indigo-600/20">
       {isEditing ? (
         <div className="space-y-3">
-          <div className="flex items-center gap-3 relative">
-            <button onClick={() => setShowPicker(!showPicker)} className="text-2xl w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-2 relative">
+            <button onClick={() => setShowPicker(!showPicker)} className="text-xl w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
               {editState.icon}
             </button>
             <input
@@ -72,8 +72,8 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
         </div>
       ) : (
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl bg-slate-800 [.light-theme_&]:bg-black/20 w-10 h-10 flex items-center justify-center rounded-xl">{mission.icon}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xl bg-slate-800 [.light-theme_&]:bg-black/20 w-8 h-8 flex items-center justify-center rounded-lg">{mission.icon}</span>
             <div className="flex flex-col">
               <span className="text-white font-bold text-sm">{t(mission.title)}</span>
               <div className="flex items-center gap-1.5 mt-1">
@@ -214,7 +214,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           icon={Library}
         />
       )}
-      <section className="space-y-6">
+      <section className="space-y-4">
         <div className="flex items-center justify-between px-2">
           <h3 className="text-slate-500 font-black text-[10px] uppercase tracking-widest">{t('settings.missions_title')}</h3>
         </div>
@@ -241,16 +241,16 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           })}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* 🟣 ACTIONS PRINCIPALES : BIBLIOTHÈQUE & CUSTOM */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {/* Bibliothèque - Orange pulsant */}
             <button
               onClick={() => !isLimitReached && setShowLibrary(true)}
               disabled={isLimitReached}
-              className={`border-2 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group transition-all active:scale-[0.98] ${isLimitReached
-                  ? 'bg-slate-800/50 border-slate-700 cursor-not-allowed opacity-50'
-                  : 'bg-orange-500/80 border-orange-400 hover:bg-orange-500/90 shadow-xl shadow-orange-500/40 animate-heartbeat'
+              className={`border-2 py-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 group transition-all active:scale-[0.98] ${isLimitReached
+                ? 'bg-slate-800/50 border-slate-700 cursor-not-allowed opacity-50'
+                : 'bg-orange-500/80 border-orange-400 hover:bg-orange-500/90 shadow-xl shadow-orange-500/40 animate-heartbeat'
                 }`}
             >
               <Sparkles size={24} className={isLimitReached ? 'text-slate-500' : 'text-orange-400 group-hover:rotate-12 transition-transform'} />
@@ -261,9 +261,9 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
             <button
               onClick={() => !isLimitReached && setShowCustomModal(true)}
               disabled={isLimitReached}
-              className={`border-2 py-4 rounded-3xl flex flex-col items-center justify-center gap-2 group transition-all active:scale-[0.98] ${isLimitReached
-                  ? 'bg-slate-800/50 border-slate-700 cursor-not-allowed opacity-50'
-                  : 'bg-slate-900/60 border-orange-500/50 hover:bg-slate-800 hover:border-orange-500 shadow-lg'
+              className={`border-2 py-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 group transition-all active:scale-[0.98] ${isLimitReached
+                ? 'bg-slate-800/50 border-slate-700 cursor-not-allowed opacity-50'
+                : 'bg-slate-900/60 border-orange-500/50 hover:bg-slate-800 hover:border-orange-500 shadow-lg'
                 }`}
             >
               <Plus size={24} className={isLimitReached ? 'text-slate-500' : 'text-orange-400 group-hover:scale-110 transition-transform'} />
@@ -272,9 +272,9 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           </div>
 
           {/* Mission Counter & Limit Notice */}
-          <div className={`p-3 rounded-2xl flex items-center justify-between gap-3 transition-all ${isLimitReached
-              ? 'bg-rose-500/20 border-2 border-rose-500/50 animate-pulse'
-              : 'bg-amber-500/10 border border-amber-500/20'
+          <div className={`p-2.5 rounded-xl flex items-center justify-between gap-2 transition-all ${isLimitReached
+            ? 'bg-rose-500/20 border-2 border-rose-500/50 animate-pulse'
+            : 'bg-amber-500/10 border border-amber-500/20'
             }`}>
             <div className="flex items-center gap-2">
               <Crown size={16} className={isLimitReached ? 'text-rose-400' : 'text-amber-400'} />
@@ -284,10 +284,10 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
               </p>
             </div>
             <div className={`px-3 py-1 rounded-full font-black text-xs ${isLimitReached
-                ? 'bg-rose-500 text-white'
-                : currentLevelCount >= 4
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-slate-700 text-slate-300'
+              ? 'bg-rose-500 text-white'
+              : currentLevelCount >= 4
+                ? 'bg-orange-500 text-white'
+                : 'bg-slate-700 text-slate-300'
               }`}>
               {currentLevelCount}/5
             </div>
