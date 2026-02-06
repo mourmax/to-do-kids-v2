@@ -18,7 +18,7 @@ export default function ChildProgressBar({ current, total, reward }) {
   const steps = Array.from({ length: safeTotal + 1 }, (_, i) => i)
 
   return (
-    <section className="bg-slate-900 [.light-theme_&]:bg-orange-600 p-8 rounded-[3rem] border-2 border-white/5 [.light-theme_&]:border-white/10 relative shadow-2xl transition-colors">
+    <section className="bg-slate-900 [.light-theme_&]:bg-gradient-to-br [.light-theme_&]:from-orange-500 [.light-theme_&]:to-orange-600 p-8 rounded-[3rem] border-2 border-white/5 [.light-theme_&]:border-white/10 relative shadow-2xl transition-colors">
       <div className="flex justify-between items-end mb-12 relative z-10">
         <div>
           <p className="text-orange-500 [.light-theme_&]:text-orange-100 text-[10px] font-black uppercase tracking-widest mb-1">{t('child.final_goal')}</p>

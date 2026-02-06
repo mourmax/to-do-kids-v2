@@ -376,15 +376,14 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{
-                opacity: 1,
+                opacity: [0.9, 1, 0.9],
                 scale: 1,
                 y: [0, -5, 0]
               }}
               transition={{
-                duration: 3,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut"
+                opacity: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                y: { duration: 3, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" },
+                scale: { duration: 0.5 }
               }}
               className="relative inline-block"
             >
@@ -555,7 +554,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
       {/* Barre de progression */}
       {challenge && (
-        <div className="max-w-md mx-auto">
+        <div className="max-w-3xl mx-auto">
           <ProgressBar
             current={safeCurrent}
             total={safeTotal}
@@ -566,7 +565,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
       {/* Liste des missions (Masquée si challenge fini) */}
       {!isVictory && challenge?.is_active && (
-        <div id="mission-grid" className="max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 px-4">
+        <div id="mission-grid" className="max-w-3xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 px-4">
           {optimisticMissions.map((mission, index) => {
             const displayMission = validationResult === 'success'
               ? { ...mission, is_completed: false, parent_validated: false }
