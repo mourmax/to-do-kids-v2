@@ -226,7 +226,7 @@ export default function ParentDashboard({
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+    <div className="max-w-4xl lg:max-w-6xl mx-auto space-y-6 relative z-10">
       {/* Onboarding Completion Modal - Final Step */}
       {isNewUser && onboardingStep === 'done' && (
         <OnboardingCompletionModal

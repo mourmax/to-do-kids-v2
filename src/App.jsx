@@ -265,7 +265,7 @@ export default function App() {
 
       {/* HEADER FIXE */}
       <div className={`fixed top-0 left-0 right-0 z-50 bg-gradient-to-b ${isParentMode ? 'from-[#020617] via-[#020617]/90' : 'from-[#F8FAFF] via-[#F8FAFF]/90'} to-transparent transition-colors duration-500`}>
-        <div className={`p-4 mx-auto flex justify-between items-center transition-all ${isParentMode ? 'max-w-4xl lg:max-w-5xl' : 'max-w-3xl lg:max-w-6xl'}`}>
+        <div className={`p-4 mx-auto flex justify-between items-center transition-all ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
           {/* Logo/Title (Discret) */}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg overflow-hidden shadow-lg border border-white/10">
@@ -332,7 +332,7 @@ export default function App() {
 
       {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
       {!showTutorial && !shouldShowTutorial && (
-        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl lg:max-w-5xl' : 'max-w-3xl lg:max-w-6xl'}`}>
+        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
           <AnimatePresence mode="wait">
             {isParentMode ? (
               family ? (

@@ -58,7 +58,7 @@ export default function MissionLibrary({ onClose, onSelect, currentCount }) {
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
-                className="bg-slate-900 border border-white/10 w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[85vh]"
+                className="bg-slate-900 border border-white/10 w-full max-w-4xl rounded-t-[3rem] sm:rounded-[4rem] overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[90vh] sm:max-h-[80vh]"
             >
                 {/* Header */}
                 <div className="p-6 flex items-center justify-between border-b border-white/5">
@@ -86,7 +86,7 @@ export default function MissionLibrary({ onClose, onSelect, currentCount }) {
                                 {t(`library.category_${cat.category}`)}
                             </h3>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {cat.missions.map((mission) => (
                                     <button
                                         key={mission.title}
