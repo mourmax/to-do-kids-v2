@@ -6,7 +6,8 @@ import MissionCard from './MissionCard'
 import ProgressBar from './ChildProgressBar'
 import { useTranslation } from 'react-i18next'
 import confetti from 'canvas-confetti'
-import ParentVictoryModal from '../parent/ParentVictoryModal'
+import ParentVictoryModal from '../ui/ParentVictoryModal'
+import { NotificationService } from '../../services/notificationService'
 
 const getColorClasses = (colorName) => {
   const maps = {
@@ -201,6 +202,21 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
     }
   }
 
+  // 4. Initialisation des rappels de notifications
+  useEffect(() => {
+    if (missions && missions.length > 0 && NotificationService.getPermissionStatus() === 'granted') {
+      missions.forEach(m => {
+        if (m.scheduled_time && !m.is_done) {
+          NotificationService.scheduleLocalReminder(
+            t(m.title),
+            m.scheduled_time,
+            m.id
+          )
+        }
+      })
+    }
+  }, [missions, t])
+
   const handleToggleMission = async (missionId, isCompleted) => {
     // 🚀 SI BRAVO EST AFFICHÉ, ON RÉINITIALISE TOUTE LA JOURNÉE POUR RECOMMENCER
     if (validationResult) {
@@ -268,283 +284,345 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
   const isVictory = safeCurrent >= safeTotal
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className={`space-y-6 pb-20 min-h-screen transition-colors duration-500 ${profile?.preferred_theme === 'light' ? 'light-theme bg-[#F8FAFF]' : 'bg-[#020617]'}`}>
 
-      {/* 🔴 SÉLECTEUR D'ENFANT (Header) */}
-      {childProfiles.length > 1 && (
-        <div className="flex justify-center mb-8">
-          <div className="flex gap-2 p-1.5 bg-slate-900/40 border border-white/5 rounded-2xl">
-            {childProfiles.map(p => {
-              const isActive = profile?.id === p.id
-              const colors = getColorClasses(p.color) || { active: '', inactive: '' }
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => onSwitchProfile(p.id)}
-                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isActive
-                    ? `${colors.active} shadow-lg scale-105`
-                    : `${colors.inactive} hover:bg-white/5`
-                    }`}
-                >
-                  {isActive ? `${t('auth.welcome', { name: '' })} ${p.child_name}` : p.child_name}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Titre Section */}
-      <div className="text-center space-y-2 relative">
-        <h2 className="text-xl font-black text-indigo-400 italic uppercase tracking-widest">{profile?.child_name}</h2>
-        <h1 className="text-3xl font-black text-white [.light-theme_&]:text-slate-900 italic tracking-tighter uppercase transition-colors">
-          {t('dashboard.child_title')}
-        </h1>
-
-        {/* Toggle Thème pour l'enfant */}
-        <button
-          onClick={async () => {
-            const newTheme = profile?.preferred_theme === 'light' ? 'dark' : 'light'
-            const { error } = await supabase
-              .from('profiles')
-              .update({ preferred_theme: newTheme })
-              .eq('id', profile.id)
-            if (!error) refresh()
+      {/* 🎈 ÉLÉMENTS LUDIQUES DE FOND (Bubbles) */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 5, 0]
           }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-slate-900/40 [.light-theme_&]:bg-indigo-100 border border-white/5 [.light-theme_&]:border-indigo-200 rounded-xl text-slate-400 [.light-theme_&]:text-indigo-500 hover:text-white [.light-theme_&]:hover:text-indigo-700 transition-all shadow-lg shadow-black/20 [.light-theme_&]:shadow-indigo-500/10"
-          title="Changer de thème"
-        >
-          {profile?.preferred_theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-        </button>
+          transition={{ duration: 5, repeat: Infinity }}
+          className="absolute top-[10%] left-[5%] w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            y: [0, 20, 0],
+            rotate: [0, -5, 0]
+          }}
+          transition={{ duration: 7, repeat: Infinity }}
+          className="absolute bottom-[20%] right-[10%] w-48 h-48 bg-purple-500/5 rounded-full blur-3xl"
+        />
+        <div className="absolute top-[40%] left-[80%] w-24 h-24 bg-amber-500/5 rounded-full blur-2xl" />
       </div>
 
-      {/* --- 🏆 MESSAGE DE FIN (EN HAUT) --- */}
-      <AnimatePresence>
-        {allMissionsDone && !validationRequested && validationResult !== 'success' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-green-500 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(34,197,94,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-
-            <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center animate-bounce mb-2">
-                <CheckCircle size={24} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('dashboard.all_done')}</h3>
-              <p className="text-sm font-medium text-green-100">{t('dashboard.good_job')}</p>
+      <div className="relative z-10 space-y-6 px-4 pt-6">
+        {/* 🔴 SÉLECTEUR D'ENFANT (Header) */}
+        {childProfiles.length > 1 && (
+          <div className="flex justify-center mb-8">
+            <div className="flex gap-2 p-1.5 bg-slate-900/40 [.light-theme_&]:bg-white/50 border border-white/5 [.light-theme_&]:border-indigo-100 rounded-3xl shadow-xl [.light-theme_&]:shadow-indigo-500/5 backdrop-blur-sm">
+              {childProfiles.map(p => {
+                const isActive = profile?.id === p.id
+                const colors = getColorClasses(p.color) || { active: '', inactive: '' }
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => onSwitchProfile(p.id)}
+                    className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${isActive
+                      ? `${colors.active} shadow-lg scale-105`
+                      : `${colors.inactive} hover:bg-white/5`
+                      }`}
+                  >
+                    {isActive ? `${t('auth.welcome', { name: '' })} ${p.child_name}` : p.child_name}
+                  </button>
+                )
+              })}
             </div>
+          </div>
+        )}
 
-            <div className="pt-4 border-t border-white/20 relative z-10">
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-3">
-                {t('actions.next')}
-              </p>
-              <button
-                onClick={handleRequestValidation}
-                disabled={isRequesting}
-                className="w-full bg-white text-green-700 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+        {/* Titre Section */}
+        <div className="text-center space-y-1 relative">
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-lg font-black text-indigo-500/70 [.light-theme_&]:text-indigo-600/60 italic uppercase tracking-widest"
+          >
+            {profile?.child_name}
+          </motion.h2>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl font-black text-white [.light-theme_&]:text-indigo-950 italic tracking-tighter uppercase transition-colors"
+          >
+            {t('dashboard.child_title')}
+          </motion.h1>
+
+          {/* Notification Button */}
+          {NotificationService.isSupported() && NotificationService.getPermissionStatus() === 'default' && (
+            <button
+              onClick={async () => {
+                const res = await NotificationService.requestPermission()
+                if (res === 'granted') {
+                  NotificationService.sendLocalNotification("Notifications activées ! ✨", {
+                    body: "Tu recevras des rappels pour tes missions."
+                  })
+                  refresh()
+                }
+              }}
+              className="absolute right-16 top-1/2 -translate-y-1/2 p-3 bg-slate-900/40 [.light-theme_&]:bg-white border border-white/5 [.light-theme_&]:border-indigo-100 rounded-2xl text-slate-400 [.light-theme_&]:text-indigo-500 hover:text-white [.light-theme_&]:hover:text-indigo-700 transition-all shadow-lg [.light-theme_&]:shadow-indigo-500/10 backdrop-blur-sm"
+              title="Activer les notifications"
+            >
+              <Sparkles size={20} />
+            </button>
+          )}
+
+          {/* Toggle Thème pour l'enfant */}
+          <button
+            onClick={async () => {
+              const newTheme = profile?.preferred_theme === 'light' ? 'dark' : 'light'
+              const { error } = await supabase
+                .from('profiles')
+                .update({ preferred_theme: newTheme })
+                .eq('id', profile.id)
+              if (!error) refresh()
+            }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-slate-900/40 [.light-theme_&]:bg-white border border-white/5 [.light-theme_&]:border-indigo-100 rounded-2xl text-slate-400 [.light-theme_&]:text-indigo-500 hover:text-white [.light-theme_&]:hover:text-indigo-700 transition-all shadow-lg [.light-theme_&]:shadow-indigo-500/10 backdrop-blur-sm"
+            title="Changer de thème"
+          >
+            {profile?.preferred_theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+        </div>
+
+        {/* --- 🏆 MESSAGE DE FIN (EN HAUT) --- */}
+        <div className="max-w-md mx-auto">
+          <AnimatePresence>
+            {allMissionsDone && !validationRequested && validationResult !== 'success' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-green-500 text-white p-6 rounded-[2.5rem] shadow-[0_20px_40px_rgba(34,197,94,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
               >
-                <Send size={14} />
-                {isRequesting ? 'Envoi...' : t('dashboard.request_validation')}
-              </button>
-            </div>
-          </motion.div>
-        )}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
 
-        {/* ✅ SUCCÈS - JOURNÉE VALIDÉE */}
-        {validationResult === 'success' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            className="bg-emerald-500 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(16,185,129,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-            <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-bounce">
-                <CheckCircle size={24} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.congratulations')}</h3>
-              <p className="text-sm font-medium text-emerald-100">{t('dashboard.day_validated_success')}</p>
-            </div>
-          </motion.div>
-        )}
-
-        {/* 🕐 EN ATTENTE DE VALIDATION */}
-        {validationRequested && !validationResult && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-amber-500 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(245,158,11,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-            <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-pulse">
-                <Clock size={24} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.waiting')}</h3>
-              <p className="text-sm font-medium text-amber-100">{t('child.waiting_msg')}</p>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ❌ ÉCHEC / MODE PARENT NON VALIDÉ */}
-        {validationResult === 'failure' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            className="bg-red-500 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(239,68,68,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-            <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2">
-                <span className="text-2xl">😢</span>
-              </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.oh_no')}</h3>
-              <p className="text-sm font-medium text-red-100">
-                {t('child.day_not_validated')}
-              </p>
-              {challenge?.malus_message && (
-                <div className="bg-white/10 p-3 rounded-xl w-full mt-2">
-                  <p className="text-[10px] font-black uppercase opacity-70">{t('child.malus_pay')}</p>
-                  <p className="font-bold italic">"{challenge.malus_message}"</p>
+                <div className="flex flex-col items-center gap-1 relative z-10">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center animate-bounce mb-2">
+                    <CheckCircle size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-3xl font-black uppercase italic tracking-tight">{t('dashboard.all_done')}</h3>
+                  <p className="text-sm font-medium text-green-100 opacity-90">{t('dashboard.good_job')}</p>
                 </div>
-              )}
-            </div>
 
-            <div className="pt-4 border-t border-white/20 relative z-10">
-              <button
-                onClick={async () => {
-                  // Reset local
-                  setValidationResult(null)
-                  setValidationRequested(false)
-                  // Reset DB (acknowledge)
-                  const today = new Date().toISOString().split('T')[0]
-                  await supabase.from('daily_logs')
-                    .update({
-                      validation_requested: false,
-                      validation_result: null,
-                      child_validated: false,
-                      parent_validated: false
-                    })
-                    .eq('profile_id', profile.id)
-                    .eq('date', today)
+                <div className="pt-4 border-t border-white/20 relative z-10">
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-3">
+                    {t('actions.next')}
+                  </p>
+                  <button
+                    onClick={handleRequestValidation}
+                    disabled={isRequesting}
+                    className="w-full bg-white text-green-700 py-4 rounded-[1.5rem] font-black uppercase text-[12px] tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Send size={16} />
+                    {isRequesting ? 'Envoi...' : t('dashboard.request_validation')}
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
-                  await refresh(true)
-                }}
-                className="w-full bg-white text-red-600 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+            {/* ✅ SUCCÈS - JOURNÉE VALIDÉE */}
+            {validationResult === 'success' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                className="bg-emerald-500 text-white p-6 rounded-[2.5rem] shadow-[0_20px_40px_rgba(16,185,129,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
               >
-                {t('actions.i_understand')}
-              </button>
-            </div>
-          </motion.div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                <div className="flex flex-col items-center gap-1 relative z-10">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-bounce">
+                    <CheckCircle size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-3xl font-black uppercase italic tracking-tight">{t('child.congratulations')}</h3>
+                  <p className="text-sm font-medium text-emerald-100">{t('dashboard.day_validated_success')}</p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 🕐 EN ATTENTE DE VALIDATION */}
+            {validationRequested && !validationResult && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-amber-500 text-white p-6 rounded-[2.5rem] shadow-[0_20px_40px_rgba(245,158,11,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                <div className="flex flex-col items-center gap-1 relative z-10">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-pulse">
+                    <Clock size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-3xl font-black uppercase italic tracking-tight">{t('child.waiting')}</h3>
+                  <p className="text-sm font-medium text-amber-100">{t('child.waiting_msg')}</p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ❌ ÉCHEC / MODE PARENT NON VALIDÉ */}
+            {validationResult === 'failure' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                className="bg-red-500 text-white p-6 rounded-[2.5rem] shadow-[0_20px_40px_rgba(239,68,68,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                <div className="flex flex-col items-center gap-1 relative z-10">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-2">
+                    <span className="text-3xl">😢</span>
+                  </div>
+                  <h3 className="text-3xl font-black uppercase italic tracking-tight">{t('child.oh_no')}</h3>
+                  <div className="bg-white/10 p-4 rounded-2xl w-full mt-2 space-y-2">
+                    <p className="text-sm font-medium text-red-100">
+                      {t('child.day_not_validated')}
+                    </p>
+                    {challenge?.malus_message && (
+                      <div className="pt-2 border-t border-white/10">
+                        <p className="text-[10px] font-black uppercase opacity-70 tracking-widest">{t('child.malus_pay')}</p>
+                        <p className="font-bold italic text-white">"{challenge.malus_message}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/20 relative z-10">
+                  <button
+                    onClick={async () => {
+                      setValidationResult(null)
+                      setValidationRequested(false)
+                      const today = new Date().toISOString().split('T')[0]
+                      await supabase.from('daily_logs')
+                        .update({
+                          validation_requested: false,
+                          validation_result: null,
+                          child_validated: false,
+                          parent_validated: false
+                        })
+                        .eq('profile_id', profile.id)
+                        .eq('date', today)
+                      await refresh(true)
+                    }}
+                    className="w-full bg-white text-red-600 py-4 rounded-[1.5rem] font-black uppercase text-[12px] tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    {t('actions.i_understand')}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Barre de progression */}
+        {challenge && (
+          <div className="max-w-md mx-auto">
+            <ProgressBar
+              current={safeCurrent}
+              total={safeTotal}
+              reward={challenge.reward_name || "Surprise"}
+            />
+          </div>
         )}
-      </AnimatePresence>
 
-      {/* Barre de progression */}
-      {challenge && (
-        <ProgressBar
-          current={safeCurrent}
-          total={safeTotal}
-          reward={challenge.reward_name || "Surprise"}
-        />
-      )}
+        {/* Liste des missions (Masquée si challenge fini) */}
+        {!isVictory && challenge?.is_active && (
+          <div className="max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {optimisticMissions.map((mission, index) => {
+              const displayMission = validationResult === 'success'
+                ? { ...mission, is_completed: false, parent_validated: false }
+                : mission
 
-      {/* Liste des missions (Masquée si challenge fini) */}
-      {!isVictory && challenge?.is_active && (
-        <div className="grid grid-cols-2 gap-4">
-          {optimisticMissions.map((mission, index) => {
-            // 🚀 VISUEL "A FAIRE" SI VALIDÉ (pour pouvoir recommencer)
-            const displayMission = validationResult === 'success'
-              ? { ...mission, is_completed: false, parent_validated: false }
-              : mission
+              return (
+                <MissionCard
+                  key={mission.id}
+                  mission={displayMission}
+                  index={index}
+                  onToggle={handleToggleMission}
+                />
+              )
+            })}
 
-            return (
-              <MissionCard
-                key={mission.id}
-                mission={displayMission}
-                index={index}
-                onToggle={handleToggleMission}
-              />
-            )
-          })}
+            {optimisticMissions.length === 0 && (
+              <div className="col-span-full py-20 text-center">
+                <div className="bg-slate-900/40 [.light-theme_&]:bg-white/50 border-2 border-dashed border-white/5 [.light-theme_&]:border-indigo-100 rounded-[2.5rem] p-8">
+                  <p className="text-slate-500 [.light-theme_&]:text-indigo-400 text-xs font-black uppercase tracking-widest">
+                    {t('dashboard.missions_empty')}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-          {optimisticMissions.length === 0 && (
-            <div className="col-span-2 text-slate-500 text-center text-xs font-bold uppercase py-10">
-              {t('dashboard.missions_empty')}
+        <AnimatePresence>
+          {showVictoryModal && (
+            <ParentVictoryModal
+              childName={profile?.child_name || 'Enfant'}
+              rewardName={challenge?.reward_name}
+              isParent={false}
+              isReady={challenge && Number(challenge.current_streak) === 0}
+              onClose={async () => {
+                if (challenge && Number(challenge.current_streak) === 0) {
+                  setShowVictoryModal(false)
+                  setHasSeenVictory(false)
+                } else {
+                  setHasSeenVictory(true)
+                  setShowVictoryModal(false)
+                }
+                refresh()
+              }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* --- 🚀 ÉCRAN "Nouveau Challenge" SI LE PARENT A RE-VALIDÉ --- */}
+        <AnimatePresence>
+          {challenge && challenge.is_active && Number(challenge.current_streak) === 0 && !allMissionsDone && !validationRequested && (
+            <div className="max-w-md mx-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-indigo-600 text-white p-6 rounded-[2.5rem] shadow-[0_20px_40px_rgba(79,70,229,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                <div className="flex flex-col items-center gap-1 relative z-10">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-bounce">
+                    <Trophy size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-3xl font-black uppercase italic tracking-tight">{t('child.lets_go')}</h3>
+                  <p className="text-sm font-medium text-indigo-100">{t('child.challenge_ready')}</p>
+                  <button
+                    onClick={async () => {
+                      refresh(true)
+                    }}
+                    className="mt-4 w-full bg-white text-indigo-600 py-4 rounded-[1.5rem] font-black uppercase text-[12px] tracking-widest shadow-xl active:scale-95 transition-all"
+                  >
+                    {t('child.start_challenge')} {profile?.child_name}
+                  </button>
+                </div>
+              </motion.div>
             </div>
           )}
-        </div>
-      )}
 
-      <AnimatePresence>
-        {showVictoryModal && (
-          <ParentVictoryModal
-            childName={profile?.child_name || 'Enfant'}
-            rewardName={challenge?.reward_name}
-            isParent={false}
-            isReady={challenge && Number(challenge.current_streak) === 0}
-            onClose={async () => {
-              if (challenge && Number(challenge.current_streak) === 0) {
-                // Si le parent a déjà configuré, on ferme juste
-                setShowVictoryModal(false)
-                setHasSeenVictory(false)
-              } else {
-                // Sinon on marque comme vu pour éviter le loop
-                setHasSeenVictory(true)
-                setShowVictoryModal(false)
-              }
-              refresh()
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* --- 🚀 ÉCRAN "Nouveau Challenge" SI LE PARENT A RE-VALIDÉ --- */}
-      <AnimatePresence>
-        {challenge && challenge.is_active && Number(challenge.current_streak) === 0 && !allMissionsDone && !validationRequested && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-indigo-600 text-white p-6 rounded-3xl shadow-[0_0_40px_rgba(79,70,229,0.3)] text-center space-y-4 border border-white/20 relative overflow-hidden mb-6"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-            <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-2 animate-bounce">
-                <Trophy size={24} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-black uppercase italic tracking-tight">{t('child.lets_go')}</h3>
-              <p className="text-sm font-medium text-indigo-100">{t('child.challenge_ready')}</p>
-              <button
-                onClick={async () => {
-                  // Optionnel: On peut marquer un début officiel ici si besoin
-                  refresh(true)
-                }}
-                className="mt-4 w-full bg-white text-indigo-600 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl active:scale-95 transition-all"
+          {/* --- 🕐 MESSAGE PENDING CONFIG SI CHALLENGE FINI MAIS PAS ENCORE RE-CONFIGURÉ --- */}
+          {challenge && !challenge.is_active && (
+            <div className="max-w-md mx-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-slate-800 [.light-theme_&]:bg-white border border-white/10 [.light-theme_&]:border-indigo-100 p-6 rounded-[2.5rem] shadow-xl [.light-theme_&]:shadow-indigo-500/10 text-center space-y-4 relative overflow-hidden"
               >
-                {t('child.start_challenge')} {profile?.child_name}
-              </button>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-14 h-14 bg-white/5 [.light-theme_&]:bg-indigo-50 rounded-full flex items-center justify-center mb-2">
+                    <Clock size={28} className="text-slate-400 [.light-theme_&]:text-indigo-400 animate-pulse" />
+                  </div>
+                  <p className="text-sm font-black uppercase text-slate-300 [.light-theme_&]:text-indigo-950 tracking-widest opacity-80">
+                    {t('child.waiting_parent_config')}
+                  </p>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
-        )}
-
-        {/* --- 🕐 MESSAGE PENDING CONFIG SI CHALLENGE FINI MAIS PAS ENCORE RE-CONFIGURÉ --- */}
-        {challenge && !challenge.is_active && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 text-white p-6 rounded-3xl shadow-xl text-center space-y-4 border border-white/10 relative overflow-hidden mb-6"
-          >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-2">
-                <Clock size={24} className="text-slate-400 animate-pulse" />
-              </div>
-              <p className="text-sm font-medium text-slate-300">{t('child.waiting_parent_config')}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </div>
 
     </div>
   )

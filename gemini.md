@@ -46,7 +46,8 @@
 4. **Deterministic Logic**: Favor deterministic states over probabilistic AI guesses for mission status.
 5. **Context Lifecycle**: Purge execution logs and summarize `progress.md` every 5 major tasks to avoid context fatigue.
 6. **Agile Guardrail**: Skip heavy planning documentation for minor UI/CSS fixes to avoid Planning Paralysis.
-7. **Data Versioning**: Any breaking change to schemas in this file must increment the minor version and maintain a migration SOP in `architecture/`.
+8. **Child-Centric UI**: The child dashboard must use a "Ludic Light Theme" (vibrant colors, light backgrounds, soft shadows) to differentiate it from the Parent "Glassmorphism" theme.
+9. **PWA Notifications**: Favor Web Push API for scheduled task reminders. Research server-side triggers for reliability.
 
 ---
 
@@ -58,5 +59,6 @@
 
 ## 📝 Maintenance Log
 - **2026-02-06**: Initialized B.L.A.S.T. Protocol.
-- **2026-02-06**: Integrated Vigilance Points v1.1 (Context, Paralysis, Versioning, Fallbacks).
+- **2026-02-06**: Integrated Vigilance Points v1.1.
 - **2026-02-06**: Fixed settings input reset bug and mission renewal UI.
+- **2026-02-06**: Defined Phase 2 Vision (Distinct Child UI + PWA Notifications).

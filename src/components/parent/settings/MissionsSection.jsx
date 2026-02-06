@@ -45,6 +45,16 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
             />
           </div>
 
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappel :</span>
+            <input
+              type="time"
+              value={editState.scheduled_time || ''}
+              onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
+              className="bg-slate-800 border border-indigo-500/30 rounded-lg px-2 py-1 text-xs font-bold text-indigo-400 outline-none"
+            />
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <button
@@ -80,6 +90,11 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
                 <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${targetStyle}`}>
                   {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : t('common.all')}
                 </span>
+                {mission.scheduled_time && (
+                  <span className="text-[8px] font-black text-indigo-400/80 bg-indigo-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Timer size={10} /> {mission.scheduled_time}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -100,6 +115,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   const [activeTab, setActiveTab] = useState('all') // Onglet de FILTRE d'affichage
   const [newMissionTitle, setNewMissionTitle] = useState('')
   const [selectedIcon, setSelectedIcon] = useState('✨')
+  const [newScheduledTime, setNewScheduledTime] = useState('')
   const [targetId, setTargetId] = useState(null) // Qui va avoir la NOUVELLE mission
   const [showPickerForAdd, setShowPickerForAdd] = useState(false)
   const [showLibrary, setShowLibrary] = useState(false)
@@ -110,7 +126,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   const [optimisticMissions, setOptimisticMissions] = useState(missions)
   useEffect(() => { setOptimisticMissions(missions) }, [missions])
 
-  const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null })
+  const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null, scheduled_time: '' })
   const [showPickerForEdit, setShowPickerForEdit] = useState(false)
 
   // On synchronise le targetId par défaut quand on change d'onglet
@@ -146,13 +162,14 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
       title: title,
       icon: icon,
       assigned_to: targetId,
+      scheduled_time: newScheduledTime || null,
       order_index: (missions || []).length
     }])
     if (error) {
       console.error("Error adding mission:", error)
       onShowSuccess("Erreur lors de l'ajout")
     } else {
-      setNewMissionTitle(''); setSelectedIcon('✨'); setShowPickerForAdd(false); setShowLibrary(false); setShowCustomModal(false);
+      setNewMissionTitle(''); setSelectedIcon('✨'); setNewScheduledTime(''); setShowPickerForAdd(false); setShowLibrary(false); setShowCustomModal(false);
       onShowSuccess(t('actions.add_success'));
       if (preventStepRecalc) preventStepRecalc();
       refresh(true);
@@ -180,7 +197,8 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
     const { error } = await supabase.from('missions').update({
       title: editState.title,
       icon: editState.icon,
-      assigned_to: editState.assigned_to
+      assigned_to: editState.assigned_to,
+      scheduled_time: editState.scheduled_time || null
     }).eq('id', id)
     if (!error) {
       setEditingId(null); setShowPickerForEdit(false);
@@ -286,10 +304,10 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
 
             <div className="flex flex-col items-center">
               <div className={`text-3xl font-black tabular-nums transition-colors ${isLimitReached
-                  ? 'text-rose-500'
-                  : currentLevelCount >= 4
-                    ? 'text-orange-500'
-                    : 'text-indigo-400'
+                ? 'text-rose-500'
+                : currentLevelCount >= 4
+                  ? 'text-orange-500'
+                  : 'text-indigo-400'
                 }`}>
                 {currentLevelCount} <span className="text-lg opacity-40">/ 5</span>
               </div>
@@ -346,6 +364,16 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                         placeholder={t('actions.add_placeholder')}
                         className="flex-1 bg-slate-950 border border-white/10 rounded-2xl px-5 py-3 outline-none font-bold focus:border-indigo-500 transition-colors text-white text-sm"
                         autoFocus
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Heure de rappel (Optionnel) :</span>
+                      <input
+                        type="time"
+                        value={newScheduledTime}
+                        onChange={(e) => setNewScheduledTime(e.target.value)}
+                        className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3 outline-none font-bold focus:border-indigo-500 transition-colors text-indigo-400 text-sm"
                       />
                     </div>
 
@@ -422,7 +450,12 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                   setEditState={setEditState}
                   onEditStart={(mission) => {
                     setEditingId(mission.id)
-                    setEditState({ title: mission.title, icon: mission.icon, assigned_to: mission.assigned_to })
+                    setEditState({
+                      title: mission.title,
+                      icon: mission.icon,
+                      assigned_to: mission.assigned_to,
+                      scheduled_time: mission.scheduled_time || ''
+                    })
                     setShowPickerForEdit(false)
                   }}
                   onEditSave={saveMissionEdit}

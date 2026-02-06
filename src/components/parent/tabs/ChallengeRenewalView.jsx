@@ -17,7 +17,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
 
     // States pour l'édition inline
     const [editingId, setEditingId] = useState(null)
-    const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null })
+    const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null, scheduled_time: '' })
     const [showPickerForEdit, setShowPickerForEdit] = useState(false)
 
     // States pour l'ajout inline
@@ -26,6 +26,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
     const [newTitle, setNewTitle] = useState('')
     const [newIcon, setNewIcon] = useState('✨')
     const [newTargetId, setNewTargetId] = useState(null)
+    const [newScheduledTime, setNewScheduledTime] = useState('')
     const [showPickerForAdd, setShowPickerForAdd] = useState(false)
 
     const missionsCount = missions?.length || 0
@@ -56,7 +57,8 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
         setEditState({
             title: mission.title,
             icon: mission.icon,
-            assigned_to: mission.assigned_to
+            assigned_to: mission.assigned_to,
+            scheduled_time: mission.scheduled_time || ''
         })
         setShowPickerForEdit(false)
     }
@@ -65,7 +67,8 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
         const { error } = await supabase.from('missions').update({
             title: editState.title,
             icon: editState.icon,
-            assigned_to: editState.assigned_to
+            assigned_to: editState.assigned_to,
+            scheduled_time: editState.scheduled_time || null
         }).eq('id', id)
 
         if (!error) {
@@ -79,7 +82,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
         if (!error) refresh(true)
     }
 
-    const addMission = async (title = newTitle, icon = newIcon, targetId = newTargetId) => {
+    const addMission = async (title = newTitle, icon = newIcon, targetId = newTargetId, time = newScheduledTime) => {
         if (!title.trim() || isLimitReached) return
 
         const { error } = await supabase.from('missions').insert([{
@@ -87,6 +90,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
             title: title,
             icon: icon,
             assigned_to: targetId,
+            scheduled_time: time || null,
             order_index: missionsCount
         }])
 
@@ -94,6 +98,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
             setNewTitle('')
             setNewIcon('✨')
             setNewTargetId(null)
+            setNewScheduledTime('')
             setShowQuickAdd(false)
             setShowLibrary(false)
             refresh(true)
@@ -205,6 +210,13 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                 placeholder="Nom de la mission..."
                                                 className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 text-[10px] font-bold text-white focus:border-emerald-500 outline-none"
                                             />
+                                            <input
+                                                type="time"
+                                                value={newScheduledTime}
+                                                onChange={(e) => setNewScheduledTime(e.target.value)}
+                                                className="w-20 bg-slate-900 border border-white/10 rounded-xl px-2 text-[10px] font-bold text-indigo-400 outline-none"
+                                                title="Heure de rappel"
+                                            />
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
@@ -253,6 +265,12 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                             {p.child_name}
                                                         </button>
                                                     ))}
+                                                    <input
+                                                        type="time"
+                                                        value={editState.scheduled_time}
+                                                        onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
+                                                        className="ml-2 w-16 bg-slate-900 border border-indigo-500/30 rounded-lg px-1 text-[8px] font-bold text-indigo-400 outline-none"
+                                                    />
                                                 </div>
                                                 <div className="flex gap-1">
                                                     <button onClick={() => saveEdit(mission.id)} className="p-1 text-emerald-400"><Check size={16} /></button>
@@ -266,9 +284,16 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                             <span className="text-sm shrink-0 bg-slate-950 w-7 h-7 flex items-center justify-center rounded-lg">{mission.icon}</span>
                                             <div className="flex-1 min-w-0">
                                                 <span className="block text-[10px] font-bold text-slate-300 truncate lowercase first-letter:uppercase">{mission.title}</span>
-                                                <span className="text-[7px] font-black uppercase text-slate-500 tracking-widest italic">
-                                                    {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : 'Tous'}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[7px] font-black uppercase text-slate-500 tracking-widest italic">
+                                                        {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : 'Tous'}
+                                                    </span>
+                                                    {mission.scheduled_time && (
+                                                        <span className="text-[7px] font-black text-indigo-400/80 bg-indigo-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                                            <Timer size={8} /> {mission.scheduled_time}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => startEditing(mission)} className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
