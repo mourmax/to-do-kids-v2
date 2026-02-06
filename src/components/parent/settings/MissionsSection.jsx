@@ -105,8 +105,20 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
               ))}
             </div>
             <div className="flex gap-1">
-              <button onClick={() => onEditSave(mission.id)} className="p-2 text-emerald-400 hover:bg-emerald-400/10 rounded-xl"><Check size={24} /></button>
-              <button onClick={onEditCancel} className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl"><X size={24} /></button>
+              <button
+                type="button"
+                onClick={() => onEditSave(mission.id)}
+                className="p-2 text-emerald-400 hover:bg-emerald-400/10 rounded-xl"
+              >
+                <Check size={24} />
+              </button>
+              <button
+                type="button"
+                onClick={onEditCancel}
+                className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl"
+              >
+                <X size={24} />
+              </button>
             </div>
           </div>
 
@@ -197,7 +209,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   const currentLevelCount = getMissionCountFor(targetId)
   const isLimitReached = currentLevelCount >= 5
 
-  const addMission = async (title = newMissionTitle, icon = selectedIcon) => {
+  const addMission = async (title = newMissionTitle, icon = selectedIcon, times = newScheduledTimes) => {
     if (!title.trim()) return
     if (isLimitReached) {
       onShowSuccess(t('errors.mission_limit_reached'))
@@ -209,12 +221,12 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
       title: title,
       icon: icon,
       assigned_to: targetId,
-      scheduled_times: newScheduledTimes || [],
+      scheduled_times: times || [],
       order_index: (missions || []).length
     }])
     if (error) {
       console.error("Error adding mission:", error)
-      onShowSuccess("Erreur lors de l'ajout")
+      onShowSuccess(`Erreur: ${error.message || "Impossible d'ajouter"}`)
     } else {
       setNewMissionTitle(''); setSelectedIcon('✨'); setNewScheduledTimes([]); setShowPickerForAdd(false); setShowLibrary(false); setShowCustomModal(false);
       onShowSuccess(t('actions.add_success'));
@@ -247,7 +259,11 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
       assigned_to: editState.assigned_to,
       scheduled_times: editState.scheduled_times || []
     }).eq('id', id)
-    if (!error) {
+
+    if (error) {
+      console.error("Error updating mission:", error)
+      onShowSuccess(`Erreur: ${error.message || "Impossible de sauvegarder"}`)
+    } else {
       setEditingId(null); setShowPickerForEdit(false);
       onShowSuccess("Mission modifiée !");
       if (preventStepRecalc) preventStepRecalc();
@@ -414,16 +430,33 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Heure de rappel (Optionnel) :</span>
-                      <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-2xl px-4 py-3">
-                        <TimerIcon size={18} className="text-indigo-400" />
-                        <input
-                          type="time"
-                          value={newScheduledTime}
-                          onChange={(e) => setNewScheduledTime(e.target.value)}
-                          className="flex-1 bg-transparent font-bold text-indigo-400 outline-none [color-scheme:dark]"
-                        />
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappels :</span>
+                        <button
+                          type="button"
+                          onClick={() => setShowTimePickerForAdd(true)}
+                          className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl transition-all flex items-center gap-2 group"
+                        >
+                          <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+                          <span className="text-[10px] font-black uppercase tracking-tight">Ajouter</span>
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {newScheduledTimes.map((t, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-slate-950 border border-indigo-500/30 rounded-xl px-3 py-2">
+                            <TimerIcon size={14} className="text-indigo-400" />
+                            <span className="text-xs font-black text-indigo-400">{t}</span>
+                            <button
+                              type="button"
+                              onClick={() => setNewScheduledTimes(prev => prev.filter((_, i) => i !== idx))}
+                              className="p-1 hover:text-red-400 text-slate-600"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -431,6 +464,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                       <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Affecter à :</span>
                       <div className="flex gap-2">
                         <button
+                          type="button"
                           onClick={() => setTargetId(null)}
                           className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all border ${!targetId ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-slate-950 border-white/5 text-slate-600'}`}
                         >
@@ -439,6 +473,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                         {childProfiles.map(p => (
                           <button
                             key={p.id}
+                            type="button"
                             onClick={() => setTargetId(p.id)}
                             className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all border ${targetId === p.id ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-slate-950 border-white/5 text-slate-600'}`}
                           >
@@ -450,34 +485,26 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
 
                     <AnimatePresence>{showPickerForAdd && <IconPicker onSelect={(icon) => { setSelectedIcon(icon); setShowPickerForAdd(false); }} />}</AnimatePresence>
 
-                    {isLimitReached && (
-                      <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-center gap-3">
-                        <Crown size={20} className="text-amber-400" />
-                        <p className="text-[10px] text-amber-200 font-bold uppercase tracking-tight leading-relaxed">
-                          {targetId === null
-                            ? "Limite de 5 missions collectives atteinte."
-                            : `Limite de 5 missions pour ${childProfiles.find(p => p.id === targetId)?.child_name} atteinte.`}
-                        </p>
-                      </div>
-                    )}
+                    <AnimatePresence>
+                      {showTimePickerForAdd && (
+                        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                          <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setShowTimePickerForAdd(false)}
+                            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+                          />
+                          <TimePicker onClose={() => setShowTimePickerForAdd(false)} onChange={(time) => setNewScheduledTimes(prev => [...prev, time].sort())} />
+                        </div>
+                      )}
+                    </AnimatePresence>
 
-                    <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 p-6 rounded-2xl flex flex-col items-center gap-4 text-center">
-                      <Crown size={32} className="text-indigo-400" />
-                      <div>
-                        <p className="text-sm font-black text-white uppercase tracking-wide mb-2">
-                          Fonctionnalité Premium Uniquement
-                        </p>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          Créez des missions personnalisées illimitées avec la version Premium
-                        </p>
-                      </div>
-                      <button
-                        disabled
-                        className="w-full py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] bg-slate-700 text-slate-500 cursor-not-allowed"
-                      >
-                        Valider la mission
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => addMission()}
+                      className="w-full py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/20 transition-all active:scale-95"
+                    >
+                      Valider la mission
+                    </button>
                   </div>
                 </motion.div>
               </div>
@@ -547,6 +574,6 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           )}
         </div >
       </section >
-    </div>
+    </div >
   )
 }
