@@ -13,7 +13,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       layout
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className={`relative overflow-hidden p-5 aspect-square rounded-[3rem] border-2 transition-all duration-700 flex flex-col items-center justify-between shadow-xl ${isParentValidated
+      className={`relative overflow-hidden p-6 sm:p-8 aspect-square sm:aspect-[4/5] max-w-[320px] mx-auto w-full rounded-[3rem] border-2 transition-all duration-700 flex flex-col items-center justify-between shadow-xl ${isParentValidated
         ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_15px_30px_rgba(251,191,36,0.3)]'
         : isDone
           ? 'bg-emerald-500 border-emerald-400 shadow-[0_15px_30px_rgba(16,185,129,0.2)]'
@@ -45,11 +45,11 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       <div className={`flex flex-col items-center gap-2 mt-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''}`}>
         <motion.span
           animate={isDone ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-          className={`text-7xl mb-1 transition-all drop-shadow-sm flex items-center justify-center h-20 w-20 ${isDone ? 'drop-shadow-md' : ''}`}
+          className={`text-6xl sm:text-8xl mb-1 transition-all drop-shadow-sm flex items-center justify-center h-20 sm:h-28 w-20 sm:w-28 ${isDone ? 'drop-shadow-md' : ''}`}
         >
           {mission.icon || '⭐'}
         </motion.span>
-        <h3 className={`font-black uppercase text-[13px] tracking-tight leading-tight px-1 ${isParentValidated ? 'text-white' : 'text-slate-200 [.light-theme_&]:text-indigo-950'}`}>
+        <h3 className={`font-black uppercase text-[12px] sm:text-base tracking-tight leading-tight px-1 ${isParentValidated ? 'text-white' : 'text-slate-200 [.light-theme_&]:text-indigo-950'}`}>
           {t(mission.title)}
         </h3>
 
@@ -65,7 +65,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       {!isParentValidated ? (
         <button
           onClick={() => !disabled && onToggle(mission.id, isDone)}
-          className={`w-full py-3.5 rounded-[1.8rem] font-black uppercase text-[9px] tracking-[0.15em] transition-all z-30 shadow-lg ${isDone
+          className={`w-full py-4 sm:py-5 rounded-[1.8rem] sm:rounded-[2.2rem] font-black uppercase text-[9px] sm:text-[11px] tracking-[0.15em] transition-all z-30 shadow-lg ${isDone
             ? 'bg-white/20 text-white border border-white/30 hover:bg-white/40'
             : 'bg-indigo-600 text-white border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1 [.light-theme_&]:bg-indigo-500 [.light-theme_&]:text-white [.light-theme_&]:border-indigo-700 [.light-theme_&]:shadow-indigo-500/20'
             }`}
@@ -80,7 +80,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="w-full py-3.5 rounded-[1.8rem] bg-white text-orange-600 font-black uppercase text-[9px] tracking-widest text-center shadow-inner"
+          className="w-full py-4 sm:py-5 rounded-[1.8rem] sm:rounded-[2.2rem] bg-white text-orange-600 font-black uppercase text-[9px] sm:text-[11px] tracking-widest text-center shadow-inner"
         >
           {t('child.victory_title').toUpperCase()}
         </motion.div>

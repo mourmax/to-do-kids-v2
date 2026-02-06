@@ -530,7 +530,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
       {/* Liste des missions (Masquée si challenge fini) */}
       {!isVictory && challenge?.is_active && (
-        <div id="mission-grid" className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-4">
+        <div id="mission-grid" className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 px-4 pb-12">
           {optimisticMissions.map((mission, index) => {
             const displayMission = validationResult === 'success'
               ? { ...mission, is_completed: false, parent_validated: false }
