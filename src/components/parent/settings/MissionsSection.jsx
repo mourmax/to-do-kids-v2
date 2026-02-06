@@ -32,6 +32,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
   const [showTimePicker, setShowTimePicker] = useState(false)
 
   const addTime = (time) => {
+    if ((editState.scheduled_times || []).length >= 2) return
     const times = [...(editState.scheduled_times || []), time].sort()
     setEditState({ ...editState, scheduled_times: times })
   }
@@ -60,14 +61,16 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappels :</span>
-              <button
-                onClick={() => setShowTimePicker(true)}
-                className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl transition-all flex items-center gap-2 group"
-              >
-                <Plus size={14} className="group-hover:rotate-90 transition-transform" />
-                <span className="text-[10px] font-black uppercase tracking-tight">Ajouter</span>
-              </button>
+              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappels (max 2) :</span>
+              {(editState.scheduled_times || []).length < 2 && (
+                <button
+                  onClick={() => setShowTimePicker(true)}
+                  className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl transition-all flex items-center gap-2 group"
+                >
+                  <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+                  <span className="text-[10px] font-black uppercase tracking-tight">Ajouter</span>
+                </button>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -432,15 +435,17 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
 
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappels :</span>
-                        <button
-                          type="button"
-                          onClick={() => setShowTimePickerForAdd(true)}
-                          className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl transition-all flex items-center gap-2 group"
-                        >
-                          <Plus size={14} className="group-hover:rotate-90 transition-transform" />
-                          <span className="text-[10px] font-black uppercase tracking-tight">Ajouter</span>
-                        </button>
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappels (max 2) :</span>
+                        {newScheduledTimes.length < 2 && (
+                          <button
+                            type="button"
+                            onClick={() => setShowTimePickerForAdd(true)}
+                            className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl transition-all flex items-center gap-2 group"
+                          >
+                            <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-tight">Ajouter</span>
+                          </button>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap gap-2">
@@ -493,7 +498,11 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                             onClick={() => setShowTimePickerForAdd(false)}
                             className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
                           />
-                          <TimePicker onClose={() => setShowTimePickerForAdd(false)} onChange={(time) => setNewScheduledTimes(prev => [...prev, time].sort())} />
+                          <TimePicker onClose={() => setShowTimePickerForAdd(false)} onChange={(time) => {
+                            if (newScheduledTimes.length < 2) {
+                              setNewScheduledTimes(prev => [...prev, time].sort())
+                            }
+                          }} />
                         </div>
                       )}
                     </AnimatePresence>

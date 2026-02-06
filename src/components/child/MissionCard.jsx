@@ -41,12 +41,12 @@ export default function MissionCard({ mission, onToggle, disabled }) {
           </motion.div>
         )}
 
-        {/* 🔔 Rappels déplacés en haut */}
+        {/* 🔔 Rappels déplacés en haut (Côte à côte) */}
         {!isParentValidated && (mission.scheduled_times || []).length > 0 && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="absolute top-4 left-4 z-40 flex flex-col gap-1"
+            className="absolute top-4 left-4 right-4 z-40 flex flex-row flex-wrap gap-2"
           >
             {(mission.scheduled_times || []).map((t, idx) => (
               <div key={idx} className="flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 [.light-theme_&]:bg-indigo-50 text-indigo-500 [.light-theme_&]:text-indigo-600 rounded-full text-[10px] font-black border border-indigo-500/5 backdrop-blur-sm shadow-sm">
@@ -57,7 +57,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
         )}
       </AnimatePresence>
 
-      <div className={`flex flex-col items-center gap-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''} ${(!isParentValidated && mission.scheduled_times?.length > 0) ? (mission.scheduled_times.length > 1 ? 'mt-24' : 'mt-16') : 'mt-6'}`}>
+      <div className={`flex flex-col items-center gap-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''} ${(!isParentValidated && mission.scheduled_times?.length > 0) ? 'mt-16' : 'mt-6'}`}>
         <motion.span
           animate={isDone ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
           className={`text-6xl sm:text-7xl mb-1 transition-all drop-shadow-sm flex items-center justify-center h-20 sm:h-24 w-20 sm:w-24 ${isDone ? 'drop-shadow-md' : ''}`}
