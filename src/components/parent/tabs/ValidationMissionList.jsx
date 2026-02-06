@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle, Timer as TimerIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 export default function ValidationMissionList({ missions, onValidate }) {
@@ -15,9 +15,14 @@ export default function ValidationMissionList({ missions, onValidate }) {
                 <span className="text-2xl bg-slate-800 [.light-theme_&]:bg-white/20 [.light-theme_&]:text-white w-12 h-12 flex items-center justify-center rounded-2xl transition-colors">{m.icon}</span>
                 <div>
                   <span className="text-white font-bold text-sm block transition-colors">{t(m.title)}</span>
-                  <div className="flex gap-2 mt-1">
+                  <div className="flex flex-wrap gap-2 mt-1">
                     <span className={`text-[8px] font-black uppercase ${m.is_completed ? 'text-emerald-400 [.light-theme_&]:text-emerald-300' : 'text-slate-600 [.light-theme_&]:text-indigo-200'}`}>{m.is_completed ? `● ${t('validation.child_ok')}` : `○ ${t('validation.child_waiting')}`}</span>
                     {isWaitingForParent && <span className="text-[8px] font-black uppercase text-indigo-400 [.light-theme_&]:text-white animate-pulse">| {t('validation.to_validate')}</span>}
+                    {(m.scheduled_times || []).map((time, idx) => (
+                      <span key={idx} className="text-[8px] font-black uppercase text-indigo-400/60 flex items-center gap-1">
+                        <TimerIcon size={10} /> {time}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -4,8 +4,9 @@ import { supabase } from '../../../supabaseClient'
 import IconPicker from '../IconPicker'
 import MissionLibrary from '../MissionLibrary'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, Crown, Plus, Trash2, Check, X, Edit2, Library, Timer as TimerIcon } from 'lucide-react'
+import { Sparkles, Crown, Plus, Trash2, Check, X, Edit2, Library, Timer as TimerIcon, Clock } from 'lucide-react'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
+import TimePicker from '../../ui/TimePicker'
 
 // Sous-composant MissionItem interne
 const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, onEditCancel, onDelete, editState, setEditState, setShowPicker, showPicker, onIconSelect }) => {
@@ -28,41 +29,68 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
   }
 
   const targetStyle = getTargetStyle(mission.assigned_to)
+  const [showTimePicker, setShowTimePicker] = useState(false)
+
+  const addTime = (time) => {
+    const times = [...(editState.scheduled_times || []), time].sort()
+    setEditState({ ...editState, scheduled_times: times })
+  }
+
+  const removeTime = (index) => {
+    const times = [...(editState.scheduled_times || [])]
+    times.splice(index, 1)
+    setEditState({ ...editState, scheduled_times: times })
+  }
 
   return (
     <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-600 p-3 rounded-2xl border border-white/5 [.light-theme_&]:border-transparent flex flex-col gap-3 shadow-md [.light-theme_&]:shadow-indigo-600/20">
       {isEditing ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-2 relative">
-            <button onClick={() => setShowPicker(!showPicker)} className="text-xl w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
+            <button onClick={() => setShowPicker(!showPicker)} className="text-xl w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-white/5">
               {editState.icon}
             </button>
             <input
               value={editState.title}
               onChange={(e) => setEditState({ ...editState, title: e.target.value })}
-              className="flex-1 bg-transparent border-b border-indigo-500 text-white font-bold outline-none"
+              className="flex-1 bg-transparent border-b border-indigo-500 text-white font-bold text-lg outline-none"
               autoFocus
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappel :</span>
-            <div className="flex items-center gap-1 bg-slate-800 border border-indigo-500/30 rounded-lg px-2 py-1">
-              <TimerIcon size={10} className="text-indigo-400" />
-              <input
-                type="time"
-                value={editState.scheduled_time || ''}
-                onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
-                className="bg-transparent text-[10px] font-bold text-indigo-400 outline-none w-16 [color-scheme:dark]"
-              />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappels :</span>
+              <button
+                onClick={() => setShowTimePicker(true)}
+                className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl transition-all flex items-center gap-2 group"
+              >
+                <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+                <span className="text-[10px] font-black uppercase tracking-tight">Ajouter</span>
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {(editState.scheduled_times || []).map((t, idx) => (
+                <div key={idx} className="flex items-center gap-2 bg-slate-800 border border-indigo-500/30 rounded-xl px-3 py-2 group">
+                  <TimerIcon size={14} className="text-indigo-400" />
+                  <span className="text-xs font-black text-indigo-400">{t}</span>
+                  <button onClick={() => removeTime(idx)} className="p-1 hover:text-red-400 text-slate-600 transition-colors">
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+              {(editState.scheduled_times || []).length === 0 && (
+                <p className="text-[10px] text-slate-600 italic px-2">Aucun rappel configuré</p>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-2 border-t border-white/5">
             <div className="flex gap-2">
               <button
                 onClick={() => setEditState({ ...editState, assigned_to: null })}
-                className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${!editState.assigned_to ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500'}`}
+                className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all ${!editState.assigned_to ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500 border border-white/5'}`}
               >
                 {t('common.all')}
               </button>
@@ -70,40 +98,55 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
                 <button
                   key={p.id}
                   onClick={() => setEditState({ ...editState, assigned_to: p.id })}
-                  className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${editState.assigned_to === p.id ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500'}`}
+                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all ${editState.assigned_to === p.id ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-500 border border-white/5'}`}
                 >
                   {p.child_name}
                 </button>
               ))}
             </div>
             <div className="flex gap-1">
-              <button onClick={() => onEditSave(mission.id)} className="p-2 text-emerald-400 hover:bg-emerald-400/10 rounded-lg"><Check size={20} /></button>
-              <button onClick={onEditCancel} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg"><X size={20} /></button>
+              <button onClick={() => onEditSave(mission.id)} className="p-2 text-emerald-400 hover:bg-emerald-400/10 rounded-xl"><Check size={24} /></button>
+              <button onClick={onEditCancel} className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl"><X size={24} /></button>
             </div>
           </div>
+
+          {/* Time Picker Modal */}
+          <AnimatePresence>
+            {showTimePicker && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  onClick={() => setShowTimePicker(false)}
+                  className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+                />
+                <TimePicker onClose={() => setShowTimePicker(false)} onChange={addTime} />
+              </div>
+            )}
+          </AnimatePresence>
+
           <AnimatePresence>{showPicker && <IconPicker onSelect={onIconSelect} />}</AnimatePresence>
         </div>
       ) : (
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl bg-slate-800 [.light-theme_&]:bg-black/20 w-8 h-8 flex items-center justify-center rounded-lg">{mission.icon}</span>
-            <div className="flex flex-col">
-              <span className="text-white font-bold text-sm">{t(mission.title)}</span>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${targetStyle}`}>
+          <div className="flex items-center gap-4">
+            <span className="text-2xl bg-slate-800 [.light-theme_&]:bg-black/20 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/5">{mission.icon}</span>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-white font-black text-base leading-tight">{t(mission.title)}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border ${targetStyle}`}>
                   {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : t('common.all')}
                 </span>
-                {mission.scheduled_time && (
-                  <span className="text-[8px] font-black text-indigo-400/80 bg-indigo-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <TimerIcon size={10} /> {mission.scheduled_time}
+                {(mission.scheduled_times || []).map((t, idx) => (
+                  <span key={idx} className="text-[9px] font-black text-indigo-400 bg-indigo-500/15 px-3 py-1 rounded-full flex items-center gap-1.5 border border-indigo-500/20 shadow-lg shadow-indigo-600/5">
+                    <TimerIcon size={12} className="text-indigo-400" /> {t}
                   </span>
-                )}
+                ))}
               </div>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => onEditStart(mission)} className="p-2 rounded-full border-2 border-slate-500 hover:border-white text-slate-500 hover:text-white [.light-theme_&]:border-white [.light-theme_&]:text-white [.light-theme_&]:hover:bg-white [.light-theme_&]:hover:text-emerald-500 transition-all"><Edit2 size={14} /></button>
-            <button onClick={() => onDelete(mission.id)} className="p-2 rounded-full border-2 border-slate-500 hover:border-red-400 text-slate-500 hover:text-red-400 [.light-theme_&]:border-white [.light-theme_&]:text-white [.light-theme_&]:hover:bg-white [.light-theme_&]:hover:text-red-500 transition-all"><Trash2 size={14} /></button>
+            <button onClick={() => onEditStart(mission)} className="p-2.5 rounded-2xl border-2 border-slate-700 hover:border-white text-slate-500 hover:text-white transition-all"><Edit2 size={16} /></button>
+            <button onClick={() => onDelete(mission.id)} className="p-2.5 rounded-2xl border-2 border-slate-700 hover:border-red-400 text-slate-500 hover:text-red-400 transition-all"><Trash2 size={16} /></button>
           </div>
         </div>
       )}
@@ -118,7 +161,8 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   const [activeTab, setActiveTab] = useState('all') // Onglet de FILTRE d'affichage
   const [newMissionTitle, setNewMissionTitle] = useState('')
   const [selectedIcon, setSelectedIcon] = useState('✨')
-  const [newScheduledTime, setNewScheduledTime] = useState('')
+  const [newScheduledTimes, setNewScheduledTimes] = useState([])
+  const [showTimePickerForAdd, setShowTimePickerForAdd] = useState(false)
   const [targetId, setTargetId] = useState(null) // Qui va avoir la NOUVELLE mission
   const [showPickerForAdd, setShowPickerForAdd] = useState(false)
   const [showLibrary, setShowLibrary] = useState(false)
@@ -129,7 +173,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
   const [optimisticMissions, setOptimisticMissions] = useState(missions)
   useEffect(() => { setOptimisticMissions(missions) }, [missions])
 
-  const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null, scheduled_time: '' })
+  const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null, scheduled_times: [] })
   const [showPickerForEdit, setShowPickerForEdit] = useState(false)
 
   // On synchronise le targetId par défaut quand on change d'onglet
@@ -165,14 +209,14 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
       title: title,
       icon: icon,
       assigned_to: targetId,
-      scheduled_time: newScheduledTime || null,
+      scheduled_times: newScheduledTimes || [],
       order_index: (missions || []).length
     }])
     if (error) {
       console.error("Error adding mission:", error)
       onShowSuccess("Erreur lors de l'ajout")
     } else {
-      setNewMissionTitle(''); setSelectedIcon('✨'); setNewScheduledTime(''); setShowPickerForAdd(false); setShowLibrary(false); setShowCustomModal(false);
+      setNewMissionTitle(''); setSelectedIcon('✨'); setNewScheduledTimes([]); setShowPickerForAdd(false); setShowLibrary(false); setShowCustomModal(false);
       onShowSuccess(t('actions.add_success'));
       if (preventStepRecalc) preventStepRecalc();
       refresh(true);
@@ -201,7 +245,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
       title: editState.title,
       icon: editState.icon,
       assigned_to: editState.assigned_to,
-      scheduled_time: editState.scheduled_time || null
+      scheduled_times: editState.scheduled_times || []
     }).eq('id', id)
     if (!error) {
       setEditingId(null); setShowPickerForEdit(false);
@@ -460,7 +504,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                       title: t(mission.title),
                       icon: mission.icon,
                       assigned_to: mission.assigned_to,
-                      scheduled_time: mission.scheduled_time || ''
+                      scheduled_times: mission.scheduled_times || []
                     })
                     setShowPickerForEdit(false)
                   }}

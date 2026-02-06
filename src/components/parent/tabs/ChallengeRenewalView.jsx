@@ -6,6 +6,7 @@ import SectionCard from '../settings/SectionCard'
 import { supabase } from '../../../supabaseClient'
 import IconPicker from '../IconPicker'
 import MissionLibrary from '../MissionLibrary'
+import TimePicker from '../../ui/TimePicker'
 
 export default function ChallengeRenewalView({ challenge, missions, profiles, familyId, onStart, onEditMissions, refresh }) {
     const { t } = useTranslation()
@@ -17,8 +18,9 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
 
     // States pour l'édition inline
     const [editingId, setEditingId] = useState(null)
-    const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null, scheduled_time: '' })
+    const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null, scheduled_times: [] })
     const [showPickerForEdit, setShowPickerForEdit] = useState(false)
+    const [showTimePickerForEdit, setShowTimePickerForEdit] = useState(false)
 
     // States pour l'ajout inline
     const [showLibrary, setShowLibrary] = useState(false)
@@ -26,8 +28,9 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
     const [newTitle, setNewTitle] = useState('')
     const [newIcon, setNewIcon] = useState('✨')
     const [newTargetId, setNewTargetId] = useState(null)
-    const [newScheduledTime, setNewScheduledTime] = useState('')
+    const [newScheduledTimes, setNewScheduledTimes] = useState([])
     const [showPickerForAdd, setShowPickerForAdd] = useState(false)
+    const [showTimePickerForAdd, setShowTimePickerForAdd] = useState(false)
 
     const missionsCount = missions?.length || 0
     const isLimitReached = missionsCount >= 5
@@ -63,7 +66,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
             title: t(mission.title),
             icon: mission.icon,
             assigned_to: mission.assigned_to,
-            scheduled_time: mission.scheduled_time || ''
+            scheduled_times: mission.scheduled_times || []
         })
         setShowPickerForEdit(false)
     }
@@ -73,7 +76,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
             title: editState.title,
             icon: editState.icon,
             assigned_to: editState.assigned_to,
-            scheduled_time: editState.scheduled_time || null
+            scheduled_times: editState.scheduled_times || []
         }).eq('id', id)
 
         if (!error) {
@@ -95,7 +98,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
             title: title,
             icon: icon,
             assigned_to: targetId,
-            scheduled_time: time || null,
+            scheduled_times: time || [],
             order_index: missionsCount
         }])
 
@@ -103,7 +106,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
             setNewTitle('')
             setNewIcon('✨')
             setNewTargetId(null)
-            setNewScheduledTime('')
+            setNewScheduledTimes([])
             setShowQuickAdd(false)
             setShowLibrary(false)
             refresh(true)
@@ -215,14 +218,32 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                 placeholder="Nom de la mission..."
                                                 className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 text-[10px] font-bold text-white focus:border-emerald-500 outline-none"
                                             />
-                                            <div className="flex items-center gap-1 bg-slate-900 border border-white/10 rounded-xl px-2">
-                                                <TimerIcon size={14} className="text-indigo-400" />
-                                                <input
-                                                    type="time"
-                                                    value={newScheduledTime}
-                                                    onChange={(e) => setNewScheduledTime(e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold text-indigo-400 outline-none w-16 [color-scheme:dark]"
-                                                />
+                                            <div className="flex flex-col gap-2 flex-1">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Rappels :</span>
+                                                    <button
+                                                        onClick={() => setShowTimePickerForAdd(true)}
+                                                        className="p-1 px-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg transition-all flex items-center gap-1 group"
+                                                    >
+                                                        <Plus size={10} />
+                                                        <span className="text-[8px] font-black uppercase">Ajouter</span>
+                                                    </button>
+                                                </div>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {newScheduledTimes.map((t, idx) => (
+                                                        <div key={idx} className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-1">
+                                                            <TimerIcon size={10} className="text-indigo-400" />
+                                                            <span className="text-[9px] font-bold text-indigo-400">{t}</span>
+                                                            <button onClick={() => {
+                                                                const ts = [...newScheduledTimes]
+                                                                ts.splice(idx, 1)
+                                                                setNewScheduledTimes(ts)
+                                                            }} className="p-0.5 hover:text-red-400 text-slate-600 transition-colors">
+                                                                <X size={10} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between">
@@ -241,6 +262,21 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                 <button onClick={() => setShowQuickAdd(false)} className="p-1.5 bg-slate-800 text-slate-400 rounded-lg"><X size={14} /></button>
                                             </div>
                                         </div>
+                                        <AnimatePresence>
+                                            {showTimePickerForAdd && (
+                                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                                        onClick={() => setShowTimePickerForAdd(false)}
+                                                        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+                                                    />
+                                                    <TimePicker
+                                                        onClose={() => setShowTimePickerForAdd(false)}
+                                                        onChange={(time) => setNewScheduledTimes([...newScheduledTimes, time].sort())}
+                                                    />
+                                                </div>
+                                            )}
+                                        </AnimatePresence>
                                         <AnimatePresence>{showPickerForAdd && <IconPicker onSelect={(i) => { setNewIcon(i); setShowPickerForAdd(false); }} />}</AnimatePresence>
                                     </div>
                                 </motion.div>
@@ -272,14 +308,32 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                             {p.child_name}
                                                         </button>
                                                     ))}
-                                                    <div className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-1 ml-2">
-                                                        <TimerIcon size={10} className="text-indigo-400" />
-                                                        <input
-                                                            type="time"
-                                                            value={editState.scheduled_time}
-                                                            onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
-                                                            className="bg-transparent text-[8px] font-bold text-indigo-400 outline-none w-14 [color-scheme:dark]"
-                                                        />
+                                                    <div className="flex flex-col gap-2 flex-1 ml-2">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Rappels :</span>
+                                                            <button
+                                                                onClick={() => setShowTimePickerForEdit(true)}
+                                                                className="p-1 px-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg transition-all flex items-center gap-1 group"
+                                                            >
+                                                                <Plus size={8} />
+                                                                <span className="text-[7px] font-black uppercase">Ajouter</span>
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {editState.scheduled_times.map((t, idx) => (
+                                                                <div key={idx} className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-0.5">
+                                                                    <TimerIcon size={8} className="text-indigo-400" />
+                                                                    <span className="text-[8px] font-bold text-indigo-400">{t}</span>
+                                                                    <button onClick={() => {
+                                                                        const ts = [...editState.scheduled_times]
+                                                                        ts.splice(idx, 1)
+                                                                        setEditState({ ...editState, scheduled_times: ts })
+                                                                    }} className="p-0.5 hover:text-red-400 text-slate-600 transition-colors">
+                                                                        <X size={8} />
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-1">
@@ -287,6 +341,21 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                     <button onClick={() => setEditingId(null)} className="p-1 text-rose-400"><X size={16} /></button>
                                                 </div>
                                             </div>
+                                            <AnimatePresence>
+                                                {showTimePickerForEdit && (
+                                                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                                        <motion.div
+                                                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                                            onClick={() => setShowTimePickerForEdit(false)}
+                                                            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+                                                        />
+                                                        <TimePicker
+                                                            onClose={() => setShowTimePickerForEdit(false)}
+                                                            onChange={(time) => setEditState({ ...editState, scheduled_times: [...editState.scheduled_times, time].sort() })}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </AnimatePresence>
                                             <AnimatePresence>{showPickerForEdit && <IconPicker onSelect={(i) => { setEditState(prev => ({ ...prev, icon: i })); setShowPickerForEdit(false); }} />}</AnimatePresence>
                                         </div>
                                     ) : (
@@ -298,11 +367,13 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                     <span className="text-[7px] font-black uppercase text-slate-500 tracking-widest italic">
                                                         {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : 'Tous'}
                                                     </span>
-                                                    {mission.scheduled_time && (
-                                                        <span className="text-[7px] font-black text-indigo-400/80 bg-indigo-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                                                            <TimerIcon size={8} /> {mission.scheduled_time}
-                                                        </span>
-                                                    )}
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {(mission.scheduled_times || []).map((t, idx) => (
+                                                            <span key={idx} className="text-[7px] font-black text-indigo-400/80 bg-indigo-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                                                <TimerIcon size={8} /> {t}
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

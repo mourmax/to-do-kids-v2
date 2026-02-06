@@ -4,21 +4,26 @@ Transfers the child interface from the current "Glassmorphism/Dark" theme to a "
 
 ## Proposed Changes
 
-### Mission Editing Refinements
+### Database Migration
 
-Fix the issue where translation keys are displayed instead of translated titles when editing a mission.
+Change `scheduled_time` to `scheduled_times` (array) in the `missions` table to support multiple reminders.
+
+#### [MODIFY] [Supabase](https://supabase.com)
+- SQL: `ALTER TABLE missions RENAME COLUMN scheduled_time TO scheduled_time_old;`
+- SQL: `ALTER TABLE missions ADD COLUMN scheduled_times TEXT[] DEFAULT '{}';`
+- SQL: `UPDATE missions SET scheduled_times = ARRAY[scheduled_time_old::text] WHERE scheduled_time_old IS NOT NULL;`
+
+### Mission UI Enhancements
+
+Support multiple reminders and make clock icons more prominent.
 
 #### [MODIFY] [ChallengeRenewalView.jsx](file:///c:/Users/matis/TodoKids_Antigravity/to-do-kids-v2/src/components/parent/tabs/ChallengeRenewalView.jsx)
-- Wrap `mission.title` in `t()` inside the `startEditing` function.
-- Update the time input to use a custom-styled picker.
+- Update state to handle `scheduled_times` as an array.
+- Implement UI for adding/removing multiple times.
+- Increase size of clock icons and time displays.
 
 #### [MODIFY] [MissionsSection.jsx](file:///c:/Users/matis/TodoKids_Antigravity/to-do-kids-v2/src/components/parent/settings/MissionsSection.jsx)
-- Wrap `mission.title` in `t()` inside the `onEditStart` callback.
-- Update the time input to use a custom-styled picker.
-
-### UI Enhancements
-
-Research and implement a custom, premium time selector for mission reminders to replace the clunky browser default.
+- Similar updates as above for mission management and editing.
 
 ### [UI] Child Dashboard Theme
 

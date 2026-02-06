@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle2, Check } from 'lucide-react'
+import { CheckCircle2, Check, Timer as TimerIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 // 1. On change "onClick" en "onToggle" dans les arguments
@@ -52,6 +52,14 @@ export default function MissionCard({ mission, onToggle, disabled }) {
         <h3 className={`font-black uppercase text-[11px] tracking-tight leading-tight px-1 ${isParentValidated ? 'text-white' : 'text-white [.light-theme_&]:text-indigo-950'}`}>
           {t(mission.title)}
         </h3>
+
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+          {(mission.scheduled_times || []).map((t, idx) => (
+            <div key={idx} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black ${isParentValidated ? 'bg-white/20 text-white' : 'bg-indigo-500/10 text-indigo-400'}`}>
+              <TimerIcon size={8} /> {t}
+            </div>
+          ))}
+        </div>
       </div>
 
       {!isParentValidated ? (

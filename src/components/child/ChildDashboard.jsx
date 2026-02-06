@@ -206,12 +206,14 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
   useEffect(() => {
     if (missions && missions.length > 0 && NotificationService.getPermissionStatus() === 'granted') {
       missions.forEach(m => {
-        if (m.scheduled_time && !m.is_done) {
-          NotificationService.scheduleLocalReminder(
-            t(m.title),
-            m.scheduled_time,
-            m.id
-          )
+        if (m.scheduled_times && m.scheduled_times.length > 0 && !m.is_done) {
+          m.scheduled_times.forEach(timeStr => {
+            NotificationService.scheduleLocalReminder(
+              t(m.title),
+              timeStr,
+              m.id
+            )
+          })
         }
       })
     }

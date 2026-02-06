@@ -7,7 +7,9 @@ J'ai corrigé le problème de synchronisation où les tâches validées par l'en
 ### Parent Dashboard
 #### [ParentDashboard.jsx](file:///c:/Users/matis/TodoKids_Antigravity/to-do-kids-v2/src/components/parent/ParentDashboard.jsx)
 - **Correction du Realtime** : L'abonnement Supabase ne se mettait pas à jour correctement car la fonction `refresh` était "stale" (vieille référence) dans le `useEffect`. J'ai ajouté `refresh` et `activeTab` aux dépendances.
-- **Ajout du Polling de Secours** : Comme dans l'interface enfant, j'ai ajouté un rafraîchissement automatique toutes les 5 secondes lorsque le parent est sur l'onglet "Validation". Cela garantit que les données sont à jour même si une notification Realtime est perdue ou bloquée par le réseau.
+- **Ajout du Polling de Secours** : Comme dans l'interface enfant, j'ai ajouté un rafraîchissement automatique toutes les 5 secondes lorsque le parent est sur l'onglet "Validation". Cela- [x] Corrigé l'erreur `ReferenceError: Timer is not defined` en renommant l'icône Lucide.
+- [x] Ajouté les imports d'icônes manquants dans le dashboard enfant.
+- [x] Préparé le script SQL pour la mise à jour de la base de données.
 
 ## Nouveaux Changements (Reset Visuel)
 
