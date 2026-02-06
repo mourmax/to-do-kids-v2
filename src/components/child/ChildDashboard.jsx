@@ -631,6 +631,28 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
           </div>
         )}
       </AnimatePresence>
+
+      <button
+        onClick={() => {
+          if (NotificationService.getPermissionStatus() !== 'granted') {
+            NotificationService.requestPermission().then(res => {
+              if (res === 'granted') {
+                NotificationService.sendLocalNotification("Notifications activées ! ✨", {
+                  body: "Voici à quoi ressembleront tes rappels."
+                })
+              }
+            })
+          } else {
+            NotificationService.sendLocalNotification("C'est l'heure ! 🔔", {
+              body: "Ta mission 'Ranger la chambre' t'attend ! ✨",
+              icon: '/icon-192.png'
+            })
+          }
+        }}
+        className="fixed bottom-6 right-6 z-[100] bg-white hover:bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100 text-indigo-500 text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95"
+      >
+        🔔 Test Alerte
+      </button>
     </div>
   )
 }
