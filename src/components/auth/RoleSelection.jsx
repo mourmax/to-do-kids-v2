@@ -142,7 +142,7 @@ export default function RoleSelection({ onSelectParent, onSelectChild }) {
                                     disabled={inviteCode.length !== 6}
                                     className="w-full bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-500 p-4 rounded-2xl text-white font-black uppercase italic tracking-wider transition-all"
                                 >
-                                    {t('actions.next')}
+                                    {t('child.lets_go')}
                                 </button>
                             </form>
                         </div>
