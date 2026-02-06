@@ -173,6 +173,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   }
 
   const handleStartNewChallenge = async (newSettings = {}) => {
+    console.log("[ValidationTab] handleStartNewChallenge starting with:", newSettings)
     const today = new Date().toISOString().split('T')[0]
     try {
       const updates = {
@@ -181,21 +182,38 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
         ...newSettings
       }
 
-      await supabase.from('challenges').update(updates).eq('id', challenge.id)
+      if (challenge?.id) {
+        console.log("[ValidationTab] Updating existing challenge:", challenge.id)
+        const { error } = await supabase.from('challenges').update(updates).eq('id', challenge.id)
+        if (error) throw error
+      } else {
+        console.log("[ValidationTab] Creating new challenge for family:", profile?.family_id)
+        if (!profile?.family_id) throw new Error("Missing family ID to create challenge")
+
+        const { error } = await supabase.from('challenges').insert([{
+          ...updates,
+          family_id: profile.family_id,
+          assigned_to: profile.id
+        }])
+        if (error) throw error
+      }
 
       const missionIds = missions.map(m => m.id)
       if (missionIds.length > 0) {
+        console.log("[ValidationTab] Resetting daily logs for missions:", missionIds)
         // ️ RESET: Là seulement on supprime pour repartir à zéro
         await supabase.from('daily_logs').delete()
           .in('mission_id', missionIds)
           .eq('profile_id', profile.id)
           .eq('date', today)
       }
+
+      console.log("[ValidationTab] Refreshing family data...")
       await refresh(true)
-      // showToast(t('dashboard.challenge_started')) // Optional feedback
+      showToast(t('dashboard.challenge_started'))
     } catch (error) {
-      console.error("Erreur reset:", error)
-      showToast(t('errors.reset_failed'), "error")
+      console.error("[ValidationTab] Critical error in handleStartNewChallenge:", error)
+      showToast(t('errors.reset_failed') || "Erreur lors du démarrage du défi", "error")
     }
   }
 

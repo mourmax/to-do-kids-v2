@@ -6,7 +6,7 @@ import MissionCard from './MissionCard'
 import ProgressBar from './ChildProgressBar'
 import { useTranslation } from 'react-i18next'
 import confetti from 'canvas-confetti'
-import ParentVictoryModal from '../ui/ParentVictoryModal'
+import ParentVictoryModal from '../parent/ParentVictoryModal'
 import { NotificationService } from '../../services/notificationService'
 
 const getColorClasses = (colorName) => {

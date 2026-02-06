@@ -43,12 +43,17 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
 
     const handleStart = async () => {
         setIsSubmitting(true)
-        await onStart({
-            reward_name: rewardName,
-            malus_message: malusMessage,
-            duration_days: durationDays
-        })
-        setIsSubmitting(false)
+        try {
+            await onStart({
+                reward_name: rewardName,
+                malus_message: malusMessage,
+                duration_days: durationDays
+            })
+        } catch (err) {
+            console.error("[ChallengeRenewalView] Error in handleStart:", err)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     // --- Actions Missions ---
@@ -240,7 +245,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                             )}
                         </AnimatePresence>
 
-                        <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                        <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1 no-scrollbar">
                             {missions?.map(mission => (
                                 <div key={mission.id} className={`transition-all ${editingId === mission.id ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-950/30 border-white/5'} border p-2 rounded-xl`}>
                                     {editingId === mission.id ? (
@@ -283,7 +288,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                         <div className="flex items-center gap-2 group">
                                             <span className="text-sm shrink-0 bg-slate-950 w-7 h-7 flex items-center justify-center rounded-lg">{mission.icon}</span>
                                             <div className="flex-1 min-w-0">
-                                                <span className="block text-[10px] font-bold text-slate-300 truncate lowercase first-letter:uppercase">{mission.title}</span>
+                                                <span className="block text-[10px] font-bold text-slate-300 truncate lowercase first-letter:uppercase">{t(mission.title)}</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[7px] font-black uppercase text-slate-500 tracking-widest italic">
                                                         {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : 'Tous'}

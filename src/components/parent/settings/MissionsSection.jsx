@@ -435,7 +435,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
           </AnimatePresence>
 
           {/* 🔵 LISTE DES MISSIONS FILTRÉE */}
-          <div className="space-y-3 pt-2" >
+          <div className="space-y-3 pt-2 no-scrollbar" >
             {filteredMissions.length === 0 ? (
               <div className="py-12 text-center border-2 border-dashed border-white/5 rounded-[2.5rem] bg-slate-900/20">
                 <p className="text-slate-600 font-black uppercase text-[10px] tracking-[0.2em]">Aucune mission dans cet onglet</p>
