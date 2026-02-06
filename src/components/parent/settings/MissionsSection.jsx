@@ -4,7 +4,7 @@ import { supabase } from '../../../supabaseClient'
 import IconPicker from '../IconPicker'
 import MissionLibrary from '../MissionLibrary'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, Crown, Plus, Trash2, Check, X, Edit2, Library } from 'lucide-react'
+import { Sparkles, Crown, Plus, Trash2, Check, X, Edit2, Library, Timer as TimerIcon } from 'lucide-react'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 
 // Sous-composant MissionItem interne
@@ -48,7 +48,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
           <div className="flex items-center gap-2">
             <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappel :</span>
             <div className="flex items-center gap-1 bg-slate-800 border border-indigo-500/30 rounded-lg px-2 py-1">
-              <Timer size={10} className="text-indigo-400" />
+              <TimerIcon size={10} className="text-indigo-400" />
               <input
                 type="time"
                 value={editState.scheduled_time || ''}
@@ -95,7 +95,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
                 </span>
                 {mission.scheduled_time && (
                   <span className="text-[8px] font-black text-indigo-400/80 bg-indigo-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Timer size={10} /> {mission.scheduled_time}
+                    <TimerIcon size={10} /> {mission.scheduled_time}
                   </span>
                 )}
               </div>
@@ -373,7 +373,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                     <div className="space-y-2">
                       <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Heure de rappel (Optionnel) :</span>
                       <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-2xl px-4 py-3">
-                        <Timer size={18} className="text-indigo-400" />
+                        <TimerIcon size={18} className="text-indigo-400" />
                         <input
                           type="time"
                           value={newScheduledTime}

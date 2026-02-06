@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle, Lock, Send, Clock, Trophy, Sun, Moon } from 'lucide-react'
+import { CheckCircle, Lock, Send, Clock, Trophy, Sun, Moon, Sparkles, BellRing, BellOff } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import MissionCard from './MissionCard'
 import ProgressBar from './ChildProgressBar'

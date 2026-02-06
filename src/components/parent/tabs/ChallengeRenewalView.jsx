@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { Trophy, Flame, Timer, Sparkles, Play, Edit3, Trash2, Check, X, Plus, Library } from 'lucide-react'
+import { Trophy, Flame, Timer as TimerIcon, Sparkles, Play, Edit3, Trash2, Check, X, Plus, Library } from 'lucide-react'
 import SectionCard from '../settings/SectionCard'
 import { supabase } from '../../../supabaseClient'
 import IconPicker from '../IconPicker'
@@ -139,7 +139,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                 </SectionCard>
 
                 {/* Duration */}
-                <SectionCard icon={Timer} title={t('settings.duration_label')} color="indigo">
+                <SectionCard icon={TimerIcon} title={t('settings.duration_label')} color="indigo">
                     <div className="flex items-center gap-4 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3">
                         <button
                             onClick={() => setDurationDays(Math.max(1, durationDays - 1))}
@@ -216,7 +216,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                 className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 text-[10px] font-bold text-white focus:border-emerald-500 outline-none"
                                             />
                                             <div className="flex items-center gap-1 bg-slate-900 border border-white/10 rounded-xl px-2">
-                                                <Timer size={14} className="text-indigo-400" />
+                                                <TimerIcon size={14} className="text-indigo-400" />
                                                 <input
                                                     type="time"
                                                     value={newScheduledTime}
@@ -273,7 +273,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                         </button>
                                                     ))}
                                                     <div className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-1 ml-2">
-                                                        <Timer size={10} className="text-indigo-400" />
+                                                        <TimerIcon size={10} className="text-indigo-400" />
                                                         <input
                                                             type="time"
                                                             value={editState.scheduled_time}
@@ -300,7 +300,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                     </span>
                                                     {mission.scheduled_time && (
                                                         <span className="text-[7px] font-black text-indigo-400/80 bg-indigo-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                                                            <Timer size={8} /> {mission.scheduled_time}
+                                                            <TimerIcon size={8} /> {mission.scheduled_time}
                                                         </span>
                                                     )}
                                                 </div>
