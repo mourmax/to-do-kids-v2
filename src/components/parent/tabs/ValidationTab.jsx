@@ -56,7 +56,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     return (
       <ChallengeRenewalView
         challenge={challenge}
-        missionsCount={missions.length}
+        missions={missions}
         onStart={(settings) => handleStartNewChallenge(settings)}
         onEditMissions={() => onEditSettings('missions')}
       />

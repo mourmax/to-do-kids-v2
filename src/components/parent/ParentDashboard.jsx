@@ -373,6 +373,7 @@ export default function ParentDashboard({
                 refresh={refresh}
                 onExit={onExit}
                 onEditSettings={(target) => {
+                  manualTabChangeRef.current = true
                   setActiveTab('settings')
                   if (target) setActiveSubTab(target)
                 }}
