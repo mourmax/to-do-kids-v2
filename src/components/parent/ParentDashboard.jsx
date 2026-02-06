@@ -369,6 +369,7 @@ export default function ParentDashboard({
                 challenge={challenge}
                 missions={missions}
                 profile={profile}
+                profiles={profiles}
                 childName={profile?.child_name}
                 refresh={refresh}
                 onExit={onExit}

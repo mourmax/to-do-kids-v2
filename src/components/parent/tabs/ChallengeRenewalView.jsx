@@ -1,16 +1,35 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { Trophy, Flame, Timer, Sparkles, Play, Edit3 } from 'lucide-react'
+import { Trophy, Flame, Timer, Sparkles, Play, Edit3, Trash2, Check, X, Plus, Library } from 'lucide-react'
 import SectionCard from '../settings/SectionCard'
+import { supabase } from '../../../supabaseClient'
+import IconPicker from '../IconPicker'
+import MissionLibrary from '../MissionLibrary'
 
-export default function ChallengeRenewalView({ challenge, missionsCount, onStart, onEditMissions }) {
+export default function ChallengeRenewalView({ challenge, missions, profiles, familyId, onStart, onEditMissions, refresh }) {
     const { t } = useTranslation()
 
     const [rewardName, setRewardName] = useState('')
     const [malusMessage, setMalusMessage] = useState('')
     const [durationDays, setDurationDays] = useState(7)
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    // States pour l'édition inline
+    const [editingId, setEditingId] = useState(null)
+    const [editState, setEditState] = useState({ title: '', icon: '', assigned_to: null })
+    const [showPickerForEdit, setShowPickerForEdit] = useState(false)
+
+    // States pour l'ajout inline
+    const [showLibrary, setShowLibrary] = useState(false)
+    const [showQuickAdd, setShowQuickAdd] = useState(false)
+    const [newTitle, setNewTitle] = useState('')
+    const [newIcon, setNewIcon] = useState('✨')
+    const [newTargetId, setNewTargetId] = useState(null)
+    const [showPickerForAdd, setShowPickerForAdd] = useState(false)
+
+    const missionsCount = missions?.length || 0
+    const isLimitReached = missionsCount >= 5
 
     // Initialize with current challenge values
     useEffect(() => {
@@ -19,7 +38,7 @@ export default function ChallengeRenewalView({ challenge, missionsCount, onStart
             setMalusMessage(challenge.malus_message || '')
             setDurationDays(challenge.duration_days || 7)
         }
-    }, [challenge?.id]) // On ne synchronise qu'au montage ou si le challenge change d'ID
+    }, [challenge?.id])
 
     const handleStart = async () => {
         setIsSubmitting(true)
@@ -29,6 +48,56 @@ export default function ChallengeRenewalView({ challenge, missionsCount, onStart
             duration_days: durationDays
         })
         setIsSubmitting(false)
+    }
+
+    // --- Actions Missions ---
+    const startEditing = (mission) => {
+        setEditingId(mission.id)
+        setEditState({
+            title: mission.title,
+            icon: mission.icon,
+            assigned_to: mission.assigned_to
+        })
+        setShowPickerForEdit(false)
+    }
+
+    const saveEdit = async (id) => {
+        const { error } = await supabase.from('missions').update({
+            title: editState.title,
+            icon: editState.icon,
+            assigned_to: editState.assigned_to
+        }).eq('id', id)
+
+        if (!error) {
+            setEditingId(null)
+            refresh(true)
+        }
+    }
+
+    const deleteMission = async (id) => {
+        const { error } = await supabase.from('missions').delete().eq('id', id)
+        if (!error) refresh(true)
+    }
+
+    const addMission = async (title = newTitle, icon = newIcon, targetId = newTargetId) => {
+        if (!title.trim() || isLimitReached) return
+
+        const { error } = await supabase.from('missions').insert([{
+            family_id: familyId,
+            title: title,
+            icon: icon,
+            assigned_to: targetId,
+            order_index: missionsCount
+        }])
+
+        if (!error) {
+            setNewTitle('')
+            setNewIcon('✨')
+            setNewTargetId(null)
+            setShowQuickAdd(false)
+            setShowLibrary(false)
+            refresh(true)
+        }
     }
 
     return (
@@ -61,34 +130,164 @@ export default function ChallengeRenewalView({ challenge, missionsCount, onStart
 
                 {/* Duration */}
                 <SectionCard icon={Timer} title={t('settings.duration_label')} color="indigo">
-                    <div className="flex items-center gap-4 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2">
+                    <div className="flex items-center gap-4 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3">
                         <button
                             onClick={() => setDurationDays(Math.max(1, durationDays - 1))}
-                            className="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-lg hover:bg-slate-700 font-bold text-white transition-colors"
+                            className="w-10 h-10 flex items-center justify-center bg-slate-800 rounded-xl hover:bg-slate-700 font-bold text-white transition-colors"
                         >
                             -
                         </button>
-                        <span className="flex-1 text-center font-black text-xl text-white">{durationDays} {t('common.day_plural')}</span>
+                        <span className="flex-1 text-center font-black text-xl text-white italic">{durationDays} {t('common.day_plural')}</span>
                         <button
                             onClick={() => setDurationDays(durationDays + 1)}
-                            className="w-8 h-8 flex items-center justify-center bg-slate-800 rounded-lg hover:bg-slate-700 font-bold text-white transition-colors"
+                            className="w-10 h-10 flex items-center justify-center bg-slate-800 rounded-xl hover:bg-slate-700 font-bold text-white transition-colors"
                         >
                             +
                         </button>
                     </div>
                 </SectionCard>
 
-                {/* Missions Summary */}
+                {/* Missions Inline Management */}
                 <SectionCard icon={Sparkles} title={t('common.missions')} color="emerald">
-                    <div className="flex items-center justify-between bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3">
-                        <span className="font-bold text-emerald-400">{missionsCount} {t('common.missions')} active(s)</span>
-                        <button
-                            onClick={onEditMissions}
-                            className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-white transition-colors"
-                            title={t('actions.edit')}
-                        >
-                            <Edit3 size={16} />
-                        </button>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-black text-emerald-500/70 uppercase tracking-widest italic">
+                                {missionsCount} / 5 {t('common.missions')}
+                            </span>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => !isLimitReached && setShowLibrary(true)}
+                                    disabled={isLimitReached}
+                                    className={`p-2 rounded-lg transition-colors border ${isLimitReached ? 'bg-slate-800 text-slate-600 border-white/5 opacity-50' : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/20'}`}
+                                    title={t('library.library_button')}
+                                >
+                                    <Library size={16} />
+                                </button>
+                                <button
+                                    onClick={() => !isLimitReached && setShowQuickAdd(!showQuickAdd)}
+                                    disabled={isLimitReached}
+                                    className={`p-2 rounded-lg transition-colors border ${isLimitReached ? 'bg-slate-800 text-slate-600 border-white/5 opacity-50' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
+                                    title={t('library.custom_button')}
+                                >
+                                    <Plus size={16} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Modale Bibliothèque (Inline logic) */}
+                        <AnimatePresence>
+                            {showLibrary && (
+                                <MissionLibrary
+                                    currentCount={missionsCount}
+                                    onClose={() => setShowLibrary(false)}
+                                    onSelect={(m) => addMission(m.title, m.icon)}
+                                />
+                            )}
+                        </AnimatePresence>
+
+                        {/* Quick Add Interface */}
+                        <AnimatePresence>
+                            {showQuickAdd && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl space-y-3 mb-2">
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setShowPickerForAdd(!showPickerForAdd)} className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-xl shrink-0 border border-white/5">
+                                                {newIcon}
+                                            </button>
+                                            <input
+                                                value={newTitle}
+                                                onChange={(e) => setNewTitle(e.target.value)}
+                                                placeholder="Nom de la mission..."
+                                                className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 text-[10px] font-bold text-white focus:border-emerald-500 outline-none"
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+                                                <button onClick={() => setNewTargetId(null)} className={`px-2 py-1 rounded-full text-[8px] font-black uppercase border transition-all ${!newTargetId ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-900 text-slate-500 border-white/5'}`}>
+                                                    Tous
+                                                </button>
+                                                {profiles?.filter(p => !p.is_parent).map(p => (
+                                                    <button key={p.id} onClick={() => setNewTargetId(p.id)} className={`px-2 py-1 rounded-full text-[8px] font-black uppercase border transition-all ${newTargetId === p.id ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-900 text-slate-500 border-white/5'}`}>
+                                                        {p.child_name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <button onClick={() => addMission()} className="p-1.5 bg-emerald-500 text-white rounded-lg"><Check size={14} /></button>
+                                                <button onClick={() => setShowQuickAdd(false)} className="p-1.5 bg-slate-800 text-slate-400 rounded-lg"><X size={14} /></button>
+                                            </div>
+                                        </div>
+                                        <AnimatePresence>{showPickerForAdd && <IconPicker onSelect={(i) => { setNewIcon(i); setShowPickerForAdd(false); }} />}</AnimatePresence>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                            {missions?.map(mission => (
+                                <div key={mission.id} className={`transition-all ${editingId === mission.id ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-950/30 border-white/5'} border p-2 rounded-xl`}>
+                                    {editingId === mission.id ? (
+                                        <div className="space-y-2">
+                                            <div className="flex gap-2">
+                                                <button onClick={() => setShowPickerForEdit(!showPickerForEdit)} className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-sm shrink-0">
+                                                    {editState.icon}
+                                                </button>
+                                                <input
+                                                    value={editState.title}
+                                                    onChange={(e) => setEditState({ ...editState, title: e.target.value })}
+                                                    className="flex-1 bg-slate-900 border-b border-emerald-500 text-[10px] font-bold text-white outline-none"
+                                                />
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex gap-1">
+                                                    <button onClick={() => setEditState({ ...editState, assigned_to: null })} className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-tighter transition-all border ${!editState.assigned_to ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-900 border-white/5 text-slate-500'}`}>
+                                                        Tous
+                                                    </button>
+                                                    {profiles?.filter(p => !p.is_parent).map(p => (
+                                                        <button key={p.id} onClick={() => setEditState({ ...editState, assigned_to: p.id })} className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-tighter transition-all border ${editState.assigned_to === p.id ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-900 border-white/5 text-slate-500'}`}>
+                                                            {p.child_name}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    <button onClick={() => saveEdit(mission.id)} className="p-1 text-emerald-400"><Check size={16} /></button>
+                                                    <button onClick={() => setEditingId(null)} className="p-1 text-rose-400"><X size={16} /></button>
+                                                </div>
+                                            </div>
+                                            <AnimatePresence>{showPickerForEdit && <IconPicker onSelect={(i) => { setEditState(prev => ({ ...prev, icon: i })); setShowPickerForEdit(false); }} />}</AnimatePresence>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2 group">
+                                            <span className="text-sm shrink-0 bg-slate-950 w-7 h-7 flex items-center justify-center rounded-lg">{mission.icon}</span>
+                                            <div className="flex-1 min-w-0">
+                                                <span className="block text-[10px] font-bold text-slate-300 truncate lowercase first-letter:uppercase">{mission.title}</span>
+                                                <span className="text-[7px] font-black uppercase text-slate-500 tracking-widest italic">
+                                                    {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : 'Tous'}
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => startEditing(mission)} className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
+                                                    <Edit3 size={12} />
+                                                </button>
+                                                <button onClick={() => deleteMission(mission.id)} className="p-1.5 hover:bg-rose-500/10 rounded-lg text-slate-400 hover:text-rose-400 transition-colors">
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                            {missionsCount === 0 && (
+                                <div className="py-6 text-center border-2 border-dashed border-white/5 rounded-2xl bg-slate-950/20">
+                                    <p className="text-[10px] text-slate-500 italic uppercase tracking-widest">Aucune mission configurée</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </SectionCard>
             </div>
@@ -96,8 +295,8 @@ export default function ChallengeRenewalView({ challenge, missionsCount, onStart
             <div className="pt-4">
                 <button
                     onClick={handleStart}
-                    disabled={isSubmitting}
-                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                    disabled={isSubmitting || missionsCount === 0}
+                    className={`w-full py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 group ${isSubmitting || missionsCount === 0 ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'}`}
                 >
                     {isSubmitting ? (
                         <span className="animate-spin text-xl">⏳</span>

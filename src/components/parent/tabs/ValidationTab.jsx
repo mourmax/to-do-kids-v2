@@ -12,7 +12,7 @@ import ChallengeRenewalView from './ChallengeRenewalView'
 import { useTranslation } from 'react-i18next'
 import { ListChecks } from 'lucide-react'
 
-export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName, profile }) {
+export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName, profile, profiles }) {
   const { t } = useTranslation()
 
   const [showVictoryAnimation, setShowVictoryAnimation] = useState(false)
@@ -57,8 +57,11 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       <ChallengeRenewalView
         challenge={challenge}
         missions={missions}
+        profiles={profiles}
+        familyId={profile?.family_id}
         onStart={(settings) => handleStartNewChallenge(settings)}
         onEditMissions={() => onEditSettings('missions')}
+        refresh={refresh}
       />
     )
   }
