@@ -64,13 +64,34 @@ export const NotificationService = {
      * @param {string} title 
      * @param {object} options 
      */
-    sendLocalNotification: (title, options = {}) => {
-        if (NotificationService.getPermissionStatus() === 'granted') {
-            new Notification(title, {
-                icon: '/icon-192.png',
-                badge: '/icon-192.png',
-                ...options
-            });
+    sendLocalNotification: async (title, options = {}) => {
+        if (NotificationService.getPermissionStatus() !== 'granted') return;
+
+        const defaultOptions = {
+            icon: '/icon-192.png',
+            badge: '/icon-192.png',
+            vibrate: [100, 50, 100],
+            ...options
+        };
+
+        // Try using Service Worker (more reliable for PWAs/Android)
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                if (registration) {
+                    registration.showNotification(title, defaultOptions);
+                    return;
+                }
+            } catch (e) {
+                console.warn("[NotificationService] SW showNotification failed, falling back", e);
+            }
+        }
+
+        // Fallback to standard Notification API
+        try {
+            new Notification(title, defaultOptions);
+        } catch (e) {
+            console.error("[NotificationService] Notification API failed", e);
         }
     },
 

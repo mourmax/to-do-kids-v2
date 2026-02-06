@@ -631,6 +631,30 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
           </div>
         )}
       </AnimatePresence>
+
+      <button
+        onClick={() => {
+          console.log("[Test] Clicked notification test button");
+          if (NotificationService.getPermissionStatus() !== 'granted') {
+            NotificationService.requestPermission().then(res => {
+              if (res === 'granted') {
+                NotificationService.sendLocalNotification("Gagné ! ✨", {
+                  body: "Tes notifications sont maintenant activées."
+                })
+              } else {
+                alert("Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur.");
+              }
+            })
+          } else {
+            NotificationService.sendLocalNotification("C'est l'heure ! 🔔", {
+              body: "Ta mission 'Mettre la table' t'attend ! ✨",
+            })
+          }
+        }}
+        className="fixed bottom-6 right-6 z-[999] bg-white border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-full font-black uppercase text-xs shadow-2xl active:scale-95 transition-all"
+      >
+        🔔 Test Alerte
+      </button>
     </div>
   )
 }
