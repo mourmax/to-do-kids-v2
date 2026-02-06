@@ -13,7 +13,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       layout
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className={`relative overflow-hidden p-6 sm:p-8 aspect-square sm:aspect-[4/5] max-w-[320px] mx-auto w-full rounded-[3rem] border-2 transition-all duration-700 flex flex-col items-center justify-between shadow-xl ${isParentValidated
+      className={`relative overflow-hidden p-5 sm:p-7 min-h-[380px] sm:min-h-[440px] max-w-[320px] mx-auto w-full rounded-[3rem] border-2 transition-all duration-700 flex flex-col items-center justify-between shadow-xl ${isParentValidated
         ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_15px_30px_rgba(251,191,36,0.3)]'
         : isDone
           ? 'bg-emerald-500 border-emerald-400 shadow-[0_15px_30px_rgba(16,185,129,0.2)]'
@@ -45,7 +45,7 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       <div className={`flex flex-col items-center gap-2 mt-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''}`}>
         <motion.span
           animate={isDone ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-          className={`text-6xl sm:text-8xl mb-1 transition-all drop-shadow-sm flex items-center justify-center h-20 sm:h-28 w-20 sm:w-28 ${isDone ? 'drop-shadow-md' : ''}`}
+          className={`text-6xl sm:text-7xl mb-2 transition-all drop-shadow-sm flex items-center justify-center h-20 sm:h-24 w-20 sm:w-24 ${isDone ? 'drop-shadow-md' : ''}`}
         >
           {mission.icon || '⭐'}
         </motion.span>
@@ -53,10 +53,10 @@ export default function MissionCard({ mission, onToggle, disabled }) {
           {t(mission.title)}
         </h3>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
           {(mission.scheduled_times || []).map((t, idx) => (
-            <div key={idx} className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black shadow-sm ${isParentValidated ? 'bg-white/20 text-white' : 'bg-indigo-500/10 text-indigo-500 [.light-theme_&]:bg-indigo-50 [.light-theme_&]:text-indigo-600 border border-indigo-500/10'}`}>
-              <Bell size={11} className="shrink-0" /> {t}
+            <div key={idx} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black shadow-sm ${isParentValidated ? 'bg-white/20 text-white' : 'bg-indigo-500/10 text-indigo-500 [.light-theme_&]:bg-indigo-50 [.light-theme_&]:text-indigo-600 border border-indigo-500/10'}`}>
+              <Bell size={12} className="shrink-0" /> {t}
             </div>
           ))}
         </div>
