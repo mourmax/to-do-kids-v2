@@ -58,6 +58,7 @@
         "title": "Settings",
         "identity_title": "Kids Management",
         "child_name_label": "Child's First Name",
+        "associated_color": "Associated Color",
         "add_child": "Add a child",
         "challenge_title": "Challenge Settings",
         "reward_label": "Reward",

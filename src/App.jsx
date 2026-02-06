@@ -256,7 +256,7 @@ export default function App() {
 
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-[#020617] text-slate-100 dark font-sans selection:bg-indigo-500/30">
+    <div className={`min-h-screen transition-colors duration-500 ${isParentMode ? 'bg-[#020617] text-slate-100 dark' : 'bg-[#F8FAFF] text-indigo-950'} font-sans selection:bg-indigo-500/30`}>
 
       {/* Tuto Modal (s'affiche par dessus tout) */}
       <AnimatePresence>
@@ -264,14 +264,14 @@ export default function App() {
       </AnimatePresence>
 
       {/* HEADER FIXE */}
-      <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-[#020617] via-[#020617]/90 to-transparent flex justify-between items-center">
+      <div className={`fixed top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b ${isParentMode ? 'from-[#020617] via-[#020617]/90' : 'from-[#F8FAFF] via-[#F8FAFF]/90'} to-transparent flex justify-between items-center`}>
 
         {/* Logo/Title (Discret) */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg overflow-hidden shadow-lg border border-white/10">
             <img src="/icon-192.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <span className="text-sm font-black uppercase italic tracking-tighter text-white">To-Do Kids</span>
+          <span className={`text-sm font-black uppercase italic tracking-tighter ${isParentMode ? 'text-white' : 'text-indigo-950'}`}>To-Do Kids</span>
         </div>
 
         {/* Actions à droite */}
@@ -287,7 +287,7 @@ export default function App() {
                   setShowPinModal(true)
                 }
               }}
-              className="bg-slate-900 border border-white/10 px-3 py-2 rounded-xl text-slate-400 hover:text-white transition-all flex items-center gap-2 group"
+              className={`${isParentMode ? 'bg-slate-900 border-white/10 text-slate-400' : 'bg-white border-indigo-100 text-indigo-400'} border px-3 py-2 rounded-xl hover:opacity-80 transition-all flex items-center gap-2 group shadow-sm`}
             >
               {isParentMode ? (
                 <>
@@ -306,7 +306,7 @@ export default function App() {
           {/* Bouton pour relancer le Tuto */}
           <button
             onClick={() => setShowTutorial(true)}
-            className="bg-slate-900 border border-white/10 p-2 rounded-xl text-slate-400 hover:text-white transition-colors"
+            className={`${isParentMode ? 'bg-slate-900 border-white/10 text-slate-400' : 'bg-white border-indigo-100 text-indigo-400'} border p-2 rounded-xl hover:opacity-80 transition-colors shadow-sm`}
             title="Aide"
           >
             <HelpCircle size={18} />
@@ -322,7 +322,7 @@ export default function App() {
               await supabase.auth.signOut()
               window.location.reload()
             }}
-            className="bg-slate-900 border border-white/5 p-2 rounded-xl text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
+            className={`border p-2 rounded-xl transition-all shadow-sm ${isParentMode ? 'bg-slate-900 border-white/5 text-slate-400 hover:text-rose-400' : 'bg-white border-indigo-100 text-indigo-400 hover:text-rose-500'}`}
             title={t('actions.logout')}
           >
             <LogOut size={18} />
@@ -332,7 +332,7 @@ export default function App() {
 
       {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
       {!showTutorial && !shouldShowTutorial && (
-        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-md'}`}>
+        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-xl'}`}>
           <AnimatePresence mode="wait">
             {isParentMode ? (
               family ? (

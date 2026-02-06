@@ -61,6 +61,7 @@
         "malus_title": "Malus (Sanction)",
         "identity_title": "Gestion des Enfants",
         "child_name_label": "Prénom de l'enfant",
+        "associated_color": "Couleur associée",
         "add_child": "Ajouter un enfant",
         "challenge_title": "Réglages du Défi",
         "reward_label": "Récompense",
@@ -82,12 +83,7 @@
         "theme": "Thème",
         "dark": "Sombre",
         "light": "Clair",
-        "premium_status": "Version Premium",
-        "kids_management": "Gestion des Enfants",
-        "child_first_name": "Prénom de l'enfant",
-        "associated_color": "Couleur associée",
-        "preferred_theme": "Thème préféré",
-        "child_activation_code": "Code d'activation enfant"
+        "premium_status": "Version Premium"
     },
     "library": {
         "title": "Bibliothèque de Missions",

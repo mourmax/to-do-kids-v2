@@ -14,6 +14,15 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
   const [isAdding, setIsAdding] = useState(false)
   const [updatingId, setUpdatingId] = useState(null)
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [copiedId, setCopiedId] = useState(null)
+
+  const handleCopyCode = (code) => {
+    if (!code) return
+    navigator.clipboard.writeText(code)
+    setCopiedId(code)
+    setTimeout(() => setCopiedId(null), 2000)
+    onShowSuccess(t('actions.save_success'))
+  }
 
   // Local state for onboarding drafts to prevent DB syncing issues during typing/color selection
   const [onboardingDrafts, setOnboardingDrafts] = useState({})
@@ -118,9 +127,6 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                       <label className="text-[10px] text-orange-500 uppercase font-black tracking-widest leading-none">
                         {t('settings.child_name_label')}
                       </label>
-                      <span className="text-[10px] text-indigo-400/50 font-black font-mono tracking-widest uppercase">
-                        ID: {p.invite_code || '---'}
-                      </span>
                     </div>
 
                     <div className="relative">
@@ -162,10 +168,12 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                   </div>
                 </div>
 
-                {/* Color Selector */}
-                <div className="flex flex-col gap-4">
+                {/* Color Selector & Invite Code */}
+                <div className="flex flex-col md:flex-row gap-6 md:items-end">
                   <div className="space-y-2">
-                    <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">Couleur associée</label>
+                    <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">
+                      {t('settings.associated_color') || 'Couleur associée'}
+                    </label>
                     <div className="flex gap-2">
                       {COLORS.map(color => (
                         <button
@@ -180,6 +188,27 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                           {(draft.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-20`} />}
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* New Prominent Code Block */}
+                  <div className="flex-1 space-y-2">
+                    <label className="text-[9px] text-indigo-400 uppercase font-black ml-1 tracking-widest">
+                      {t('settings.invite_code_description')}
+                    </label>
+                    <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-4 flex items-center justify-between group hover:border-indigo-500/30 transition-all [.light-theme_&]:bg-indigo-600/10 [.light-theme_&]:border-indigo-200">
+                      <span className="text-2xl font-black text-white tracking-[0.3em] italic uppercase [.light-theme_&]:text-indigo-900">
+                        {p.invite_code || '------'}
+                      </span>
+                      <button
+                        onClick={() => handleCopyCode(p.invite_code)}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 ${copiedId === p.invite_code
+                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                          : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 [.light-theme_&]:bg-white [.light-theme_&]:text-indigo-400 [.light-theme_&]:hover:text-indigo-600'
+                          }`}
+                      >
+                        {copiedId === p.invite_code ? <Check size={18} /> : <Copy size={18} />}
+                      </button>
                     </div>
                   </div>
                 </div>

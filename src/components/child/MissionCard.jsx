@@ -13,11 +13,11 @@ export default function MissionCard({ mission, onToggle, disabled }) {
       layout
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className={`relative overflow-hidden p-5 aspect-square rounded-[2.8rem] border-2 transition-all duration-700 flex flex-col items-center justify-between shadow-2xl ${isParentValidated
+      className={`relative overflow-hidden p-6 min-h-[160px] rounded-[3rem] border-2 transition-all duration-700 flex flex-col items-center justify-between shadow-xl ${isParentValidated
         ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 shadow-[0_15px_30px_rgba(251,191,36,0.3)]'
         : isDone
           ? 'bg-emerald-500 border-emerald-400 shadow-[0_15px_30px_rgba(16,185,129,0.2)]'
-          : 'bg-slate-900 [.light-theme_&]:bg-white border-white/5 [.light-theme_&]:border-indigo-100 [.light-theme_&]:border-b-[8px] [.light-theme_&]:shadow-indigo-500/10'
+          : 'bg-slate-900 [.light-theme_&]:bg-white border-white/5 [.light-theme_&]:border-indigo-100 [.light-theme_&]:border-b-[10px] [.light-theme_&]:shadow-[0_20px_40px_rgba(99,102,241,0.08)]'
         }`}
     >
       <AnimatePresence>
@@ -42,14 +42,14 @@ export default function MissionCard({ mission, onToggle, disabled }) {
         )}
       </AnimatePresence>
 
-      <div className={`flex flex-col items-center gap-1 mt-4 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''}`}>
+      <div className={`flex flex-col items-center gap-2 mt-2 z-10 text-center pointer-events-none transition-transform duration-500 ${isParentValidated ? 'scale-110' : ''}`}>
         <motion.span
           animate={isDone ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-          className={`text-6xl mb-2 transition-all drop-shadow-sm ${isDone ? 'drop-shadow-md' : ''}`}
+          className={`text-7xl mb-1 transition-all drop-shadow-sm flex items-center justify-center h-20 w-20 ${isDone ? 'drop-shadow-md' : ''}`}
         >
           {mission.icon || '⭐'}
         </motion.span>
-        <h3 className={`font-black uppercase text-[11px] tracking-tight leading-tight px-1 ${isParentValidated ? 'text-white' : 'text-white [.light-theme_&]:text-indigo-950'}`}>
+        <h3 className={`font-black uppercase text-[13px] tracking-tight leading-tight px-1 ${isParentValidated ? 'text-white' : 'text-slate-200 [.light-theme_&]:text-indigo-950'}`}>
           {t(mission.title)}
         </h3>
 
