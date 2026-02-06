@@ -21,7 +21,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
   const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === t('completion_modal.default_reward')))
 
   useEffect(() => {
-    if (challenge && !isSaving) {
+    if (challenge) {
       // Logic to translate default presets if they are in French (legacy)
       let rName = challenge.reward_name || ''
       if (rName === 'Cadeau Surprise' || rName === 'Surprise Gift' || rName === t('completion_modal.default_reward')) {
@@ -38,7 +38,7 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       }
       setMalusMessage(mMsg)
     }
-  }, [challenge, isSaving])
+  }, [challenge?.id]) // On ne synchronise qu'au montage ou si le challenge change d'ID
 
 
 
@@ -84,6 +84,16 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
       <SectionCard icon={Trophy} colorClass="text-orange-500" title={t('settings.challenge_title')}>
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3">
+            <div className="space-y-2">
+              <label className="text-[10px] text-orange-500 uppercase font-black ml-1 mb-1 block">{t('settings.reward_label')}</label>
+              <input
+                value={rewardName}
+                onChange={(e) => setRewardName(e.target.value)}
+                placeholder={t('settings.reward_placeholder')}
+                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 font-bold outline-none text-emerald-400 focus:border-emerald-500 transition-colors [.light-theme_&]:bg-white [.light-theme_&]:text-slate-900 [.light-theme_&]:border-indigo-200"
+              />
+            </div>
+
             <div className="space-y-2">
               <label className="text-[10px] text-orange-500 uppercase font-black ml-1 mb-1 block">{t('settings.duration_label')}</label>
               <input

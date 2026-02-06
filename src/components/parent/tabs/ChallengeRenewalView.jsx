@@ -19,7 +19,7 @@ export default function ChallengeRenewalView({ challenge, missionsCount, onStart
             setMalusMessage(challenge.malus_message || '')
             setDurationDays(challenge.duration_days || 7)
         }
-    }, [challenge])
+    }, [challenge?.id]) // On ne synchronise qu'au montage ou si le challenge change d'ID
 
     const handleStart = async () => {
         setIsSubmitting(true)
