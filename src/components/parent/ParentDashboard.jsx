@@ -8,6 +8,7 @@ import OnboardingStepper from '../ui/OnboardingStepper'
 import OnboardingCompletionModal from '../ui/OnboardingCompletionModal'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
+import { NotificationService } from '../../services/notificationService'
 
 const getColorClasses = (colorName) => {
   const maps = {
@@ -149,8 +150,16 @@ export default function ParentDashboard({
           if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
             if (payload.new.validation_requested && !payload.new.validation_result) {
               if (dismissedIdsRef.current.has(child.id)) return
+
               setNotifications(prev => {
                 if (prev.find(n => n.profile_id === child.id)) return prev
+
+                // 🔔 Trigger browser notification for parent
+                NotificationService.sendLocalNotification(`Bravo ! ${child.child_name} a fini ! ✨`, {
+                  body: "Il ou elle attend ta validation pour ses missions.",
+                  tag: `validation-${child.id}` // Prevent duplicates
+                });
+
                 return [...prev, { profile_id: child.id, child_name: child.child_name }]
               })
             }
@@ -295,29 +304,43 @@ export default function ParentDashboard({
             </div>
 
             {/* Selector Profile Child for Parent (Validation context) */}
-            {filteredProfilesForUI.length > 1 && (
-              <div className="flex gap-1.5 p-1 bg-slate-900/60 border border-white/5 rounded-xl">
-                {filteredProfilesForUI.map(p => {
-                  const isActive = profile?.id === p.id
-                  const colors = getColorClasses(p.color) || { active: '', inactive: '' }
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        onSwitchProfile(p.id)
-                        setActiveTab('validation')
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${isActive
-                        ? `${colors.active} shadow-lg`
-                        : `${colors.inactive} hover:bg-white/5 opacity-50`
-                        }`}
-                    >
-                      {p.child_name}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {filteredProfilesForUI.length > 1 && (
+                <div className="flex gap-1.5 p-1 bg-slate-900/60 border border-white/5 rounded-xl">
+                  {filteredProfilesForUI.map(p => {
+                    const isActive = profile?.id === p.id
+                    const colors = getColorClasses(p.color) || { active: '', inactive: '' }
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          onSwitchProfile(p.id)
+                          setActiveTab('validation')
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${isActive
+                          ? `${colors.active} shadow-lg`
+                          : `${colors.inactive} hover:bg-white/5 opacity-50`
+                          }`}
+                      >
+                        {p.child_name}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* 🔔 Button to activate notifications for parents */}
+              {NotificationService.getPermissionStatus() !== 'granted' && (
+                <button
+                  onClick={() => NotificationService.requestPermission().then(refresh)}
+                  className="px-3 py-1.5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600/30 transition-all flex items-center gap-2"
+                  title="Activer les alertes de validation"
+                >
+                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-ping" />
+                  🔔 Alertes
+                </button>
+              )}
+            </div>
           </div>
         </div>
         {/* Tab Switcher - Premium Look - Masqué pendant l'onboarding */}
