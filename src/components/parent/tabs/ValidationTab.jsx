@@ -23,6 +23,8 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
   const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed && m.parent_validated)
   const childFinishedAll = missions.length > 0 && missions.every(m => m.is_completed) && !allMissionsDone
+  const isDaySuccess = missions.length > 0 && missions.some(m => m.validation_result === 'success')
+
   // ✅ FIX: Le challenge est fini si le streak atteint la durée, PEU IMPORTE si is_active est encore true
   const isChallengeFinished = (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
 
@@ -227,6 +229,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       <ValidationHeader
         isChallengeFinished={isChallengeFinished}
         allMissionsDone={allMissionsDone}
+        isDaySuccess={isDaySuccess}
         challenge={challenge}
         missionsCount={missions.length}
         onStartNewChallenge={handleStartNewChallenge}
@@ -236,7 +239,10 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
       {/* 2. Liste des Missions */}
       <ValidationMissionList
-        missions={missions}
+        missions={isDaySuccess
+          ? missions.map(m => ({ ...m, is_completed: false, parent_validated: false }))
+          : missions
+        }
         onValidate={validateParent}
       />
 
