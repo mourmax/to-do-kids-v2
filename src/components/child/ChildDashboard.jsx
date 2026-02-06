@@ -336,41 +336,6 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
         {/* Titre Section Refined */}
         <div className="relative pt-8 pb-4">
-          {/* Header Controls (Absolute positioned but higher up or flexed) */}
-          <div className="absolute right-0 -top-2 flex gap-2">
-            {NotificationService.isSupported() && NotificationService.getPermissionStatus() === 'default' && (
-              <button
-                onClick={async () => {
-                  const res = await NotificationService.requestPermission()
-                  if (res === 'granted') {
-                    NotificationService.sendLocalNotification("Notifications activées ! ✨", {
-                      body: "Tu recevras des rappels pour tes missions."
-                    })
-                    refresh()
-                  }
-                }}
-                className="p-3 bg-slate-900/40 [.light-theme_&]:bg-white border border-white/5 [.light-theme_&]:border-indigo-100 rounded-2xl text-slate-400 [.light-theme_&]:text-indigo-500 hover:text-white [.light-theme_&]:hover:text-indigo-700 transition-all shadow-lg [.light-theme_&]:shadow-indigo-500/10 backdrop-blur-sm"
-                title="Activer les notifications"
-              >
-                <Sparkles size={18} />
-              </button>
-            )}
-
-            <button
-              onClick={async () => {
-                const newTheme = profile?.preferred_theme === 'light' ? 'dark' : 'light'
-                const { error } = await supabase
-                  .from('profiles')
-                  .update({ preferred_theme: newTheme })
-                  .eq('id', profile.id)
-                if (!error) refresh()
-              }}
-              className="p-3 bg-slate-900/40 [.light-theme_&]:bg-white border border-white/5 [.light-theme_&]:border-indigo-100 rounded-2xl text-slate-400 [.light-theme_&]:text-indigo-500 hover:text-white [.light-theme_&]:hover:text-indigo-700 transition-all shadow-lg [.light-theme_&]:shadow-indigo-500/10 backdrop-blur-sm"
-              title="Changer de thème"
-            >
-              {profile?.preferred_theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
-          </div>
 
           <div className="text-center space-y-4">
             <motion.div
@@ -387,7 +352,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
               }}
               className="relative inline-block"
             >
-              <h2 className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-indigo-500 to-indigo-800 italic uppercase tracking-tighter drop-shadow-[0_10px_20px_rgba(99,102,241,0.2)] animate-inner-glow">
+              <h2 className="text-5xl sm:text-7xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-indigo-500 to-indigo-800 italic uppercase tracking-tighter drop-shadow-[0_10px_20px_rgba(99,102,241,0.2)] animate-inner-glow">
                 {profile?.child_name}
               </h2>
               {/* Stars moved to background and further away to not hide text */}
@@ -428,7 +393,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
       </div>
 
       {/* --- 🏆 MESSAGE DE FIN (EN HAUT) --- */}
-      <div className="max-w-md mx-auto">
+      <div className="max-w-2xl mx-auto">
         <AnimatePresence>
           {allMissionsDone && !validationRequested && validationResult !== 'success' && (
             <motion.div
@@ -554,7 +519,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
       {/* Barre de progression */}
       {challenge && (
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <ProgressBar
             current={safeCurrent}
             total={safeTotal}
@@ -565,7 +530,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
       {/* Liste des missions (Masquée si challenge fini) */}
       {!isVictory && challenge?.is_active && (
-        <div id="mission-grid" className="max-w-3xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 px-4">
+        <div id="mission-grid" className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-4">
           {optimisticMissions.map((mission, index) => {
             const displayMission = validationResult === 'success'
               ? { ...mission, is_completed: false, parent_validated: false }
@@ -617,7 +582,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
       {/* --- 🚀 ÉCRAN "Nouveau Challenge" SI LE PARENT A RE-VALIDÉ --- */}
       <AnimatePresence>
         {challenge && challenge.is_active && Number(challenge.current_streak) === 0 && !allMissionsDone && !validationRequested && (
-          <div className="max-w-md mx-auto">
+          <div className="max-w-2xl mx-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -648,7 +613,7 @@ export default function ChildDashboard({ profile, profiles, challenge, missions,
 
         {/* --- 🕐 MESSAGE PENDING CONFIG SI CHALLENGE FINI MAIS PAS ENCORE RE-CONFIGURÉ --- */}
         {challenge && !challenge.is_active && (
-          <div className="max-w-md mx-auto">
+          <div className="max-w-2xl mx-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

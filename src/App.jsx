@@ -264,75 +264,75 @@ export default function App() {
       </AnimatePresence>
 
       {/* HEADER FIXE */}
-      <div className={`fixed top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b ${isParentMode ? 'from-[#020617] via-[#020617]/90' : 'from-[#F8FAFF] via-[#F8FAFF]/90'} to-transparent flex justify-between items-center`}>
-
-        {/* Logo/Title (Discret) */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-lg border border-white/10">
-            <img src="/icon-192.png" alt="Logo" className="w-full h-full object-contain" />
+      <div className={`fixed top-0 left-0 right-0 z-50 bg-gradient-to-b ${isParentMode ? 'from-[#020617] via-[#020617]/90' : 'from-[#F8FAFF] via-[#F8FAFF]/90'} to-transparent transition-colors duration-500`}>
+        <div className={`p-4 mx-auto flex justify-between items-center transition-all ${isParentMode ? 'max-w-4xl lg:max-w-5xl' : 'max-w-3xl lg:max-w-6xl'}`}>
+          {/* Logo/Title (Discret) */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg overflow-hidden shadow-lg border border-white/10">
+              <img src="/icon-192.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <span className={`text-sm font-black uppercase italic tracking-tighter ${isParentMode ? 'text-white' : 'text-indigo-950'}`}>To-Do Kids</span>
           </div>
-          <span className={`text-sm font-black uppercase italic tracking-tighter ${isParentMode ? 'text-white' : 'text-indigo-950'}`}>To-Do Kids</span>
-        </div>
 
-        {/* Actions à droite */}
-        <div className="flex items-center gap-3">
+          {/* Actions à droite */}
+          <div className="flex items-center gap-3">
+            {/* Toggle Parent/Child (Uniquement si Parent Loggé) */}
+            {session && (
+              <button
+                onClick={() => {
+                  if (isParentMode) {
+                    setIsParentMode(false)
+                  } else {
+                    setShowPinModal(true)
+                  }
+                }}
+                className={`${isParentMode ? 'bg-slate-900 border-white/10 text-slate-400' : 'bg-white border-indigo-100 text-indigo-400'} border px-3 py-2 rounded-xl hover:opacity-80 transition-all flex items-center gap-2 group shadow-sm`}
+              >
+                {isParentMode ? (
+                  <>
+                    <Baby size={18} className="group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t('dashboard.parent_exit')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sliders size={18} className="group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t('dashboard.parent_title')}</span>
+                  </>
+                )}
+              </button>
+            )}
 
-          {/* Toggle Parent/Child (Uniquement si Parent Loggé) */}
-          {session && (
+            {/* Bouton pour relancer le Tuto */}
             <button
-              onClick={() => {
-                if (isParentMode) {
-                  setIsParentMode(false)
-                } else {
-                  setShowPinModal(true)
-                }
-              }}
-              className={`${isParentMode ? 'bg-slate-900 border-white/10 text-slate-400' : 'bg-white border-indigo-100 text-indigo-400'} border px-3 py-2 rounded-xl hover:opacity-80 transition-all flex items-center gap-2 group shadow-sm`}
+              onClick={() => setShowTutorial(true)}
+              className={`${isParentMode ? 'bg-slate-900 border-white/10 text-slate-400' : 'bg-white border-indigo-100 text-indigo-400'} border p-2 rounded-xl hover:opacity-80 transition-colors shadow-sm`}
+              title="Aide"
             >
-              {isParentMode ? (
-                <>
-                  <Baby size={18} className="group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t('dashboard.parent_exit')}</span>
-                </>
-              ) : (
-                <>
-                  <Sliders size={18} className="group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t('dashboard.parent_title')}</span>
-                </>
-              )}
+              <HelpCircle size={18} />
             </button>
-          )}
 
-          {/* Bouton pour relancer le Tuto */}
-          <button
-            onClick={() => setShowTutorial(true)}
-            className={`${isParentMode ? 'bg-slate-900 border-white/10 text-slate-400' : 'bg-white border-indigo-100 text-indigo-400'} border p-2 rounded-xl hover:opacity-80 transition-colors shadow-sm`}
-            title="Aide"
-          >
-            <HelpCircle size={18} />
-          </button>
-
-          {/* Bouton Déconnexion */}
-          <button
-            onClick={async () => {
-              localStorage.removeItem('child_family_id')
-              localStorage.removeItem('active_profile_id')
-              localStorage.removeItem('hasSeenTutorial_v1') // Nettoyage pour tests
-              localStorage.removeItem('reset_pin_mode')
-              await supabase.auth.signOut()
-              window.location.reload()
-            }}
-            className={`border p-2 rounded-xl transition-all shadow-sm ${isParentMode ? 'bg-slate-900 border-white/5 text-slate-400 hover:text-rose-400' : 'bg-white border-indigo-100 text-indigo-400 hover:text-rose-500'}`}
-            title={t('actions.logout')}
-          >
-            <LogOut size={18} />
-          </button>
+            {/* Bouton Déconnexion */}
+            <button
+              onClick={async () => {
+                localStorage.removeItem('child_family_id')
+                localStorage.removeItem('active_profile_id')
+                localStorage.removeItem('hasSeenTutorial_v1') // Nettoyage pour tests
+                localStorage.removeItem('reset_pin_mode')
+                await supabase.auth.signOut()
+                window.location.reload()
+              }}
+              className={`border p-2 rounded-xl transition-all shadow-sm ${isParentMode ? 'bg-slate-900 border-white/5 text-slate-400 hover:text-rose-400' : 'bg-white border-indigo-100 text-indigo-400 hover:text-rose-500'}`}
+              title={t('actions.logout')}
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
       {!showTutorial && !shouldShowTutorial && (
-        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl' : 'max-w-3xl'}`}>
+        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl lg:max-w-5xl' : 'max-w-3xl lg:max-w-6xl'}`}>
           <AnimatePresence mode="wait">
             {isParentMode ? (
               family ? (
