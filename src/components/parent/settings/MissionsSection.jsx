@@ -4,7 +4,7 @@ import { supabase } from '../../../supabaseClient'
 import IconPicker from '../IconPicker'
 import MissionLibrary from '../MissionLibrary'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, Crown, Plus, Trash2, Check, X, Edit2, Library, Timer as TimerIcon, Clock } from 'lucide-react'
+import { Sparkles, Crown, Plus, Trash2, Check, X, Edit2, Library, Timer as TimerIcon, Clock, Bell } from 'lucide-react'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 import TimePicker from '../../ui/TimePicker'
 
@@ -73,7 +73,7 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
             <div className="flex flex-wrap gap-2">
               {(editState.scheduled_times || []).map((t, idx) => (
                 <div key={idx} className="flex items-center gap-2 bg-slate-800 border border-indigo-500/30 rounded-xl px-3 py-2 group">
-                  <TimerIcon size={14} className="text-indigo-400" />
+                  <Bell size={14} className="text-indigo-400" />
                   <span className="text-xs font-black text-indigo-400">{t}</span>
                   <button onClick={() => removeTime(idx)} className="p-1 hover:text-red-400 text-slate-600 transition-colors">
                     <X size={12} />
@@ -149,8 +149,8 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
                   {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : t('common.all')}
                 </span>
                 {(mission.scheduled_times || []).map((t, idx) => (
-                  <span key={idx} className="text-[9px] font-black text-indigo-400 bg-indigo-500/15 px-3 py-1 rounded-full flex items-center gap-1.5 border border-indigo-500/20 shadow-lg shadow-indigo-600/5">
-                    <TimerIcon size={12} className="text-indigo-400" /> {t}
+                  <span key={idx} className="text-[10px] font-black text-indigo-500 [.light-theme_&]:text-indigo-600 bg-indigo-500/15 [.light-theme_&]:bg-indigo-50 px-3.5 py-1.5 rounded-full flex items-center gap-2 border border-indigo-500/20 shadow-sm">
+                    <Bell size={13} className="shrink-0" /> {t}
                   </span>
                 ))}
               </div>
@@ -446,7 +446,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                       <div className="flex flex-wrap gap-2">
                         {newScheduledTimes.map((t, idx) => (
                           <div key={idx} className="flex items-center gap-2 bg-slate-950 border border-indigo-500/30 rounded-xl px-3 py-2">
-                            <TimerIcon size={14} className="text-indigo-400" />
+                            <Bell size={14} className="text-indigo-400" />
                             <span className="text-xs font-black text-indigo-400">{t}</span>
                             <button
                               type="button"
