@@ -48,6 +48,8 @@
 6. **Agile Guardrail**: Skip heavy planning documentation for minor UI/CSS fixes to avoid Planning Paralysis.
 8. **Child-Centric UI**: The child dashboard must use a "Ludic Light Theme" (vibrant colors, light backgrounds, soft shadows) to differentiate it from the Parent "Glassmorphism" theme.
 9. **PWA Notifications**: Favor Web Push API for scheduled task reminders. Research server-side triggers for reliability.
+10. **Shell Syntax**: Use `;` instead of `&&` for multi-command execution to ensure compatibility with PowerShell.
+
 
 ---
 

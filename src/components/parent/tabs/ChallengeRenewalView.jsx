@@ -60,7 +60,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
     const startEditing = (mission) => {
         setEditingId(mission.id)
         setEditState({
-            title: mission.title,
+            title: t(mission.title),
             icon: mission.icon,
             assigned_to: mission.assigned_to,
             scheduled_time: mission.scheduled_time || ''
@@ -215,13 +215,15 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                 placeholder="Nom de la mission..."
                                                 className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 text-[10px] font-bold text-white focus:border-emerald-500 outline-none"
                                             />
-                                            <input
-                                                type="time"
-                                                value={newScheduledTime}
-                                                onChange={(e) => setNewScheduledTime(e.target.value)}
-                                                className="w-20 bg-slate-900 border border-white/10 rounded-xl px-2 text-[10px] font-bold text-indigo-400 outline-none"
-                                                title="Heure de rappel"
-                                            />
+                                            <div className="flex items-center gap-1 bg-slate-900 border border-white/10 rounded-xl px-2">
+                                                <Timer size={14} className="text-indigo-400" />
+                                                <input
+                                                    type="time"
+                                                    value={newScheduledTime}
+                                                    onChange={(e) => setNewScheduledTime(e.target.value)}
+                                                    className="bg-transparent text-[10px] font-bold text-indigo-400 outline-none w-16 [color-scheme:dark]"
+                                                />
+                                            </div>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
@@ -270,12 +272,15 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                             {p.child_name}
                                                         </button>
                                                     ))}
-                                                    <input
-                                                        type="time"
-                                                        value={editState.scheduled_time}
-                                                        onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
-                                                        className="ml-2 w-16 bg-slate-900 border border-indigo-500/30 rounded-lg px-1 text-[8px] font-bold text-indigo-400 outline-none"
-                                                    />
+                                                    <div className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-1 ml-2">
+                                                        <Timer size={10} className="text-indigo-400" />
+                                                        <input
+                                                            type="time"
+                                                            value={editState.scheduled_time}
+                                                            onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
+                                                            className="bg-transparent text-[8px] font-bold text-indigo-400 outline-none w-14 [color-scheme:dark]"
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="flex gap-1">
                                                     <button onClick={() => saveEdit(mission.id)} className="p-1 text-emerald-400"><Check size={16} /></button>

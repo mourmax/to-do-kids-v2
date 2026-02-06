@@ -4,6 +4,22 @@ Transfers the child interface from the current "Glassmorphism/Dark" theme to a "
 
 ## Proposed Changes
 
+### Mission Editing Refinements
+
+Fix the issue where translation keys are displayed instead of translated titles when editing a mission.
+
+#### [MODIFY] [ChallengeRenewalView.jsx](file:///c:/Users/matis/TodoKids_Antigravity/to-do-kids-v2/src/components/parent/tabs/ChallengeRenewalView.jsx)
+- Wrap `mission.title` in `t()` inside the `startEditing` function.
+- Update the time input to use a custom-styled picker.
+
+#### [MODIFY] [MissionsSection.jsx](file:///c:/Users/matis/TodoKids_Antigravity/to-do-kids-v2/src/components/parent/settings/MissionsSection.jsx)
+- Wrap `mission.title` in `t()` inside the `onEditStart` callback.
+- Update the time input to use a custom-styled picker.
+
+### UI Enhancements
+
+Research and implement a custom, premium time selector for mission reminders to replace the clunky browser default.
+
 ### [UI] Child Dashboard Theme
 
 #### [MODIFY] [ChildDashboard.jsx](file:///c:/Users/matis/TodoKids_Antigravity/to-do-kids-v2/src/components/child/ChildDashboard.jsx)

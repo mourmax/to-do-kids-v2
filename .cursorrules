@@ -7,3 +7,4 @@
 - PWA : Toujours vérifier que les nouveaux assets sont compatibles avec le manifest PWA.
 - Schéma DB : Se référer au schéma SQL du PRD. Ne pas modifier sans accord.
 - Animations : Utiliser Framer Motion pour les entrées/sorties de composants.
+- Terminal : Utiliser ';' à la place de '&&' pour séparer les commandes (compatibilité PowerShell).

@@ -47,12 +47,15 @@ const MissionItem = ({ mission, profiles, isEditing, onEditStart, onEditSave, on
 
           <div className="flex items-center gap-2">
             <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Rappel :</span>
-            <input
-              type="time"
-              value={editState.scheduled_time || ''}
-              onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
-              className="bg-slate-800 border border-indigo-500/30 rounded-lg px-2 py-1 text-xs font-bold text-indigo-400 outline-none"
-            />
+            <div className="flex items-center gap-1 bg-slate-800 border border-indigo-500/30 rounded-lg px-2 py-1">
+              <Timer size={10} className="text-indigo-400" />
+              <input
+                type="time"
+                value={editState.scheduled_time || ''}
+                onChange={(e) => setEditState({ ...editState, scheduled_time: e.target.value })}
+                className="bg-transparent text-[10px] font-bold text-indigo-400 outline-none w-16 [color-scheme:dark]"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between">
@@ -369,12 +372,15 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
 
                     <div className="space-y-2">
                       <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest ml-1">Heure de rappel (Optionnel) :</span>
-                      <input
-                        type="time"
-                        value={newScheduledTime}
-                        onChange={(e) => setNewScheduledTime(e.target.value)}
-                        className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3 outline-none font-bold focus:border-indigo-500 transition-colors text-indigo-400 text-sm"
-                      />
+                      <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-2xl px-4 py-3">
+                        <Timer size={18} className="text-indigo-400" />
+                        <input
+                          type="time"
+                          value={newScheduledTime}
+                          onChange={(e) => setNewScheduledTime(e.target.value)}
+                          className="flex-1 bg-transparent font-bold text-indigo-400 outline-none [color-scheme:dark]"
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
@@ -451,7 +457,7 @@ export default function MissionsSection({ missions, profiles, familyId, onShowSu
                   onEditStart={(mission) => {
                     setEditingId(mission.id)
                     setEditState({
-                      title: mission.title,
+                      title: t(mission.title),
                       icon: mission.icon,
                       assigned_to: mission.assigned_to,
                       scheduled_time: mission.scheduled_time || ''
