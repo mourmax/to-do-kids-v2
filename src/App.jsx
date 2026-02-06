@@ -82,8 +82,10 @@ export default function App() {
   // Handle manual onboarding termination
   const finishOnboarding = () => {
     localStorage.setItem('onboarding_invite_dismissed', 'true')
+    setPinSuccessfullySet(true) // 🛡️ IMPORTANT: Prevent PinSetup screen from showing up if data is stale
     setIsOnboardingSession(false)
     setOnboardingStep('done')
+    loadFamilyData()
   }
 
   // 3. Derived states for onboarding (Safe to use profiles here)

@@ -89,11 +89,11 @@ export default function ParentDashboard({
     ? childProfiles.filter(isConfigured)
     : childProfiles
 
-  // ECOUTEUR TEMPS RÉEL (DEMANDES DE VALIDATION)
+  // ECOUTEUR TEMPS RÉEL (DEMANDES DE VALIDATION) + POLLING DE SECOURS
   useEffect(() => {
     if (!family?.id) return
 
-    // Charger l'état initial des notifications
+    // 1. Charger l'état initial des notifications
     const checkPendingValidations = async () => {
       const today = new Date().toISOString().split('T')[0]
       const { data } = await supabase
@@ -107,16 +107,12 @@ export default function ParentDashboard({
         // Regrouper par enfant unique
         const uniqueIds = [...new Set(data.map(d => d.profile_id))]
         const newNotifs = uniqueIds.map(id => {
-          // If explicitly dismissed in this session, skip
           if (dismissedIdsRef.current.has(id)) return null
-
           const child = childProfiles.find(p => p.id === id)
           return child ? { profile_id: id, child_name: child.child_name } : null
         }).filter(Boolean)
 
-        // Update state avoiding duplicates (and re-checking dismissed just in case)
         setNotifications(prev => {
-          // Merge pending
           const combined = [...prev]
           newNotifs.forEach(n => {
             if (!combined.find(c => c.profile_id === n.profile_id)) {
@@ -130,9 +126,9 @@ export default function ParentDashboard({
 
     checkPendingValidations()
 
-    // Abonnement aux changements
+    // 2. Abonnement Realtime aux changements (Daily Logs)
     const channel = supabase
-      .channel(`parent-sync-${family?.id || 'no-family'}`)
+      .channel(`parent-sync-${family.id}`)
       .on(
         'postgres_changes',
         {
@@ -141,19 +137,18 @@ export default function ParentDashboard({
           table: 'daily_logs',
         },
         async (payload) => {
+          console.log("Realtime update received (Parent):", payload)
+          // 🔄 Refresh global pour mettre à jour la liste des missions
+          refresh(true)
+
           const childId = payload.new?.profile_id || payload.old?.profile_id
           const child = childProfiles.find(p => p.id === childId)
           if (!child) return
 
-          // 🔄 Refresh global pour mettre à jour la liste des missions
-          refresh(true)
-
           // Gestion des notifications
-          if (payload.eventType === 'UPDATE') {
+          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
             if (payload.new.validation_requested && !payload.new.validation_result) {
-              // Check blocked
               if (dismissedIdsRef.current.has(child.id)) return
-
               setNotifications(prev => {
                 if (prev.find(n => n.profile_id === child.id)) return prev
                 return [...prev, { profile_id: child.id, child_name: child.child_name }]
@@ -174,15 +169,26 @@ export default function ParentDashboard({
           filter: `family_id=eq.${family.id}`
         },
         () => {
+          console.log("Realtime challenge update received")
           refresh(true)
         }
       )
       .subscribe()
 
+    // 3. POLLING DE SECOURS (Toutes les 5s si sur l'onglet Validation)
+    let interval = null
+    if (activeTab === 'validation') {
+      interval = setInterval(() => {
+        console.log("Polling refresh (Parent Validation)...")
+        refresh(true)
+      }, 5000)
+    }
+
     return () => {
       supabase.removeChannel(channel)
+      if (interval) clearInterval(interval)
     }
-  }, [family?.id, childProfiles])
+  }, [family?.id, childProfiles, refresh, activeTab])
 
   // Synchroniser l'onglet actif avec l'étape d'onboarding
   useEffect(() => {
