@@ -33,11 +33,6 @@ export default function ChildDashboard({
     return missions.length > 0 && missions.every(m => m.is_completed)
   }, [missions, isVictory])
 
-  const progress = useMemo(() => {
-    if (!challenge) return 0
-    return (challenge.current_streak / challenge.target_days) * 100
-  }, [challenge])
-
   // Confetti effect and scheduling on mount
   useEffect(() => {
     if (isVictory) {
@@ -270,10 +265,9 @@ export default function ChildDashboard({
       {/* CHALLENGE PROGRESS SECTION */}
       <div id="challenge-progress" className="max-w-6xl mx-auto px-4 mb-12">
         <ChildProgressBar
-          streak={challenge?.current_streak || 0}
-          target={challenge?.target_days || 7}
-          rewardName={challenge?.reward_name || "Surprise !"}
-          progress={progress}
+          current={challenge?.current_streak || 0}
+          total={challenge?.duration_days || 7}
+          reward={challenge?.reward_name || "Surprise !"}
         />
       </div>
 
@@ -418,30 +412,31 @@ export default function ChildDashboard({
         </div>
       )}
 
-      {/* --- 🧪 BOUTON TEST NOTIF (RE-ADDED & FIXED) --- */}
-      <button
-        onClick={() => {
-          console.log("[Test] Clicked notification test button");
-          if (NotificationService.getPermissionStatus() !== 'granted') {
-            NotificationService.requestPermission().then(res => {
-              if (res === 'granted') {
-                NotificationService.sendLocalNotification("Gagné ! ✨", {
-                  body: "Tes notifications sont maintenant activées."
-                })
-              } else {
-                alert("Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur.");
-              }
-            })
-          } else {
-            NotificationService.sendLocalNotification("C'est l'heure ! 🔔", {
-              body: "Ta mission 'Mettre la table' t'attend ! ✨",
-            })
-          }
-        }}
-        className="fixed bottom-6 right-6 z-[999] bg-white border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-full font-black uppercase text-xs shadow-2xl active:scale-95 transition-all"
-      >
-        🔔 Test Alerte
-      </button>
+      {/* --- BOUTON TEST NOTIF — DEV UNIQUEMENT --- */}
+      {import.meta.env.DEV && (
+        <button
+          onClick={() => {
+            if (NotificationService.getPermissionStatus() !== 'granted') {
+              NotificationService.requestPermission().then(res => {
+                if (res === 'granted') {
+                  NotificationService.sendLocalNotification("Gagné ! ✨", {
+                    body: "Tes notifications sont maintenant activées."
+                  })
+                } else {
+                  alert("Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur.");
+                }
+              })
+            } else {
+              NotificationService.sendLocalNotification("C'est l'heure ! 🔔", {
+                body: "Ta mission 'Mettre la table' t'attend ! ✨",
+              })
+            }
+          }}
+          className="fixed bottom-6 right-6 z-[999] bg-white border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-full font-black uppercase text-xs shadow-2xl active:scale-95 transition-all"
+        >
+          🔔 Test Alerte
+        </button>
+      )}
     </div>
   )
 }

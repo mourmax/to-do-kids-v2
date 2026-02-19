@@ -11,6 +11,7 @@ import ValidationMissionList from './ValidationMissionList'
 import ChallengeRenewalView from './ChallengeRenewalView'
 import { useTranslation } from 'react-i18next'
 import { ListChecks } from 'lucide-react'
+import { getProfileColorClasses } from '../../../utils/colors'
 
 export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName, profile, profiles }) {
   const { t } = useTranslation()
@@ -25,20 +26,8 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   const childFinishedAll = missions.length > 0 && missions.every(m => m.is_completed) && !allMissionsDone
   const isDaySuccess = missions.length > 0 && missions.some(m => m.validation_result === 'success')
 
-  // ✅ FIX: Le challenge est fini si le streak atteint la durée, PEU IMPORTE si is_active est encore true
+  // Le challenge est fini si le streak atteint la durée, PEU IMPORTE si is_active est encore true
   const isChallengeFinished = (challenge?.current_streak || 0) >= (challenge?.duration_days || 1)
-
-  // Helper for colors
-  const getColorClasses = (colorName) => {
-    const maps = {
-      rose: 'bg-rose-500/10 border-rose-500 text-rose-500',
-      sky: 'bg-sky-500/10 border-sky-500 text-sky-500',
-      emerald: 'bg-emerald-500/10 border-emerald-500 text-emerald-500',
-      amber: 'bg-amber-500/10 border-amber-500 text-amber-500',
-      violet: 'bg-indigo-500/10 border-indigo-500 text-indigo-500',
-    }
-    return maps[colorName] || maps.violet
-  }
 
   // --- Gestion du Toast ---
   const showToast = (message, type = 'success') => {
@@ -231,16 +220,16 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`p-6 rounded-3xl border-2 border-dashed flex flex-col items-center gap-3 text-center transition-colors ${getColorClasses(profile?.color)}`}
+            className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3"
           >
-            <div className="w-12 h-12 rounded-full bg-current opacity-20 flex items-center justify-center animate-bounce">
-              <ListChecks size={24} className="text-current" />
+            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 animate-bounce">
+              <ListChecks size={20} className="text-amber-600" />
             </div>
             <div>
-              <h4 className="font-black uppercase italic tracking-tighter text-lg">
+              <h4 className="font-semibold text-amber-800">
                 {t('validation.all_missions_done', { name: childName })}
               </h4>
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-70">
+              <p className="text-xs text-amber-600 mt-0.5">
                 {t('validation.validate_to_advance')}
               </p>
             </div>

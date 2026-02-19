@@ -388,11 +388,12 @@ export default function App() {
             ) : (
               <ChildDashboard
                 key="child"
+                family={family}
                 profile={activeProfile}
                 profiles={profiles}
                 challenge={challenge}
                 missions={missions}
-                onParentMode={() => setShowPinModal(true)}
+                onExit={() => setShowPinModal(true)}
                 onSwitchProfile={switchProfile}
                 refresh={loadFamilyData}
                 isChildSession={!session && !!childFamilyId}
@@ -418,7 +419,8 @@ export default function App() {
       <AnimatePresence>
         {showPinModal && (
           <ParentPinModal
-            correctPin={parentProfile?.pin_code || "0000"}
+            profileId={parentProfile?.id}
+            hasPinSet={!!parentProfile?.pin_code}
             onSuccess={() => { setShowPinModal(false); setIsParentMode(true); }}
             onClose={() => setShowPinModal(false)}
           />
