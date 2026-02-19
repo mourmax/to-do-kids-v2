@@ -46,7 +46,8 @@ export default function ChildApp({
     } else {
       setStep(STEP.DASHBOARD)
     }
-  }, [isFirstVisit, avatar])
+  // avatar intentionally omitted: after init, step is driven by handlers only
+  }, [isFirstVisit]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Handlers ───────────────────────────────────────────────
   const handleSelectUniverse = useCallback((key) => {
