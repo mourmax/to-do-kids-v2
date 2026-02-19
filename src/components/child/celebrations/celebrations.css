@@ -1,0 +1,278 @@
+/* ============================================================
+   TodoKids — Celebrations CSS
+   Toutes les @keyframes pour les modales streak, victoire, malus
+   Sources: todokids-celebration-v3.jsx + todokids-all-celebrations-v4.jsx
+   ============================================================ */
+
+/* ── From todokids-all-celebrations-v4.jsx ─────────────────── */
+
+@keyframes particleFall {
+  0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0%   { transform: scale(0.3) translateY(20px); opacity: 0; }
+  65%  { transform: scale(1.08) translateY(-6px); }
+  82%  { transform: scale(0.97) translateY(2px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes blackIn {
+  from { opacity: 0; }
+  to   { opacity: 0.95; }
+}
+
+@keyframes logoReveal {
+  0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+  55%  { transform: scale(1.18) rotate(4deg); opacity: 1; }
+  75%  { transform: scale(0.95) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes shakeIn {
+  0%   { transform: translateX(-36px); opacity: 0; }
+  20%  { transform: translateX(18px);  opacity: 1; }
+  40%  { transform: translateX(-10px); }
+  60%  { transform: translateX(6px); }
+  80%  { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes cloudFloat {
+  0%   { transform: translateX(0)   translateY(0); }
+  30%  { transform: translateX(10px) translateY(-6px); }
+  60%  { transform: translateX(-6px) translateY(4px); }
+  100% { transform: translateX(0)   translateY(0); }
+}
+
+@keyframes tearDrop {
+  0%   { transform: translateY(-10px) scaleY(0.8); opacity: 0; }
+  40%  { transform: translateY(8px)   scaleY(1.15); opacity: 1; }
+  100% { transform: translateY(70px)  scaleY(0.85); opacity: 0; }
+}
+
+@keyframes hopLine {
+  0%   { transform: scaleX(0); transform-origin: left; opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: scaleX(1); transform-origin: left; opacity: 1; }
+}
+
+@keyframes glitchRed {
+  0%   { text-shadow:  2px 0 #ff0000, -2px 0 #00ffff; transform: translateX(0); }
+  20%  { text-shadow: -3px 0 #ff0000,  3px 0 #00ffff; transform: translateX(3px); }
+  40%  { text-shadow:  3px 0 #ff0000, -3px 0 #00ffff; transform: translateX(-3px); }
+  60%  { text-shadow: -2px 0 #ff0000,  2px 0 #00ffff; transform: translateX(2px); }
+  80%  { text-shadow:  1px 0 #ff0000, -1px 0 #00ffff; transform: translateX(-1px); }
+  100% { text-shadow: none;                            transform: translateX(0); }
+}
+
+@keyframes adoSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes nameReveal {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0%   0 0); opacity: 1; }
+}
+
+@keyframes titleGlitch {
+  0%,  100% { transform: translateX(0);  filter: none; }
+  10%        { transform: translateX(-4px); filter: hue-rotate(90deg); }
+  20%        { transform: translateX(4px);  filter: hue-rotate(-90deg); }
+  30%        { transform: translateX(0);   filter: none; }
+  45%        { transform: translateX(3px);  filter: brightness(2); }
+  55%        { transform: translateX(-3px); filter: none; }
+  70%        { transform: translateX(2px);  filter: saturate(3); }
+  80%        { transform: translateX(0);   filter: none; }
+}
+
+@keyframes streakPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.14); }
+}
+
+@keyframes giftBounce {
+  0%,  100% { transform: translateY(0)    rotate(0deg); }
+  20%        { transform: translateY(-22px) rotate(-6deg); }
+  45%        { transform: translateY(-12px) rotate(6deg); }
+  65%        { transform: translateY(-18px) rotate(-4deg); }
+  85%        { transform: translateY(-6px)  rotate(3deg); }
+}
+
+@keyframes rayExpand {
+  from { transform: scale(0) rotate(0deg);   opacity: 0.7; }
+  to   { transform: scale(3.5) rotate(50deg); opacity: 0; }
+}
+
+@keyframes shimmerGold {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes epicPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.35); }
+  50%       { box-shadow: 0 0 65px rgba(255,215,0,0.85), 0 0 110px rgba(255,165,0,0.45); }
+}
+
+@keyframes chestPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.07); }
+}
+
+@keyframes sparkle {
+  0%   { transform: scale(0) rotate(0deg);   opacity: 1; }
+  50%  { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+@keyframes revealDown {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; }
+  to   { clip-path: inset(0 0 0%   0); opacity: 1; }
+}
+
+@keyframes labelSlide {
+  from { transform: translateX(-110%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes capsuleLand {
+  0%   { transform: translateY(-220px) rotate(-18deg); opacity: 0; }
+  65%  { transform: translateY(12px)    rotate(4deg);   opacity: 1; }
+  80%  { transform: translateY(-6px)    rotate(-2deg); }
+  100% { transform: translateY(0)       rotate(0deg);   opacity: 1; }
+}
+
+@keyframes thrusterFire {
+  0%, 100% { transform: scaleY(1)   scaleX(1); opacity: 0.7; }
+  50%       { transform: scaleY(1.6) scaleX(0.8); opacity: 1; }
+}
+
+@keyframes scanLine {
+  0%   { top: -4px; }
+  100% { top: 100%; }
+}
+
+@keyframes holoBorder {
+  0%   { border-color: #00ffff; box-shadow: 0 0 12px #00ffff; }
+  33%  { border-color: #ff00ff; box-shadow: 0 0 12px #ff00ff; }
+  66%  { border-color: #ffff00; box-shadow: 0 0 12px #ffff00; }
+  100% { border-color: #00ffff; box-shadow: 0 0 12px #00ffff; }
+}
+
+@keyframes medalDrop {
+  0%   { transform: translateY(-120px) rotate(-22deg); opacity: 0; }
+  60%  { transform: translateY(12px)    rotate(5deg);   opacity: 1; }
+  78%  { transform: translateY(-6px)    rotate(-2deg); }
+  100% { transform: translateY(0)       rotate(0deg);   opacity: 1; }
+}
+
+@keyframes medalShine {
+  0%   { left: -120%; skewX(-20deg); }
+  100% { left:  160%; skewX(-20deg); }
+}
+
+@keyframes stampIn {
+  0%   { transform: scale(3.2) rotate(-18deg); opacity: 0; }
+  55%  { transform: scale(0.88) rotate(4deg);  opacity: 1; }
+  75%  { transform: scale(1.06) rotate(-2deg); }
+  100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+
+@keyframes podiumPulse {
+  0%, 100% { transform: scaleY(1);    box-shadow: none; }
+  50%       { transform: scaleY(1.04); box-shadow: 0 -10px 24px rgba(255,215,0,0.45); }
+}
+
+/* ── From todokids-celebration-v3.jsx ──────────────────────── */
+
+@keyframes modalBounce {
+  0%   { transform: scale(0.45) translateY(70px); opacity: 0; }
+  55%  { transform: scale(1.07) translateY(-12px); opacity: 1; }
+  75%  { transform: scale(0.96) translateY(5px); }
+  90%  { transform: scale(1.02) translateY(-2px); }
+  100% { transform: scale(1)    translateY(0);    opacity: 1; }
+}
+
+@keyframes emojiBounce {
+  0%, 100% { transform: translateY(0)    rotate(0deg); }
+  15%       { transform: translateY(-32px) rotate(-12deg); }
+  35%       { transform: translateY(-16px) rotate(10deg); }
+  55%       { transform: translateY(-26px) rotate(-7deg); }
+  75%       { transform: translateY(-10px) rotate(5deg); }
+  90%       { transform: translateY(-4px)  rotate(-2deg); }
+}
+
+@keyframes emojiFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-14px); }
+}
+
+@keyframes emojiPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.18); }
+}
+
+@keyframes starBurst {
+  0%   { transform: scale(0)   rotate(0deg);   opacity: 1; }
+  75%  { transform: scale(1.3) rotate(280deg); opacity: 1; }
+  100% { transform: scale(0)   rotate(360deg); opacity: 0; }
+}
+
+@keyframes starLight {
+  0%, 100% { opacity: 0.25; transform: scale(0.75); }
+  50%       { opacity: 1;    transform: scale(1.25); }
+}
+
+@keyframes lineDrawIn {
+  from { stroke-dashoffset: 1000; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes countLand {
+  0%   { transform: translateY(-50px) scale(1.6); opacity: 0; }
+  55%  { transform: translateY(8px)   scale(0.93); opacity: 1; }
+  75%  { transform: translateY(-4px)  scale(1.03); }
+  100% { transform: translateY(0)     scale(1);    opacity: 1; }
+}
+
+@keyframes barShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes championFlash {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+@keyframes championBadge {
+  0%   { transform: rotate(-180deg) scale(0); opacity: 0; }
+  55%  { transform: rotate(12deg)   scale(1.12); opacity: 1; }
+  75%  { transform: rotate(-6deg)   scale(0.97); }
+  100% { transform: rotate(0deg)    scale(1);    opacity: 1; }
+}
+
+@keyframes streakWow {
+  0%   { transform: scale(0);    opacity: 0; }
+  38%  { transform: scale(1.35); opacity: 1; }
+  65%  { transform: scale(0.88); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes streakGlow {
+  0%, 100% { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+  50%       { text-shadow: 0 0 30px currentColor, 0 0 60px currentColor, 0 0 90px currentColor; }
+}

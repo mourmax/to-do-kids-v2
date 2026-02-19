@@ -1,442 +1,513 @@
-import { useState, useEffect, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import confetti from 'canvas-confetti'
-import { supabase } from '../../supabaseClient'
-import MissionCard from './MissionCard'
-import ChildProgressBar from './ChildProgressBar'
-import { LogOut, HelpCircle, Trophy, Clock, CheckCircle2 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { NotificationService } from '../../services/notificationService'
+'use client'
 
-export default function ChildDashboard({
-  family,
-  profile,
-  challenge,
-  missions,
-  onExit,
-  refresh
-}) {
-  const { t } = useTranslation()
-  const [isSyncing, setIsSyncing] = useState(false)
-  const [validationResult, setValidationResult] = useState(null)
-  const [showIntro, setShowIntro] = useState(false)
-  const [lastCompletedMission, setLastCompletedMission] = useState(null)
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import AvatarDisplay from './AvatarDisplay'
+import { KidModal, AdoModal } from './celebrations/StreakModal'
+import { VictoryModal } from './celebrations/VictoryModal'
+import { MalusModal } from './celebrations/MalusModal'
 
-  // 1. Calcul de l'état local (Optimistic)
-  const isVictory = useMemo(() => {
-    if (!challenge?.is_active) return false
-    return missions.length > 0 && missions.every(m => m.parent_validated)
-  }, [missions, challenge])
+/* ============================================================
+   TodoKids — ChildDashboard
+   Layout kid (rainbow/cosmos/champion) ou ado.
+   Reçoit les données depuis Supabase (passées en props par ChildApp).
 
-  const allDoneNotValidated = useMemo(() => {
-    if (isVictory) return false
-    return missions.length > 0 && missions.every(m => m.is_completed)
-  }, [missions, isVictory])
+   Props:
+     profileId, childName, gender, universeKey, avatar,
+     missions, streak, challenge, onMissionToggle, onEditAvatar
+   ============================================================ */
 
-  // Confetti effect and scheduling on mount
-  useEffect(() => {
-    if (isVictory) {
-      const duration = 3 * 1000
-      const animationEnd = Date.now() + duration
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+// ── Config univers ─────────────────────────────────────────────
+const UNIVERSES = {
+  rainbow: {
+    bg: 'linear-gradient(160deg, #FF6B9D 0%, #c84b77 40%, #FFE66D 100%)',
+    cardBg: 'rgba(255,255,255,0.22)',
+    cardBorder: 'rgba(255,255,255,0.35)',
+    doneBg: 'rgba(255,255,255,0.35)',
+    textPrimary: '#fff',
+    textMuted: 'rgba(255,255,255,0.7)',
+    checkBg: '#fff',
+    checkColor: '#FF6B9D',
+    streakBg: 'rgba(255,255,255,0.2)',
+    challengeBg: 'rgba(255,255,255,0.15)',
+    progressBar: 'linear-gradient(90deg, #fff, rgba(255,255,255,0.6))',
+    font: "'Nunito', sans-serif",
+    fontLink: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap',
+    labelDone: 'Validé par papa/maman ⏳',
+    labelPending: 'En attente de validation',
+  },
+  cosmos: {
+    bg: 'linear-gradient(160deg, #0F0C29 0%, #302B63 60%, #24243E 100%)',
+    cardBg: 'rgba(167,139,250,0.1)',
+    cardBorder: 'rgba(167,139,250,0.25)',
+    doneBg: 'rgba(167,139,250,0.2)',
+    textPrimary: '#e2e8f0',
+    textMuted: 'rgba(226,232,240,0.55)',
+    checkBg: '#A78BFA',
+    checkColor: '#fff',
+    streakBg: 'rgba(167,139,250,0.12)',
+    challengeBg: 'rgba(56,189,248,0.1)',
+    progressBar: 'linear-gradient(90deg, #A78BFA, #38BDF8)',
+    font: "'Nunito', sans-serif",
+    fontLink: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap',
+    labelDone: '⏳ En attente de validation',
+    labelPending: 'En orbite',
+  },
+  champion: {
+    bg: 'linear-gradient(160deg, #F7971E 0%, #e07a10 50%, #FFD200 100%)',
+    cardBg: 'rgba(255,255,255,0.22)',
+    cardBorder: 'rgba(255,255,255,0.4)',
+    doneBg: 'rgba(255,255,255,0.4)',
+    textPrimary: '#1a1a1a',
+    textMuted: 'rgba(26,26,26,0.6)',
+    checkBg: '#B45309',
+    checkColor: '#fff',
+    streakBg: 'rgba(255,255,255,0.2)',
+    challengeBg: 'rgba(255,255,255,0.18)',
+    progressBar: 'linear-gradient(90deg, #B45309, #FFD200)',
+    font: "'Nunito', sans-serif",
+    fontLink: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap',
+    labelDone: 'Validé ⏳',
+    labelPending: 'En attente du coach',
+  },
+  ado: {
+    bg: 'linear-gradient(160deg, #0d0d0d 0%, #1a1a2e 60%, #0d0d0d 100%)',
+    cardBg: 'rgba(255,255,255,0.04)',
+    cardBorder: 'rgba(255,255,255,0.08)',
+    doneBg: 'rgba(255,60,172,0.08)',
+    textPrimary: '#fff',
+    textMuted: 'rgba(255,255,255,0.4)',
+    checkBg: '#FF3CAC',
+    checkColor: '#fff',
+    streakBg: 'rgba(255,60,172,0.08)',
+    challengeBg: 'rgba(120,75,160,0.15)',
+    progressBar: 'linear-gradient(90deg, #FF3CAC, #784BA0)',
+    font: "'Space Grotesk', sans-serif",
+    fontLink: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap',
+    labelDone: 'Validation en attente',
+    labelPending: 'Pas encore validé',
+  },
+}
 
-      const interval = setInterval(() => {
-        const timeLeft = animationEnd - Date.now()
-        if (timeLeft <= 0) return clearInterval(interval)
-        const particleCount = 50 * (timeLeft / duration)
-        confetti({ ...defaults, particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } })
-      }, 250)
-    }
-
-    // Schedule notifications for today's missions
-    if (missions && missions.length > 0) {
-      missions.forEach(mission => {
-        if (!mission.is_completed && mission.scheduled_times) {
-          mission.scheduled_times.forEach(time => {
-            NotificationService.scheduleLocalReminder(
-              t(mission.title),
-              time,
-              mission.id
-            )
-          })
-        }
-      })
-    }
-  }, [isVictory, missions, t])
-
-  // Realtime subscription for parent validation
-  useEffect(() => {
-    if (!family?.id) return
-
-    const channel = supabase
-      .channel(`child-sync-${family.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'daily_logs',
-          filter: `profile_id=eq.${profile.id}`
-        },
-        (payload) => {
-          console.log("Realtime update received (Child):", payload)
-          if (payload.new.validation_result === 'success') {
-            setValidationResult('success')
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
-            setTimeout(() => setValidationResult(null), 5000)
-          } else if (payload.new.validation_result === 'failure') {
-            setValidationResult('failure')
-            setTimeout(() => setValidationResult(null), 5000)
-          }
-          refresh(true)
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'challenges',
-          filter: `family_id=eq.${family.id}`
-        },
-        () => {
-          console.log("Realtime challenge update received (Child)")
-          refresh(true)
-        }
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [family?.id, profile.id, refresh])
-
-  const toggleMission = async (id, currentStatus) => {
-    if (isSyncing) return
-    setIsSyncing(true)
-    const newStatus = !currentStatus
-
-    try {
-      const today = new Date().toISOString().split('T')[0]
-      const { data: logs, error: fetchError } = await supabase
-        .from('daily_logs')
-        .select('*')
-        .eq('profile_id', profile.id)
-        .eq('mission_id', id)
-        .eq('date', today)
-
-      if (fetchError) throw fetchError
-
-      if (logs && logs.length > 0) {
-        const { error: updateError } = await supabase
-          .from('daily_logs')
-          .update({ is_completed: newStatus, parent_validated: false })
-          .eq('id', logs[0].id)
-        if (updateError) throw updateError
-      } else {
-        const { error: insertError } = await supabase
-          .from('daily_logs')
-          .insert({
-            profile_id: profile.id,
-            mission_id: id,
-            date: today,
-            is_completed: newStatus,
-            parent_validated: false
-          })
-        if (insertError) throw insertError
-      }
-
-      if (newStatus) {
-        setLastCompletedMission(id)
-        confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 }, colors: ['#fbbf24', '#f59e0b', '#ffffff'] })
-      }
-
-      await refresh(true)
-    } catch (err) {
-      console.error("Error toggling mission:", err)
-    } finally {
-      setIsSyncing(false)
-    }
-  }
-
-  const requestValidation = async () => {
-    if (isSyncing) return
-    setIsSyncing(true)
-
-    try {
-      const today = new Date().toISOString().split('T')[0]
-      const { error } = await supabase
-        .from('daily_logs')
-        .update({ validation_requested: true })
-        .eq('profile_id', profile.id)
-        .eq('date', today)
-
-      if (error) throw error
-      await refresh(true)
-    } catch (err) {
-      console.error("Error requesting validation:", err)
-    } finally {
-      setIsSyncing(false)
-    }
-  }
-
-  const optimisticMissions = missions
-
+// ── Mission card (kid) ─────────────────────────────────────────
+function KidMissionCard({ mission, u, onToggle, isToggling }) {
   return (
-    <div className="min-h-screen pb-20 overflow-x-hidden">
-      {/* HEADER PREMIUM GLASSMORPHISM */}
-      <div className="max-w-6xl mx-auto px-4 pt-6">
-        <header className="relative flex flex-col items-center justify-center p-8 sm:p-12 bg-gradient-to-br from-indigo-600/90 to-violet-700/90 [.light-theme_&]:from-indigo-500 [.light-theme_&]:to-indigo-600 shadow-[0_20px_50px_rgba(79,70,229,0.3)] rounded-[3.5rem] overflow-hidden mb-10 border-b-8 border-indigo-800/50 backdrop-blur-xl">
-          {/* Decorative shapes */}
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-400/20 rounded-full blur-3xl" />
+    <div
+      key={mission.id}
+      style={{
+        borderRadius: 20,
+        padding: '16px 18px',
+        background: mission.done ? u.doneBg : u.cardBg,
+        border: `1.5px solid ${u.cardBorder}`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        opacity: isToggling ? 0.7 : 1,
+        transition: 'opacity 0.2s',
+      }}
+    >
+      {/* Checkbox */}
+      <button
+        onClick={() => !mission.done && onToggle(mission.id)}
+        disabled={mission.done || isToggling}
+        aria-label={mission.done ? 'Mission terminée' : 'Cocher la mission'}
+        style={{
+          width: 36, height: 36,
+          borderRadius: '50%',
+          border: `3px solid ${mission.done ? u.checkBg : 'rgba(255,255,255,0.5)'}`,
+          background: mission.done ? u.checkBg : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: mission.done ? 'default' : 'pointer',
+          flexShrink: 0,
+          fontSize: 18,
+          color: u.checkColor,
+          transition: 'background 0.2s, border-color 0.2s',
+        }}
+      >
+        {mission.done && '✓'}
+      </button>
+
+      {/* Icon + title */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 22 }}>{mission.icon}</span>
+          <span style={{
+            fontSize: 15,
+            fontWeight: 800,
+            color: u.textPrimary,
+            textDecoration: mission.done ? 'line-through' : 'none',
+            opacity: mission.done ? 0.7 : 1,
+          }}>
+            {mission.title}
+          </span>
+        </div>
+        {mission.time && (
+          <div style={{ fontSize: 12, color: u.textMuted, marginTop: 4, fontWeight: 600 }}>
+            ⏰ {mission.time}
           </div>
-
-          <div className="absolute top-6 right-6 flex items-center gap-3">
-            <button
-              onClick={() => setShowIntro(true)}
-              className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-[1.2rem] flex items-center justify-center transition-all border border-white/10 hover:border-white/30 active:scale-95"
-            >
-              <HelpCircle size={22} strokeWidth={2.5} />
-            </button>
-            <button
-              onClick={onExit}
-              className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-[1.2rem] flex items-center justify-center transition-all border border-white/10 hover:border-white/30 active:scale-95"
-            >
-              <LogOut size={22} strokeWidth={2.5} />
-            </button>
-          </div>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="flex flex-col items-center gap-3 z-10"
-          >
-            <div className="px-5 py-1.5 bg-white/10 rounded-full border border-white/20 backdrop-blur-md">
-              <span className="text-[10px] sm:text-xs font-black text-indigo-100 uppercase tracking-[0.3em]">
-                {t('common.dashboard')}
-              </span>
-            </div>
-            <h1 className="text-5xl sm:text-7xl font-black text-white italic tracking-tighter uppercase drop-shadow-2xl">
-              {profile.child_name || 'HÉROS'}
-            </h1>
-          </motion.div>
-        </header>
-      </div>
-
-      {/* SUCCESS/FAILURE OVERLAY */}
-      <AnimatePresence>
-        {validationResult && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-6"
-          >
-            <motion.div
-              initial={{ scale: 0.8, y: 30 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              className={`max-w-sm w-full p-8 rounded-[3rem] text-center shadow-2xl relative overflow-hidden flex flex-col items-center gap-6 border-2 ${validationResult === 'success' ? 'bg-emerald-500 border-emerald-400' : 'bg-rose-500 border-rose-400'}`}
-            >
-              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-5xl">
-                {validationResult === 'success' ? '🚀' : '💫'}
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter">
-                  {validationResult === 'success' ? 'MISSION RÉUSSIE !' : 'OUPS !'}
-                </h3>
-                <p className="text-white/90 font-bold text-sm leading-relaxed">
-                  {validationResult === 'success'
-                    ? "Tes missions ont été validées bravo ! On continue comme ça ! ✨"
-                    : "Papa ou Maman aimeraient que tu revérifies tes missions. Tu peux le faire ! 💪"}
-                </p>
-              </div>
-              <button
-                onClick={() => setValidationResult(null)}
-                className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-105 transition-transform"
-              >
-                C'EST REPARTI !
-              </button>
-            </motion.div>
-          </motion.div>
         )}
-      </AnimatePresence>
+        {mission.pendingValidation && (
+          <div style={{ fontSize: 11, color: u.textMuted, marginTop: 3, fontWeight: 700 }}>
+            {u.labelDone}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
-      {/* CHALLENGE PROGRESS SECTION */}
-      <div id="challenge-progress" className="max-w-6xl mx-auto px-4 mb-12">
-        <ChildProgressBar
-          current={challenge?.current_streak || 0}
-          total={challenge?.duration_days || 7}
-          reward={challenge?.reward_name || "Surprise !"}
-        />
+// ── Mission row (ado) ──────────────────────────────────────────
+function AdoMissionRow({ mission, u, onToggle, isToggling }) {
+  return (
+    <div
+      style={{
+        padding: '14px 16px',
+        borderBottom: `1px solid ${u.cardBorder}`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        opacity: isToggling ? 0.7 : 1,
+        transition: 'opacity 0.2s',
+        background: mission.done ? u.doneBg : 'transparent',
+      }}
+    >
+      <button
+        onClick={() => !mission.done && onToggle(mission.id)}
+        disabled={mission.done || isToggling}
+        style={{
+          width: 28, height: 28,
+          borderRadius: 6,
+          border: `2px solid ${mission.done ? u.checkBg : 'rgba(255,255,255,0.2)'}`,
+          background: mission.done ? u.checkBg : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: mission.done ? 'default' : 'pointer',
+          flexShrink: 0, fontSize: 14, color: u.checkColor,
+        }}
+      >
+        {mission.done && '✓'}
+      </button>
+
+      <span style={{ fontSize: 18 }}>{mission.icon}</span>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 14, fontWeight: 600,
+          color: mission.done ? u.textMuted : u.textPrimary,
+          textDecoration: mission.done ? 'line-through' : 'none',
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}>
+          {mission.title}
+        </div>
+        {mission.time && (
+          <div style={{ fontSize: 11, color: u.textMuted, marginTop: 2 }}>
+            {mission.time}
+          </div>
+        )}
       </div>
 
-      {/* MISSION GRID TITLE */}
-      {!isVictory && (
-        <div className="max-w-6xl mx-auto px-6 mb-6">
-          <h2 className="text-sm font-black text-slate-500 [.light-theme_&]:text-indigo-900/40 uppercase tracking-[0.4em] flex items-center gap-4">
-            {t('common.missions')}
-            <div className="h-px flex-1 bg-slate-800/50 [.light-theme_&]:bg-indigo-100" />
-          </h2>
+      {mission.pendingValidation && (
+        <div style={{
+          fontSize: 10,
+          color: '#FF3CAC',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          fontFamily: "'Space Grotesk', sans-serif",
+          flexShrink: 0,
+        }}>
+          En attente
         </div>
-      )}
-
-      {/* MISSION GRID */}
-      {!isVictory && challenge?.is_active && (
-        <div id="mission-grid" className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 px-4 pb-12">
-          {optimisticMissions.map((mission, index) => {
-            const displayMission = validationResult === 'success'
-              ? { ...mission, is_completed: false, parent_validated: false }
-              : mission
-
-            return (
-              <MissionCard
-                key={mission.id}
-                mission={displayMission}
-                onToggle={toggleMission}
-                disabled={isSyncing}
-              />
-            )
-          })}
-        </div>
-      )}
-
-      {/* VALIDATION REQUEST BUTTON */}
-      {!isVictory && allDoneNotValidated && challenge?.is_active && (
-        <div className="max-w-lg mx-auto px-6 mt-4">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="flex flex-col items-center gap-6"
-          >
-            <div className="text-center space-y-2">
-              <h3 className="text-indigo-400 font-black text-sm uppercase tracking-widest">{t('child.all_done')}</h3>
-              <p className="text-slate-500 text-xs font-bold uppercase tracking-tight">{t('child.request_validation_desc')}</p>
-            </div>
-            <button
-              onClick={requestValidation}
-              disabled={isSyncing}
-              className="w-full py-6 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-black uppercase text-base tracking-[0.2em] rounded-[2.5rem] shadow-[0_20px_40px_rgba(245,158,11,0.3)] transition-all active:scale-95 disabled:opacity-50"
-            >
-              {isSyncing ? '...' : t('child.request_validation').toUpperCase()}
-            </button>
-          </motion.div>
-        </div>
-      )}
-
-      {/* 🏆 ÉCRAN DE VICTOIRE (Mode "WOW") */}
-      {isVictory && (
-        <div className="max-w-4xl mx-auto px-4 pb-20 mt-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-gradient-to-br from-indigo-600 to-violet-700 [.light-theme_&]:from-white [.light-theme_&]:to-white border-2 border-white/20 [.light-theme_&]:border-indigo-100 p-10 sm:p-16 rounded-[4rem] shadow-[0_30px_60px_rgba(79,70,229,0.3)] [.light-theme_&]:shadow-indigo-500/10 text-center space-y-8 relative overflow-hidden"
-          >
-            {/* Arrière-plan décoratif */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
-              <div className="absolute -top-24 -left-24 w-64 h-64 bg-white rounded-full blur-[80px]" />
-              <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-400 rounded-full blur-[80px]" />
-            </div>
-
-            <div className="flex flex-col items-center gap-6 relative z-10">
-              <motion.div
-                animate={{
-                  rotate: [0, -10, 10, -10, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ repeat: Infinity, duration: 4 }}
-                className="w-32 h-32 sm:w-40 sm:h-40 bg-white/20 [.light-theme_&]:bg-indigo-50 rounded-full flex items-center justify-center text-6xl sm:text-7xl shadow-inner border border-white/30"
-              >
-                🏆
-              </motion.div>
-
-              <div className="space-y-3">
-                <h2 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-white [.light-theme_&]:text-indigo-950">
-                  {t('child.victory_title')}
-                </h2>
-                <p className="text-lg sm:text-xl font-bold text-indigo-100/80 [.light-theme_&]:text-indigo-600 uppercase tracking-[0.2em]">
-                  {t('child.victory_subtitle')}
-                </p>
-              </div>
-
-              <div className="pt-4 w-full max-w-sm mx-auto">
-                <div className="p-6 bg-white/10 [.light-theme_&]:bg-white rounded-[2.5rem] border border-white/20 [.light-theme_&]:border-indigo-50 shadow-xl">
-                  <p className="text-[10px] font-black text-indigo-200 [.light-theme_&]:text-slate-400 uppercase tracking-widest mb-1">
-                    Cadeau actuel
-                  </p>
-                  <p className="text-xl sm:text-2xl font-black text-white [.light-theme_&]:text-indigo-950 uppercase tracking-tight">
-                    🎁 {challenge?.reward_name || "Surprise !"}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bouton pour voir les détails (Optionnel) */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="pt-8 relative z-10"
-            >
-              <button
-                onClick={() => {
-                  const el = document.getElementById('challenge-progress');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="text-white/60 [.light-theme_&]:text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em] hover:text-white transition-colors"
-              >
-                Découvre ta progression ci-dessous ↓
-              </button>
-            </motion.div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* 🕐 MESSAGE PENDING CONFIG SI CHALLENGE FINI MAIS PAS ENCORE RE-CONFIGURÉ */}
-      {challenge && !challenge.is_active && (
-        <div className="max-w-2xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 [.light-theme_&]:bg-white border border-white/10 [.light-theme_&]:border-indigo-100 p-6 rounded-[2.5rem] shadow-xl [.light-theme_&]:shadow-indigo-500/10 text-center space-y-4 relative overflow-hidden"
-          >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-14 h-14 bg-white/5 [.light-theme_&]:bg-indigo-50 rounded-full flex items-center justify-center mb-2">
-                <Clock size={28} className="text-slate-400 [.light-theme_&]:text-indigo-400 animate-pulse" />
-              </div>
-              <p className="text-sm font-black uppercase text-slate-300 [.light-theme_&]:text-indigo-950 tracking-widest opacity-80">
-                {t('child.waiting_parent_config')}
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* --- BOUTON TEST NOTIF — DEV UNIQUEMENT --- */}
-      {import.meta.env.DEV && (
-        <button
-          onClick={() => {
-            if (NotificationService.getPermissionStatus() !== 'granted') {
-              NotificationService.requestPermission().then(res => {
-                if (res === 'granted') {
-                  NotificationService.sendLocalNotification("Gagné ! ✨", {
-                    body: "Tes notifications sont maintenant activées."
-                  })
-                } else {
-                  alert("Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur.");
-                }
-              })
-            } else {
-              NotificationService.sendLocalNotification("C'est l'heure ! 🔔", {
-                body: "Ta mission 'Mettre la table' t'attend ! ✨",
-              })
-            }
-          }}
-          className="fixed bottom-6 right-6 z-[999] bg-white border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-full font-black uppercase text-xs shadow-2xl active:scale-95 transition-all"
-        >
-          🔔 Test Alerte
-        </button>
       )}
     </div>
+  )
+}
+
+// ── Main component ─────────────────────────────────────────────
+export default function ChildDashboard({
+  profileId,
+  childName,
+  gender,
+  universeKey,
+  avatar,
+  missions = [],
+  streak = 0,
+  challenge = null,
+  onMissionToggle,
+  onEditAvatar,
+}) {
+  const [togglingId, setTogglingId] = useState(null)
+  const [showStreakModal, setShowStreakModal] = useState(false)
+  const [showVictoryModal, setShowVictoryModal] = useState(false)
+  const [showMalusModal, setShowMalusModal] = useState(false)
+
+  const u = UNIVERSES[universeKey] ?? UNIVERSES.rainbow
+  const isAdo = universeKey === 'ado'
+
+  const allDone = missions.length > 0 && missions.every((m) => m.done)
+  const doneCount = missions.filter((m) => m.done).length
+
+  // ── 1. Streak modal — quand toutes les missions passent à done ─
+  useEffect(() => {
+    if (allDone && missions.length > 0) {
+      const timer = setTimeout(() => setShowStreakModal(true), 600)
+      return () => clearTimeout(timer)
+    }
+  }, [allDone, missions.length])
+
+  // ── 2. Victory modal — quand challenge.status passe à "won" ───
+  useEffect(() => {
+    if (challenge?.status === 'won') {
+      setShowVictoryModal(true)
+    }
+  }, [challenge?.status])
+
+  // ── 3. Malus modal — quand challenge.status passe à "lost" ────
+  useEffect(() => {
+    if (challenge?.status === 'lost') {
+      setShowMalusModal(true)
+    }
+  }, [challenge?.status])
+
+  // ── Toggle mission (Supabase) ──────────────────────────────────
+  const handleMissionToggle = useCallback(async (missionId) => {
+    setTogglingId(missionId)
+    try {
+      await supabase
+        .from('missions')
+        .update({ child_done: true })
+        .eq('id', missionId)
+      onMissionToggle?.(missionId)
+    } finally {
+      setTogglingId(null)
+    }
+  }, [onMissionToggle])
+
+  const challengeProgress = challenge
+    ? Math.min(1, (challenge.daysCompleted ?? 0) / Math.max(1, challenge.daysTotal ?? 1))
+    : 0
+
+  return (
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link href={u.fontLink} rel="stylesheet" />
+
+      <div style={{
+        minHeight: '100dvh',
+        background: u.bg,
+        fontFamily: u.font,
+        paddingBottom: 40,
+      }}>
+        {/* ── Header ──────────────────────────────────────────── */}
+        <div style={{ padding: '48px 20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 14, color: u.textMuted, fontWeight: 600 }}>
+              {isAdo ? 'Ton dashboard' : 'Bonjour'}
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: u.textPrimary, lineHeight: 1.1 }}>
+              {childName} {isAdo ? '⚡' : '👋'}
+            </div>
+          </div>
+
+          {/* Avatar + edit */}
+          <button
+            onClick={onEditAvatar}
+            aria-label="Modifier mon avatar"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <AvatarDisplay
+              avatar={avatar}
+              size={56}
+              style={{ border: '3px solid rgba(255,255,255,0.5)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)' }}
+            />
+          </button>
+        </div>
+
+        {/* ── Streak card ──────────────────────────────────────── */}
+        <div style={{ padding: '0 20px 16px' }}>
+          <div style={{
+            borderRadius: isAdo ? 12 : 20,
+            padding: '14px 18px',
+            background: u.streakBg,
+            border: isAdo ? '1px solid rgba(255,60,172,0.2)' : `1.5px solid ${u.cardBorder}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}>
+            <span style={{ fontSize: isAdo ? 28 : 32 }}>🔥</span>
+            <div>
+              <div style={{ fontSize: isAdo ? 12 : 13, color: u.textMuted, fontWeight: 700, textTransform: isAdo ? 'uppercase' : 'none', letterSpacing: isAdo ? 2 : 0 }}>
+                {isAdo ? 'STREAK' : 'Jours consécutifs'}
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: u.textPrimary }}>
+                {streak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{streak > 1 ? 's' : ''}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Challenge card ───────────────────────────────────── */}
+        {challenge && challenge.status === 'active' && (
+          <div style={{ padding: '0 20px 16px' }}>
+            <div style={{
+              borderRadius: isAdo ? 12 : 20,
+              padding: '16px 18px',
+              background: u.challengeBg,
+              border: `1.5px solid ${u.cardBorder}`,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ fontSize: isAdo ? 12 : 14, fontWeight: 800, color: u.textPrimary, textTransform: isAdo ? 'uppercase' : 'none', letterSpacing: isAdo ? 2 : 0 }}>
+                  {isAdo ? 'CHALLENGE' : '🎯 Mon challenge'}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: u.textMuted }}>
+                  {challenge.daysCompleted ?? 0}/{challenge.daysTotal ?? 0}j
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.15)', overflow: 'hidden', marginBottom: 10 }}>
+                <div style={{
+                  height: '100%',
+                  width: `${challengeProgress * 100}%`,
+                  borderRadius: 4,
+                  background: u.progressBar,
+                  transition: 'width 0.5s ease',
+                }} />
+              </div>
+
+              <div style={{ fontSize: 13, color: u.textMuted, fontWeight: 600 }}>
+                🎁 {challenge.rewardText}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Missions header ──────────────────────────────────── */}
+        <div style={{ padding: '4px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: isAdo ? 12 : 16, fontWeight: 900, color: u.textPrimary, textTransform: isAdo ? 'uppercase' : 'none', letterSpacing: isAdo ? 2 : 0 }}>
+            {isAdo ? 'MES MISSIONS' : 'Mes missions du jour'}
+          </div>
+          <div style={{
+            fontSize: 13, fontWeight: 700,
+            color: u.textMuted,
+          }}>
+            {doneCount}/{missions.length}
+          </div>
+        </div>
+
+        {/* ── Missions list ─────────────────────────────────────── */}
+        {isAdo ? (
+          /* Ado: list style */
+          <div style={{
+            margin: '0 20px',
+            borderRadius: 12,
+            background: u.cardBg,
+            border: `1px solid ${u.cardBorder}`,
+            overflow: 'hidden',
+          }}>
+            {missions.length === 0 ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: u.textMuted, fontSize: 14 }}>
+                Aucune mission pour aujourd&apos;hui
+              </div>
+            ) : (
+              missions.map((m) => (
+                <AdoMissionRow
+                  key={m.id}
+                  mission={m}
+                  u={u}
+                  onToggle={handleMissionToggle}
+                  isToggling={togglingId === m.id}
+                />
+              ))
+            )}
+          </div>
+        ) : (
+          /* Kid: cards */
+          <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {missions.length === 0 ? (
+              <div style={{
+                borderRadius: 20, padding: '24px', textAlign: 'center',
+                background: u.cardBg, border: `1.5px solid ${u.cardBorder}`,
+                color: u.textMuted, fontSize: 15,
+              }}>
+                Aucune mission pour aujourd&apos;hui ! 🎉
+              </div>
+            ) : (
+              missions.map((m) => (
+                <KidMissionCard
+                  key={m.id}
+                  mission={m}
+                  u={u}
+                  onToggle={handleMissionToggle}
+                  isToggling={togglingId === m.id}
+                />
+              ))
+            )}
+          </div>
+        )}
+
+        {/* ── All done banner ───────────────────────────────────── */}
+        {allDone && (
+          <div style={{
+            margin: '20px 20px 0',
+            padding: '18px 20px',
+            borderRadius: isAdo ? 12 : 24,
+            background: 'rgba(255,255,255,0.25)',
+            border: `2px solid rgba(255,255,255,0.5)`,
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: isAdo ? 28 : 40, marginBottom: 8 }}>🎉</div>
+            <div style={{ fontSize: isAdo ? 16 : 20, fontWeight: 900, color: u.textPrimary }}>
+              {isAdo ? 'Toutes les missions validées !' : 'Bravo, toutes les missions sont faites !'}
+            </div>
+            <div style={{ fontSize: 13, color: u.textMuted, marginTop: 4, fontWeight: 600 }}>
+              {isAdo ? 'Papa/maman peut valider ta journée' : 'Papa ou maman va valider ta super journée !'}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Modales de célébration ──────────────────────────────── */}
+
+      {/* Streak modal */}
+      {showStreakModal && (
+        isAdo ? (
+          <AdoModal
+            childName={childName}
+            gender={gender}
+            streak={streak}
+            onClose={() => setShowStreakModal(false)}
+          />
+        ) : (
+          <KidModal
+            universeKey={universeKey}
+            childName={childName}
+            streak={streak}
+            onClose={() => setShowStreakModal(false)}
+          />
+        )
+      )}
+
+      {/* Victory modal */}
+      {showVictoryModal && challenge && (
+        <VictoryModal
+          theme={universeKey}
+          childName={childName}
+          gender={gender}
+          rewardText={challenge.rewardText}
+          onClose={() => setShowVictoryModal(false)}
+        />
+      )}
+
+      {/* Malus modal */}
+      {showMalusModal && challenge && (
+        <MalusModal
+          theme={universeKey}
+          childName={childName}
+          gender={gender}
+          malusText={challenge.malusText}
+          onClose={() => setShowMalusModal(false)}
+        />
+      )}
+    </>
   )
 }
