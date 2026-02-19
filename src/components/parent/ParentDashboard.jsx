@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ClipboardCheck, Sliders } from 'lucide-react'
+import { ClipboardCheck, Sliders, Baby, Bell } from 'lucide-react'
 import ValidationTab from './tabs/ValidationTab'
 import SettingsTab from './tabs/SettingsTab'
 import NotificationBanner from '../ui/NotificationBanner'
@@ -10,6 +10,14 @@ import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 import { NotificationService } from '../../services/notificationService'
 import { getProfileColorClasses } from '../../utils/colors'
+
+const AVATAR_COLORS = {
+  rose:    'bg-rose-100 text-rose-600',
+  sky:     'bg-sky-100 text-sky-600',
+  emerald: 'bg-emerald-100 text-emerald-600',
+  amber:   'bg-amber-100 text-amber-600',
+  violet:  'bg-violet-100 text-violet-600',
+}
 
 export default function ParentDashboard({
   family,
@@ -217,7 +225,7 @@ export default function ParentDashboard({
 
 
   return (
-    <div className="max-w-4xl lg:max-w-6xl mx-auto space-y-6 relative z-10">
+    <div className="max-w-4xl lg:max-w-6xl mx-auto space-y-5 relative z-10 font-nunito">
       {/* Onboarding Completion Modal - Final Step */}
       {isNewUser && onboardingStep === 'done' && (
         <OnboardingCompletionModal
@@ -233,11 +241,8 @@ export default function ParentDashboard({
         />
       )}
 
-      {/* Background Decorative Element (Subtle) */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden h-screen w-screen z-[-1]">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-300/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-100/10 rounded-full blur-[120px]" />
-      </div>
+      {/* Light gradient background overlay */}
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-br from-violet-50 via-white to-sky-50 z-[-1]" />
 
       <NotificationBanner
         notifications={notifications}
@@ -272,13 +277,14 @@ export default function ParentDashboard({
           />
         )}
 
-        <div className="flex items-start justify-between gap-4">
+        {/* Header row: title left, actions right */}
+        <div className="flex items-center justify-between gap-3">
           {/* Left: title + family badge */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            <h1 className="text-xl sm:text-2xl font-black text-gray-800 leading-tight">
               {t('dashboard.parent_title')}
             </h1>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 mt-0.5">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span className="text-xs text-gray-500">
                 {family?.name || t('common.family_active')}
@@ -286,58 +292,69 @@ export default function ParentDashboard({
             </div>
           </div>
 
-          {/* Right: notifications + MODE ENFANT */}
+          {/* Right: alert bell + Mode Enfant */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* 🔔 Button to activate notifications for parents */}
             {NotificationService.getPermissionStatus() !== 'granted' && (
               <button
                 onClick={() => NotificationService.requestPermission().then(refresh)}
-                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5"
+                className="min-h-[44px] px-3 py-2 bg-white border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-600 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm"
                 title="Activer les alertes de validation"
               >
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                🔔 Alertes
+                <Bell size={15} className="text-amber-500" />
+                <span className="hidden sm:inline text-gray-600">Alertes</span>
               </button>
             )}
             <button
               onClick={onExit}
-              className="px-3 py-2 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-medium transition-all"
+              className="min-h-[44px] px-3 py-2 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shadow-sm shadow-violet-200"
             >
-              Mode Enfant
+              <Baby size={15} />
+              <span className="hidden sm:inline">Mode Enfant</span>
             </button>
           </div>
         </div>
 
-        {/* Selector Profile Child for Parent (Validation context) */}
+        {/* Child selector — horizontal scroll with fade on mobile */}
         {filteredProfilesForUI.length > 1 && (
-          <div className="flex gap-2 flex-wrap">
-            {filteredProfilesForUI.map(p => {
-              const isActive = profile?.id === p.id
-              const colors = getProfileColorClasses(p.color)
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    onSwitchProfile(p.id)
-                    setActiveTab('validation')
-                  }}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
-                    ? `${colors.active} shadow-sm`
-                    : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'
+          <div className="relative">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
+              {filteredProfilesForUI.map(p => {
+                const isActive = profile?.id === p.id
+                const colors = getProfileColorClasses(p.color)
+                const hasPending = notifications.some(n => n.profile_id === p.id)
+                const avatarColors = AVATAR_COLORS[p.color] || AVATAR_COLORS.violet
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      onSwitchProfile(p.id)
+                      setActiveTab('validation')
+                    }}
+                    className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all shrink-0 min-h-[48px] ${
+                      isActive
+                        ? `${colors.active} shadow-md`
+                        : 'bg-white border border-gray-200 text-gray-700 hover:border-violet-200 hover:bg-violet-50'
                     }`}
-                >
-                  <span className="w-6 h-6 rounded-full bg-current opacity-20 flex items-center justify-center text-xs font-bold">
-                    {p.child_name?.[0]?.toUpperCase()}
-                  </span>
-                  {p.child_name}
-                </button>
-              )
-            })}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shrink-0 ${isActive ? 'bg-white/20 text-white' : avatarColors}`}>
+                      {p.child_name?.[0]?.toUpperCase()}
+                    </div>
+                    <span className="leading-none">{p.child_name}</span>
+                    {hasPending && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] rounded-full flex items-center justify-center font-black leading-none">!</span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            {/* Fade gradient hint on mobile */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/90 to-transparent pointer-events-none sm:hidden" />
           </div>
         )}
-        {/* Tab Switcher - Premium Look - Masqué pendant l'onboarding */}
+
+        {/* Tab Switcher - Hidden during onboarding */}
         {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
-          <div className="bg-gray-100 p-1 rounded-2xl flex relative max-w-sm mx-auto">
+          <div className="bg-white border border-gray-100 shadow-sm p-1 rounded-2xl flex relative max-w-sm mx-auto">
             <motion.div
               className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-violet-500 rounded-xl shadow-md z-0"
               animate={{ x: activeTab === 'settings' ? '100%' : '0%' }}
@@ -350,10 +367,15 @@ export default function ParentDashboard({
                 manualTabChangeRef.current = true
                 setActiveTab('validation')
               }}
-              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
             >
-              <ClipboardCheck size={20} className={activeTab === 'validation' ? 'text-white' : 'text-gray-400'} />
+              <ClipboardCheck size={18} className={activeTab === 'validation' ? 'text-white' : 'text-gray-400'} />
               <span className="font-semibold text-sm">{t('tabs.validation')}</span>
+              {notifications.length > 0 && (
+                <span className={`min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center text-[10px] font-black leading-none ${activeTab === 'validation' ? 'bg-white/25 text-white' : 'bg-rose-500 text-white'}`}>
+                  {notifications.length}
+                </span>
+              )}
             </button>
 
             <button
@@ -361,16 +383,16 @@ export default function ParentDashboard({
                 manualTabChangeRef.current = true
                 setActiveTab('settings')
               }}
-              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
             >
-              <Sliders size={20} className={activeTab === 'settings' ? 'text-white' : 'text-gray-400'} />
+              <Sliders size={18} className={activeTab === 'settings' ? 'text-white' : 'text-gray-400'} />
               <span className="font-semibold text-sm">{t('tabs.settings')}</span>
             </button>
           </div>
         )}
       </header>
 
-      <main className={isNewUser && onboardingStep && onboardingStep !== 'done' ? 'mt-4' : 'mt-8'}>
+      <main className={isNewUser && onboardingStep && onboardingStep !== 'done' ? 'mt-4' : 'mt-6'}>
         <AnimatePresence mode="wait">
           {activeTab === 'validation' ? (
             <motion.div
@@ -423,6 +445,6 @@ export default function ParentDashboard({
           )}
         </AnimatePresence>
       </main>
-    </div >
+    </div>
   )
 }
