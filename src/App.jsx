@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from './supabaseClient'
 import Auth from './Auth'
 import { useFamily } from './hooks/useFamily'
 import { AnimatePresence, motion } from 'framer-motion'
-import ChildDashboard from './components/child/ChildDashboard'
+import ChildApp from './components/child/ChildApp'
 import ParentDashboard from './components/parent/ParentDashboard'
 import ParentPinModal from './components/ui/ParentPinModal'
 import PinSetup from './components/ui/PinSetup'
@@ -30,6 +30,11 @@ export default function App() {
   // Track if this is an onboarding session
   const [isOnboardingSession, setIsOnboardingSession] = useState(false)
   const [tutorialShownInSession, setTutorialShownInSession] = useState(false)
+
+  // todokids_* data for ChildApp
+  const [tkMissions, setTkMissions] = useState([])
+  const [tkChallenge, setTkChallenge] = useState(null)
+  const [tkProfile, setTkProfile] = useState(null)
 
   // Onboarding stepper state (will be calculated dynamically)
   const [onboardingStep, setOnboardingStep] = useState('pin')
@@ -152,6 +157,30 @@ export default function App() {
       setTutorialShownInSession(true)
     }
   }, [shouldShowTutorial])
+
+  // --- TODOKIDS DATA (ChildApp) ---
+
+  const fetchChildData = useCallback(async (profileId) => {
+    const [missionsRes, challengeRes, profileRes] = await Promise.all([
+      supabase.from('todokids_missions').select('*').eq('profile_id', profileId),
+      supabase.from('todokids_challenges').select('*').eq('profile_id', profileId).maybeSingle(),
+      supabase.from('todokids_profiles').select('*').eq('id', profileId).maybeSingle(),
+    ])
+    if (missionsRes.data) setTkMissions(missionsRes.data)
+    if (challengeRes.data) setTkChallenge(challengeRes.data)
+    if (profileRes.data) setTkProfile(profileRes.data)
+  }, [])
+
+  useEffect(() => {
+    if (!isParentMode && activeProfile?.id) {
+      fetchChildData(activeProfile.id)
+    }
+  }, [isParentMode, activeProfile?.id, fetchChildData])
+
+  const handleMissionToggle = useCallback(async (missionId, done) => {
+    await supabase.from('todokids_missions').update({ child_done: done }).eq('id', missionId)
+    setTkMissions(prev => prev.map(m => m.id === missionId ? { ...m, child_done: done } : m))
+  }, [])
 
   // --- HANDLERS ---
 
@@ -389,17 +418,21 @@ export default function App() {
                 </div>
               )
             ) : (
-              <ChildDashboard
+              <ChildApp
                 key="child"
-                family={family}
-                profile={activeProfile}
-                profiles={profiles}
-                challenge={challenge}
-                missions={missions}
-                onExit={() => setShowPinModal(true)}
-                onSwitchProfile={switchProfile}
-                refresh={loadFamilyData}
-                isChildSession={!session && !!childFamilyId}
+                profileId={activeProfile?.id}
+                childName={tkProfile?.name ?? activeProfile?.child_name ?? ''}
+                gender={tkProfile?.gender ?? 'boy'}
+                missions={tkMissions}
+                streak={tkChallenge?.streak ?? 0}
+                challenge={tkChallenge ? {
+                  reward_text: tkChallenge.reward_text,
+                  malus_text: tkChallenge.malus_text,
+                  days_completed: tkChallenge.days_completed,
+                  days_total: tkChallenge.days_total,
+                  status: tkChallenge.status,
+                } : null}
+                onMissionToggle={handleMissionToggle}
               />
             )}
           </AnimatePresence>
