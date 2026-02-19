@@ -453,7 +453,7 @@ export default function ParentDashboard({
 
         {/* ── MAIN CONTENT ──
             Takes all remaining space. Inner content centred at max-w-2xl. */}
-        <main className="flex-1 min-w-0 px-4 lg:px-8 py-5 lg:py-6">
+        <main className="flex-1 min-w-0 px-4 lg:px-8 pt-3 lg:pt-4 pb-5 lg:pb-6">
           <div className="max-w-2xl mx-auto space-y-4">
 
             {/* Onboarding Stepper */}

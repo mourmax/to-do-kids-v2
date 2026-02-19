@@ -274,16 +274,15 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
     }
   }
 
-  const getColorClasses = (colorName) => {
-    const maps = {
-      rose: 'bg-rose-500 shadow-rose-500/20',
-      sky: 'bg-sky-500 shadow-sky-500/20',
-      emerald: 'bg-emerald-500 shadow-emerald-500/20',
-      amber: 'bg-amber-500 shadow-amber-500/20',
-      violet: 'bg-indigo-500 shadow-indigo-500/20',
-    }
-    return maps[colorName] || maps.violet
+  const CHILD_HEX = {
+    rose: '#f43f5e',
+    sky: '#0ea5e9',
+    emerald: '#22c55e',
+    amber: '#f59e0b',
+    violet: '#8b5cf6',
   }
+
+  const getChildHex = (colorName) => CHILD_HEX[colorName] || CHILD_HEX.violet
 
   // Show onboarding if few missions exist
   const showOnboarding = isNewUser || missions.length <= 3
@@ -307,7 +306,7 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
         <div className={`flex gap-2 p-1.5 bg-white border ${theme.border || 'border-violet-200'} rounded-2xl overflow-x-auto no-scrollbar`}>
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-xl transition-all shrink-0 flex flex-col items-center ${activeTab === 'all' ? 'bg-violet-500 text-white shadow-md shadow-violet-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            className={`px-4 py-2 rounded-xl transition-all shrink-0 flex flex-col items-center ${activeTab === 'all' ? 'bg-violet-500 text-white shadow-md shadow-violet-200' : 'bg-slate-200 text-slate-700 font-bold hover:bg-slate-300'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest">{t('common.all')}</span>
             <span className={`text-xs font-semibold ${activeTab === 'all' ? 'text-violet-100' : 'text-slate-400'}`}>
@@ -315,16 +314,18 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
             </span>
           </button>
           {childProfiles.map(p => {
-            const colorClass = getColorClasses(p.color)
+            const hex = getChildHex(p.color)
             const count = getMissionCountFor(p.id)
+            const isActive = activeTab === p.id
             return (
               <button
                 key={p.id}
                 onClick={() => setActiveTab(p.id)}
-                className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex flex-col items-center ${activeTab === p.id ? `${colorClass} text-white shadow-md` : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex flex-col items-center ${isActive ? 'text-white shadow-md' : 'bg-slate-200 text-slate-700 font-bold hover:bg-slate-300'}`}
+                style={isActive ? { background: hex } : {}}
               >
                 <span className="text-[10px] font-black uppercase tracking-widest">{p.child_name}</span>
-                <span className={`text-xs font-semibold ${activeTab === p.id ? 'text-white/80' : 'text-slate-400'}`}>
+                <span className={`text-xs font-semibold ${isActive ? 'text-white/80' : 'text-slate-500'}`}>
                   {count} mission{count > 1 ? 's' : ''}
                 </span>
               </button>
@@ -379,7 +380,7 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Quota gratuit</span>
               </div>
               <div>
-                <span className={`text-sm font-black tabular-nums ${currentLevelCount >= 4 ? 'text-orange-500' : 'text-indigo-500'}`}>{currentLevelCount}</span>
+                <span className={`text-sm font-black tabular-nums ${currentLevelCount >= 4 ? 'text-orange-500' : 'text-violet-600'}`}>{currentLevelCount}</span>
                 <span className="text-xs text-slate-400 font-medium"> / 5</span>
               </div>
             </div>

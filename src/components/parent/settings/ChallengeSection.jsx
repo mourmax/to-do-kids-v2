@@ -6,42 +6,57 @@ import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 import InviteCodeGuideModal from '../../ui/InviteCodeGuideModal'
 import OnboardingCompletionModal from '../../ui/OnboardingCompletionModal'
 
-export default function ChallengeSection({ theme = {}, challenge, onShowSuccess, refresh, isNewUser, onNextStep, profiles, onNavigateToValidation }) {
+export default function ChallengeSection({ theme = {}, challenge, profile, onShowSuccess, refresh, isNewUser, onNextStep, profiles, onNavigateToValidation }) {
   const { t } = useTranslation()
-  const [rewardName, setRewardName] = useState('')
-  const [seriesLength, setSeriesLength] = useState(2)
-  const [malusMessage, setMalusMessage] = useState('')
+  const profileId = profile?.id || '__default__'
+
+  const [settingsByChild, setSettingsByChild] = useState({})
   const [isSaving, setIsSaving] = useState(false)
   const [showInviteGuide, setShowInviteGuide] = useState(false)
   const [showCompletionModal, setShowCompletionModal] = useState(false)
+
+  // Derived settings for the current profile (fall back to empty defaults)
+  const settings = settingsByChild[profileId] || { rewardName: '', seriesLength: 2, malusMessage: '' }
+  const { rewardName, seriesLength, malusMessage } = settings
+
+  const updateSetting = (key, val) => {
+    setSettingsByChild(prev => ({
+      ...prev,
+      [profileId]: { ...(prev[profileId] || { rewardName: '', seriesLength: 2, malusMessage: '' }), [key]: val }
+    }))
+  }
 
   // Show onboarding if streak is 0 and no reward set
   const showOnboarding = isNewUser || (challenge?.current_streak === 0 && (!challenge?.reward_name || challenge?.reward_name === t('completion_modal.default_reward')))
 
   useEffect(() => {
     if (challenge) {
-      // Logic to translate default presets if they are in French (legacy)
-      let rName = challenge.reward_name || ''
-      if (rName === 'Cadeau Surprise' || rName === 'Surprise Gift' || rName === t('completion_modal.default_reward')) {
-        rName = ''
-      }
-      setRewardName(rName)
+      // Only seed defaults when no draft exists for this profile yet
+      setSettingsByChild(prev => {
+        if (prev[profileId]) return prev // keep existing draft
 
-      const rawDuration = challenge.duration_days || 2
-      setSeriesLength(rawDuration > 3 ? 3 : rawDuration)
+        let rName = challenge.reward_name || ''
+        if (rName === 'Cadeau Surprise' || rName === 'Surprise Gift' || rName === t('completion_modal.default_reward')) {
+          rName = ''
+        }
 
-      let mMsg = challenge.malus_message || ''
-      if (mMsg === 'Zut ! On recommence au début' || mMsg === 'Zut ! On recommence au début.' || mMsg === 'Oops! Back to the start.' || mMsg === t('completion_modal.default_malus')) {
-        mMsg = ''
-      }
-      setMalusMessage(mMsg)
+        const rawDuration = challenge.duration_days || 2
+        const dur = rawDuration > 3 ? 3 : rawDuration
+
+        let mMsg = challenge.malus_message || ''
+        if (mMsg === 'Zut ! On recommence au début' || mMsg === 'Zut ! On recommence au début.' || mMsg === 'Oops! Back to the start.' || mMsg === t('completion_modal.default_malus')) {
+          mMsg = ''
+        }
+
+        return { ...prev, [profileId]: { rewardName: rName, seriesLength: dur, malusMessage: mMsg } }
+      })
     }
-  }, [challenge?.id]) // On ne synchronise qu'au montage ou si le challenge change d'ID
+  }, [challenge?.id, profileId])
 
   const saveChallengeSettings = async () => {
     if (!challenge?.id || isSaving) return
     setIsSaving(true)
-    const finalLength = Math.max(1, parseInt(seriesLength) || 7)
+    const finalLength = Math.max(1, parseInt(seriesLength) || 2)
 
     try {
       const { data, error } = await supabase.from('challenges').update({
@@ -97,7 +112,7 @@ export default function ChallengeSection({ theme = {}, challenge, onShowSuccess,
           {[1, 2, 3].map(d => (
             <button
               key={d}
-              onClick={() => setSeriesLength(d)}
+              onClick={() => updateSetting('seriesLength', d)}
               className={`py-3.5 rounded-xl font-black text-lg transition-all border-2 min-h-[52px] ${
                 seriesLength === d
                   ? 'bg-violet-500 text-white border-violet-500 shadow-md'
@@ -126,7 +141,7 @@ export default function ChallengeSection({ theme = {}, challenge, onShowSuccess,
         </div>
         <input
           value={rewardName}
-          onChange={(e) => setRewardName(e.target.value)}
+          onChange={(e) => updateSetting('rewardName', e.target.value)}
           placeholder={t('settings.reward_placeholder')}
           className="w-full border-2 border-emerald-200 rounded-xl px-4 py-3 text-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white min-h-[48px]"
         />
@@ -143,7 +158,7 @@ export default function ChallengeSection({ theme = {}, challenge, onShowSuccess,
         </div>
         <input
           value={malusMessage}
-          onChange={(e) => setMalusMessage(e.target.value)}
+          onChange={(e) => updateSetting('malusMessage', e.target.value)}
           placeholder={t('settings.malus_placeholder')}
           className="w-full border-2 border-rose-200 rounded-xl px-4 py-3 text-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-white min-h-[48px]"
         />

@@ -160,6 +160,7 @@ export default function SettingsTab({ theme = {}, family, profile, profiles, cha
             <ChallengeSection
               theme={theme}
               challenge={challenge}
+              profile={profile}
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}

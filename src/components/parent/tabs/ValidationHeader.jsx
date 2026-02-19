@@ -1,7 +1,7 @@
 import { Trophy, RefreshCw, ListChecks, Clock, Gift, Skull, AlertCircle, Edit2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export default function ValidationHeader({ theme, isChallengeFinished, allMissionsDone, isDaySuccess, challenge, missionsCount, onStartNewChallenge, onDayResult, onEditSettings }) {
+export default function ValidationHeader({ theme, isChallengeFinished, allMissionsDone, isDaySuccess, challenge, missionsCount, onStartNewChallenge, onDayResult, onEditSettings, childColor }) {
   const { t } = useTranslation()
 
   const streakPercent = challenge
@@ -69,8 +69,8 @@ export default function ValidationHeader({ theme, isChallengeFinished, allMissio
             </div>
             <div className={`h-1.5 ${theme.progressBg} rounded-full overflow-hidden`}>
               <div
-                className="h-full bg-gradient-to-r from-violet-400 to-violet-600 rounded-full transition-all duration-500"
-                style={{ width: `${streakPercent}%` }}
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${streakPercent}%`, background: childColor ? `linear-gradient(90deg, ${childColor}cc, ${childColor})` : 'linear-gradient(90deg, #a78bfa, #7c3aed)' }}
               />
             </div>
           </div>
