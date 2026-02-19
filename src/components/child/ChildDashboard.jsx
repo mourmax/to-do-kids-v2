@@ -273,7 +273,7 @@ export default function ChildDashboard({
     setTogglingId(missionId)
     try {
       await supabase
-        .from('missions')
+        .from('todokids_missions')
         .update({ child_done: true })
         .eq('id', missionId)
       onMissionToggle?.(missionId)

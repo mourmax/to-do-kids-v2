@@ -35,6 +35,7 @@ export default function App() {
   const [tkMissions, setTkMissions] = useState([])
   const [tkChallenge, setTkChallenge] = useState(null)
   const [tkProfile, setTkProfile] = useState(null)
+  const [tkProfileId, setTkProfileId] = useState(null)
 
   // Onboarding stepper state (will be calculated dynamically)
   const [onboardingStep, setOnboardingStep] = useState('pin')
@@ -160,22 +161,51 @@ export default function App() {
 
   // --- TODOKIDS DATA (ChildApp) ---
 
-  const fetchChildData = useCallback(async (profileId) => {
-    const [missionsRes, challengeRes, profileRes] = await Promise.all([
-      supabase.from('todokids_missions').select('*').eq('profile_id', profileId),
-      supabase.from('todokids_challenges').select('*').eq('profile_id', profileId).maybeSingle(),
-      supabase.from('todokids_profiles').select('*').eq('id', profileId).maybeSingle(),
+  const fetchChildData = useCallback(async (activeProf, familyId) => {
+    if (!activeProf?.child_name || !familyId) return
+
+    // Étape 1 : résoudre le bon todokids_profile par family_id ET le nom (MARIE, lolo, etc.)
+    const { data: tkProfs, error: tkProfError } = await supabase
+      .from('todokids_profiles')
+      .select('*')
+      .eq('family_id', familyId)
+      .ilike('name', activeProf.child_name)
+
+    const tkProf = tkProfs?.[0]
+    const resolvedId = tkProf?.id
+    console.log(`[ChildData] Match sécurisé: "${activeProf.child_name}" (famille: ${familyId}) → ID résolu: ${resolvedId}`)
+
+    setTkProfileId(resolvedId)
+
+    if (!resolvedId) {
+      console.warn('[ChildData] Aucun todokids_profile trouvé pour le nom:', activeProf.child_name)
+      setTkMissions([])
+      setTkChallenge(null)
+      setTkProfile(null)
+      return
+    }
+
+    // Étape 2 : charger les données avec le bon ID
+    const today = new Date().toISOString().split('T')[0]
+    console.log('[ChildData] Requête missions avec profile_id:', resolvedId, 'date:', today)
+
+    const [missionsRes, challengeRes] = await Promise.all([
+      supabase.from('todokids_missions').select('*').eq('profile_id', resolvedId).eq('date', today),
+      supabase.from('todokids_challenges').select('*').eq('profile_id', resolvedId).maybeSingle(),
     ])
-    if (missionsRes.data) setTkMissions(missionsRes.data)
-    if (challengeRes.data) setTkChallenge(challengeRes.data)
-    if (profileRes.data) setTkProfile(profileRes.data)
+
+    console.log('[ChildData] missions trouvées:', missionsRes.data?.length ?? 0)
+
+    setTkMissions(missionsRes.data ?? [])
+    setTkChallenge(challengeRes.data ?? null)
+    setTkProfile(tkProf)
   }, [])
 
   useEffect(() => {
-    if (!isParentMode && activeProfile?.id) {
-      fetchChildData(activeProfile.id)
+    if (!isParentMode && activeProfile && family?.id) {
+      fetchChildData(activeProfile, family.id)
     }
-  }, [isParentMode, activeProfile?.id, fetchChildData])
+  }, [isParentMode, activeProfile, family?.id, fetchChildData])
 
   const handleMissionToggle = useCallback(async (missionId, done) => {
     await supabase.from('todokids_missions').update({ child_done: done }).eq('id', missionId)
@@ -420,7 +450,7 @@ export default function App() {
             ) : (
               <ChildApp
                 key="child"
-                profileId={activeProfile?.id}
+                profileId={tkProfileId || activeProfile?.id}
                 childName={tkProfile?.name ?? activeProfile?.child_name ?? ''}
                 gender={tkProfile?.gender ?? 'boy'}
                 missions={tkMissions}
