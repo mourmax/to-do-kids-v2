@@ -85,17 +85,17 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3">
             <div className="space-y-2">
-              <label className="text-[10px] text-orange-500 uppercase font-black ml-1 mb-1 block">{t('settings.reward_label')}</label>
+              <label className="text-[10px] text-violet-600 uppercase font-bold ml-1 mb-1 block">{t('settings.reward_label')}</label>
               <input
                 value={rewardName}
                 onChange={(e) => setRewardName(e.target.value)}
                 placeholder={t('settings.reward_placeholder')}
-                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 font-bold outline-none text-emerald-400 focus:border-emerald-500 transition-colors [.light-theme_&]:bg-white [.light-theme_&]:text-slate-900 [.light-theme_&]:border-indigo-200"
+                className="w-full bg-white border border-gray-200 focus:border-violet-400 rounded-xl px-4 py-2.5 font-bold outline-none text-gray-800 transition-colors"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] text-orange-500 uppercase font-black ml-1 mb-1 block">{t('settings.duration_label')}</label>
+              <label className="text-[10px] text-violet-600 uppercase font-bold ml-1 mb-1 block">{t('settings.duration_label')}</label>
               <input
                 type="number"
                 min="1"
@@ -105,11 +105,11 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
                   const val = parseInt(e.target.value) || 1
                   setSeriesLength(val > 3 ? 3 : val)
                 }}
-                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 font-bold outline-none text-white focus:border-orange-500 transition-colors [.light-theme_&]:bg-white [.light-theme_&]:text-slate-900 [.light-theme_&]:border-indigo-200"
+                className="w-full bg-white border border-gray-200 focus:border-amber-400 rounded-xl px-4 py-2.5 font-bold outline-none text-gray-800 transition-colors"
               />
-              <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
-                <Crown size={14} className="text-amber-400" />
-                <span className="text-[10px] font-bold text-amber-200/80 uppercase tracking-wide">
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg">
+                <Crown size={14} className="text-amber-500" />
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wide">
                   Limité à 3 jours max en version gratuite
                 </span>
               </div>
@@ -117,14 +117,14 @@ export default function ChallengeSection({ challenge, onShowSuccess, refresh, is
           </div>
 
           <div>
-            <label className="text-[10px] text-orange-500 uppercase font-black ml-1 mb-1 block">{t('settings.malus_label')}</label>
-            <input value={malusMessage} onChange={(e) => setMalusMessage(e.target.value)} placeholder={t('settings.malus_placeholder')} className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 font-bold outline-none text-red-400 focus:border-red-500 transition-colors [.light-theme_&]:bg-white [.light-theme_&]:border-red-200" />
+            <label className="text-[10px] text-rose-500 uppercase font-bold ml-1 mb-1 block">{t('settings.malus_label')}</label>
+            <input value={malusMessage} onChange={(e) => setMalusMessage(e.target.value)} placeholder={t('settings.malus_placeholder')} className="w-full bg-white border border-gray-200 focus:border-rose-400 rounded-xl px-4 py-2.5 font-bold outline-none text-gray-800 transition-colors" />
           </div>
 
           <button
             onClick={saveChallengeSettings}
             disabled={isSaving}
-            className={`w-full py-4 rounded-xl font-black uppercase text-[10px] shadow-xl active:scale-95 transition-all text-white mt-2 ${isSaving ? 'bg-slate-700 cursor-not-allowed opacity-50' : 'bg-orange-600 hover:bg-orange-500'
+            className={`w-full min-h-[48px] py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all text-white mt-2 ${isSaving ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-violet-500 hover:bg-violet-600 shadow-sm shadow-violet-200'
               }`}
           >
             {isSaving ? t('actions.saving') : t('actions.save')}

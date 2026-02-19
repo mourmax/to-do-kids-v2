@@ -116,8 +116,8 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
     return (
         <div className="space-y-6 animate-in fade-in zoom-in duration-300">
             <div className="text-center space-y-2 mb-8">
-                <h2 className="text-2xl font-black uppercase text-white italic tracking-tighter">Prêt pour la suite ?</h2>
-                <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Configurez le prochain défi</p>
+                <h2 className="text-2xl font-black text-gray-800 tracking-tight">Prêt pour la suite ?</h2>
+                <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Configurez le prochain défi</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,7 +127,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                         value={rewardName}
                         onChange={(e) => setRewardName(e.target.value)}
                         placeholder={t('settings.reward_placeholder')}
-                        className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 font-bold text-amber-400 focus:border-amber-500 transition-colors outline-none"
+                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-gray-800 focus:border-amber-400 transition-colors outline-none"
                     />
                 </SectionCard>
 
@@ -137,23 +137,23 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                         value={malusMessage}
                         onChange={(e) => setMalusMessage(e.target.value)}
                         placeholder={t('settings.malus_placeholder')}
-                        className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 font-bold text-orange-400 focus:border-orange-500 transition-colors outline-none"
+                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-gray-800 focus:border-rose-400 transition-colors outline-none"
                     />
                 </SectionCard>
 
                 {/* Duration */}
                 <SectionCard icon={TimerIcon} title={t('settings.duration_label')} color="indigo">
-                    <div className="flex items-center gap-4 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
                         <button
                             onClick={() => setDurationDays(Math.max(1, durationDays - 1))}
-                            className="w-10 h-10 flex items-center justify-center bg-slate-800 rounded-xl hover:bg-slate-700 font-bold text-white transition-colors"
+                            className="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-100 font-bold text-gray-700 transition-colors"
                         >
                             -
                         </button>
-                        <span className="flex-1 text-center font-black text-xl text-white italic">{durationDays} {t('common.day_plural')}</span>
+                        <span className="flex-1 text-center font-black text-xl text-gray-800">{durationDays} {t('common.day_plural')}</span>
                         <button
                             onClick={() => setDurationDays(durationDays + 1)}
-                            className="w-10 h-10 flex items-center justify-center bg-slate-800 rounded-xl hover:bg-slate-700 font-bold text-white transition-colors"
+                            className="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-100 font-bold text-gray-700 transition-colors"
                         >
                             +
                         </button>
@@ -164,14 +164,14 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                 <SectionCard icon={Sparkles} title={t('common.missions')} color="emerald">
                     <div className="space-y-3">
                         <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-black text-emerald-500/70 uppercase tracking-widest italic">
+                            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
                                 {missionsCount} / 5 {t('common.missions')}
                             </span>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => !isLimitReached && setShowLibrary(true)}
                                     disabled={isLimitReached}
-                                    className={`p-2 rounded-lg transition-colors border ${isLimitReached ? 'bg-slate-800 text-slate-600 border-white/5 opacity-50' : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/20'}`}
+                                    className={`p-2 rounded-lg transition-colors border ${isLimitReached ? 'bg-gray-100 text-gray-400 border-gray-200 opacity-50' : 'bg-violet-50 hover:bg-violet-100 text-violet-600 border-violet-200'}`}
                                     title={t('library.library_button')}
                                 >
                                     <Library size={16} />
@@ -179,7 +179,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                 <button
                                     onClick={() => !isLimitReached && setShowQuickAdd(!showQuickAdd)}
                                     disabled={isLimitReached}
-                                    className={`p-2 rounded-lg transition-colors border ${isLimitReached ? 'bg-slate-800 text-slate-600 border-white/5 opacity-50' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
+                                    className={`p-2 rounded-lg transition-colors border ${isLimitReached ? 'bg-gray-100 text-gray-400 border-gray-200 opacity-50' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200'}`}
                                     title={t('library.custom_button')}
                                 >
                                     <Plus size={16} />
@@ -207,38 +207,38 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                     exit={{ height: 0, opacity: 0 }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl space-y-3 mb-2">
+                                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-3 mb-2">
                                         <div className="flex gap-2">
-                                            <button onClick={() => setShowPickerForAdd(!showPickerForAdd)} className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-xl shrink-0 border border-white/5">
+                                            <button onClick={() => setShowPickerForAdd(!showPickerForAdd)} className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl shrink-0 border border-gray-200">
                                                 {newIcon}
                                             </button>
                                             <input
                                                 value={newTitle}
                                                 onChange={(e) => setNewTitle(e.target.value)}
                                                 placeholder="Nom de la mission..."
-                                                className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 text-[10px] font-bold text-white focus:border-emerald-500 outline-none"
+                                                className="flex-1 bg-white border border-gray-200 rounded-xl px-3 text-[10px] font-bold text-gray-800 focus:border-emerald-400 outline-none"
                                             />
                                             <div className="flex flex-col gap-2 flex-1">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Rappels :</span>
+                                                    <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Rappels :</span>
                                                     <button
                                                         onClick={() => setShowTimePickerForAdd(true)}
-                                                        className="p-1 px-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg transition-all flex items-center gap-1 group"
+                                                        className="p-1 px-2 bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 rounded-lg transition-all flex items-center gap-1 group"
                                                     >
                                                         <Plus size={10} />
-                                                        <span className="text-[8px] font-black uppercase">Ajouter</span>
+                                                        <span className="text-[8px] font-bold">Ajouter</span>
                                                     </button>
                                                 </div>
                                                 <div className="flex flex-wrap gap-1">
                                                     {newScheduledTimes.map((t, idx) => (
-                                                        <div key={idx} className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-1">
-                                                            <TimerIcon size={10} className="text-indigo-400" />
-                                                            <span className="text-[9px] font-bold text-indigo-400">{t}</span>
+                                                        <div key={idx} className="flex items-center gap-1 bg-indigo-50 border border-indigo-200 rounded-lg px-2 py-1">
+                                                            <TimerIcon size={10} className="text-indigo-500" />
+                                                            <span className="text-[9px] font-bold text-indigo-600">{t}</span>
                                                             <button onClick={() => {
                                                                 const ts = [...newScheduledTimes]
                                                                 ts.splice(idx, 1)
                                                                 setNewScheduledTimes(ts)
-                                                            }} className="p-0.5 hover:text-red-400 text-slate-600 transition-colors">
+                                                            }} className="p-0.5 hover:text-rose-500 text-gray-400 transition-colors">
                                                                 <X size={10} />
                                                             </button>
                                                         </div>
@@ -248,18 +248,18 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
-                                                <button onClick={() => setNewTargetId(null)} className={`px-2 py-1 rounded-full text-[8px] font-black uppercase border transition-all ${!newTargetId ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-900 text-slate-500 border-white/5'}`}>
+                                                <button onClick={() => setNewTargetId(null)} className={`px-2 py-1 rounded-full text-[8px] font-bold uppercase border transition-all ${!newTargetId ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
                                                     Tous
                                                 </button>
                                                 {profiles?.filter(p => !p.is_parent).map(p => (
-                                                    <button key={p.id} onClick={() => setNewTargetId(p.id)} className={`px-2 py-1 rounded-full text-[8px] font-black uppercase border transition-all ${newTargetId === p.id ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-900 text-slate-500 border-white/5'}`}>
+                                                    <button key={p.id} onClick={() => setNewTargetId(p.id)} className={`px-2 py-1 rounded-full text-[8px] font-bold uppercase border transition-all ${newTargetId === p.id ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
                                                         {p.child_name}
                                                     </button>
                                                 ))}
                                             </div>
                                             <div className="flex gap-1">
                                                 <button onClick={() => addMission()} className="p-1.5 bg-emerald-500 text-white rounded-lg"><Check size={14} /></button>
-                                                <button onClick={() => setShowQuickAdd(false)} className="p-1.5 bg-slate-800 text-slate-400 rounded-lg"><X size={14} /></button>
+                                                <button onClick={() => setShowQuickAdd(false)} className="p-1.5 bg-gray-100 text-gray-500 rounded-lg"><X size={14} /></button>
                                             </div>
                                         </div>
                                         <AnimatePresence>
@@ -268,7 +268,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                     <motion.div
                                                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                                         onClick={() => setShowTimePickerForAdd(false)}
-                                                        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+                                                        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                                                     />
                                                     <TimePicker
                                                         onClose={() => setShowTimePickerForAdd(false)}
@@ -285,50 +285,50 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
 
                         <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1 no-scrollbar">
                             {missions?.map(mission => (
-                                <div key={mission.id} className={`transition-all ${editingId === mission.id ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-950/30 border-white/5'} border p-2 rounded-xl`}>
+                                <div key={mission.id} className={`transition-all ${editingId === mission.id ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-100'} border p-2 rounded-xl`}>
                                     {editingId === mission.id ? (
                                         <div className="space-y-2">
                                             <div className="flex gap-2">
-                                                <button onClick={() => setShowPickerForEdit(!showPickerForEdit)} className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-sm shrink-0">
+                                                <button onClick={() => setShowPickerForEdit(!showPickerForEdit)} className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm shrink-0">
                                                     {editState.icon}
                                                 </button>
                                                 <input
                                                     value={editState.title}
                                                     onChange={(e) => setEditState({ ...editState, title: e.target.value })}
-                                                    className="flex-1 bg-slate-900 border-b border-emerald-500 text-[10px] font-bold text-white outline-none"
+                                                    className="flex-1 bg-transparent border-b-2 border-emerald-500 text-[10px] font-bold text-gray-800 outline-none"
                                                 />
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex gap-1">
-                                                    <button onClick={() => setEditState({ ...editState, assigned_to: null })} className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-tighter transition-all border ${!editState.assigned_to ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-900 border-white/5 text-slate-500'}`}>
+                                                    <button onClick={() => setEditState({ ...editState, assigned_to: null })} className={`px-2 py-0.5 rounded-full text-[7px] font-bold uppercase tracking-tighter transition-all border ${!editState.assigned_to ? 'bg-violet-500 border-violet-500 text-white' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
                                                         Tous
                                                     </button>
                                                     {profiles?.filter(p => !p.is_parent).map(p => (
-                                                        <button key={p.id} onClick={() => setEditState({ ...editState, assigned_to: p.id })} className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-tighter transition-all border ${editState.assigned_to === p.id ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-900 border-white/5 text-slate-500'}`}>
+                                                        <button key={p.id} onClick={() => setEditState({ ...editState, assigned_to: p.id })} className={`px-2 py-0.5 rounded-full text-[7px] font-bold uppercase tracking-tighter transition-all border ${editState.assigned_to === p.id ? 'bg-violet-500 border-violet-500 text-white' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
                                                             {p.child_name}
                                                         </button>
                                                     ))}
                                                     <div className="flex flex-col gap-2 flex-1 ml-2">
                                                         <div className="flex items-center justify-between">
-                                                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Rappels :</span>
+                                                            <span className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Rappels :</span>
                                                             <button
                                                                 onClick={() => setShowTimePickerForEdit(true)}
-                                                                className="p-1 px-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg transition-all flex items-center gap-1 group"
+                                                                className="p-1 px-2 bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 rounded-lg transition-all flex items-center gap-1 group"
                                                             >
                                                                 <Plus size={8} />
-                                                                <span className="text-[7px] font-black uppercase">Ajouter</span>
+                                                                <span className="text-[7px] font-bold">Ajouter</span>
                                                             </button>
                                                         </div>
                                                         <div className="flex flex-wrap gap-1">
                                                             {editState.scheduled_times.map((t, idx) => (
-                                                                <div key={idx} className="flex items-center gap-1 bg-slate-900 border border-indigo-500/30 rounded-lg px-2 py-0.5">
-                                                                    <TimerIcon size={8} className="text-indigo-400" />
-                                                                    <span className="text-[8px] font-bold text-indigo-400">{t}</span>
+                                                                <div key={idx} className="flex items-center gap-1 bg-indigo-50 border border-indigo-200 rounded-lg px-2 py-0.5">
+                                                                    <TimerIcon size={8} className="text-indigo-500" />
+                                                                    <span className="text-[8px] font-bold text-indigo-600">{t}</span>
                                                                     <button onClick={() => {
                                                                         const ts = [...editState.scheduled_times]
                                                                         ts.splice(idx, 1)
                                                                         setEditState({ ...editState, scheduled_times: ts })
-                                                                    }} className="p-0.5 hover:text-red-400 text-slate-600 transition-colors">
+                                                                    }} className="p-0.5 hover:text-rose-500 text-gray-400 transition-colors">
                                                                         <X size={8} />
                                                                     </button>
                                                                 </div>
@@ -347,7 +347,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                         <motion.div
                                                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                                             onClick={() => setShowTimePickerForEdit(false)}
-                                                            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+                                                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                                                         />
                                                         <TimePicker
                                                             onClose={() => setShowTimePickerForEdit(false)}
@@ -360,16 +360,16 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2 group">
-                                            <span className="text-sm shrink-0 bg-slate-950 w-7 h-7 flex items-center justify-center rounded-lg">{mission.icon}</span>
+                                            <span className="text-sm shrink-0 bg-violet-50 w-7 h-7 flex items-center justify-center rounded-lg border border-violet-100">{mission.icon}</span>
                                             <div className="flex-1 min-w-0">
-                                                <span className="block text-[10px] font-bold text-slate-300 truncate lowercase first-letter:uppercase">{t(mission.title)}</span>
+                                                <span className="block text-[10px] font-bold text-gray-700 truncate lowercase first-letter:uppercase">{t(mission.title)}</span>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[7px] font-black uppercase text-slate-500 tracking-widest italic">
+                                                    <span className="text-[7px] font-bold uppercase text-gray-400 tracking-widest">
                                                         {mission.assigned_to ? profiles?.find(p => p.id === mission.assigned_to)?.child_name : 'Tous'}
                                                     </span>
                                                     <div className="flex flex-wrap gap-1">
                                                         {(mission.scheduled_times || []).map((t, idx) => (
-                                                            <span key={idx} className="text-[7px] font-black text-indigo-400/80 bg-indigo-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                                            <span key={idx} className="text-[7px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 flex items-center gap-0.5">
                                                                 <TimerIcon size={8} /> {t}
                                                             </span>
                                                         ))}
@@ -377,10 +377,10 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                                 </div>
                                             </div>
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => startEditing(mission)} className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
+                                                <button onClick={() => startEditing(mission)} className="p-1.5 hover:bg-violet-50 rounded-lg text-gray-400 hover:text-violet-600 transition-colors">
                                                     <Edit3 size={12} />
                                                 </button>
-                                                <button onClick={() => deleteMission(mission.id)} className="p-1.5 hover:bg-rose-500/10 rounded-lg text-slate-400 hover:text-rose-400 transition-colors">
+                                                <button onClick={() => deleteMission(mission.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-gray-400 hover:text-rose-500 transition-colors">
                                                     <Trash2 size={12} />
                                                 </button>
                                             </div>
@@ -389,8 +389,8 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                                 </div>
                             ))}
                             {missionsCount === 0 && (
-                                <div className="py-6 text-center border-2 border-dashed border-white/5 rounded-2xl bg-slate-950/20">
-                                    <p className="text-[10px] text-slate-500 italic uppercase tracking-widest">Aucune mission configurée</p>
+                                <div className="py-6 text-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest">Aucune mission configurée</p>
                                 </div>
                             )}
                         </div>
@@ -402,7 +402,7 @@ export default function ChallengeRenewalView({ challenge, missions, profiles, fa
                 <button
                     onClick={handleStart}
                     disabled={isSubmitting || missionsCount === 0}
-                    className={`w-full py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 group ${isSubmitting || missionsCount === 0 ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'}`}
+                    className={`w-full min-h-[52px] py-4 rounded-2xl font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 group ${isSubmitting || missionsCount === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm shadow-violet-200'}`}
                 >
                     {isSubmitting ? (
                         <span className="animate-spin text-xl">⏳</span>
