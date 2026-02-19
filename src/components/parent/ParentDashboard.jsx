@@ -235,8 +235,8 @@ export default function ParentDashboard({
 
       {/* Background Decorative Element (Subtle) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden h-screen w-screen z-[-1]">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-900/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-300/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-100/10 rounded-full blur-[120px]" />
       </div>
 
       <NotificationBanner
@@ -272,64 +272,74 @@ export default function ParentDashboard({
           />
         )}
 
-        <div className="flex flex-col items-center justify-center text-center">
-          <h1 className="text-3xl font-black uppercase italic tracking-tighter text-white [.light-theme_&]:text-slate-900 mb-1">
-            {t('dashboard.parent_title')}
-          </h1>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+        <div className="flex items-start justify-between gap-4">
+          {/* Left: title + family badge */}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">
+              {t('dashboard.parent_title')}
+            </h1>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="text-xs text-gray-500">
                 {family?.name || t('common.family_active')}
               </span>
             </div>
+          </div>
 
-            {/* Selector Profile Child for Parent (Validation context) */}
-            <div className="flex items-center gap-2">
-              {filteredProfilesForUI.length > 1 && (
-                <div className="flex gap-1.5 p-1 bg-slate-900/60 border border-white/5 rounded-xl">
-                  {filteredProfilesForUI.map(p => {
-                    const isActive = profile?.id === p.id
-                    const colors = getProfileColorClasses(p.color)
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => {
-                          onSwitchProfile(p.id)
-                          setActiveTab('validation')
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${isActive
-                          ? `${colors.active} shadow-lg`
-                          : `${colors.inactive} hover:bg-white/5 opacity-50`
-                          }`}
-                      >
-                        {p.child_name}
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-
-              {/* 🔔 Button to activate notifications for parents */}
-              {NotificationService.getPermissionStatus() !== 'granted' && (
-                <button
-                  onClick={() => NotificationService.requestPermission().then(refresh)}
-                  className="px-3 py-1.5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600/30 transition-all flex items-center gap-2"
-                  title="Activer les alertes de validation"
-                >
-                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-ping" />
-                  🔔 Alertes
-                </button>
-              )}
-            </div>
+          {/* Right: notifications + MODE ENFANT */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* 🔔 Button to activate notifications for parents */}
+            {NotificationService.getPermissionStatus() !== 'granted' && (
+              <button
+                onClick={() => NotificationService.requestPermission().then(refresh)}
+                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5"
+                title="Activer les alertes de validation"
+              >
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                🔔 Alertes
+              </button>
+            )}
+            <button
+              onClick={onExit}
+              className="px-3 py-2 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-medium transition-all"
+            >
+              Mode Enfant
+            </button>
           </div>
         </div>
+
+        {/* Selector Profile Child for Parent (Validation context) */}
+        {filteredProfilesForUI.length > 1 && (
+          <div className="flex gap-2 flex-wrap">
+            {filteredProfilesForUI.map(p => {
+              const isActive = profile?.id === p.id
+              const colors = getProfileColorClasses(p.color)
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    onSwitchProfile(p.id)
+                    setActiveTab('validation')
+                  }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
+                    ? `${colors.active} shadow-sm`
+                    : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                >
+                  <span className="w-6 h-6 rounded-full bg-current opacity-20 flex items-center justify-center text-xs font-bold">
+                    {p.child_name?.[0]?.toUpperCase()}
+                  </span>
+                  {p.child_name}
+                </button>
+              )
+            })}
+          </div>
+        )}
         {/* Tab Switcher - Premium Look - Masqué pendant l'onboarding */}
         {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
-          <div className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/15 backdrop-blur-xl border border-white/5 [.light-theme_&]:border-indigo-500/10 p-1 rounded-2xl flex relative shadow-2xl max-w-sm mx-auto">
+          <div className="bg-gray-100 p-1 rounded-2xl flex relative max-w-sm mx-auto">
             <motion.div
-              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600 rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.4)] z-0"
+              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-violet-500 rounded-xl shadow-md z-0"
               animate={{ x: activeTab === 'settings' ? '100%' : '0%' }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               style={{ left: '4px' }}
@@ -340,10 +350,10 @@ export default function ParentDashboard({
                 manualTabChangeRef.current = true
                 setActiveTab('validation')
               }}
-              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
             >
-              <ClipboardCheck size={20} className={activeTab === 'validation' ? 'text-white' : 'text-slate-600'} />
-              <span className="font-bold uppercase text-[11px] tracking-[0.15em]">{t('tabs.validation')}</span>
+              <ClipboardCheck size={20} className={activeTab === 'validation' ? 'text-white' : 'text-gray-400'} />
+              <span className="font-semibold text-sm">{t('tabs.validation')}</span>
             </button>
 
             <button
@@ -351,10 +361,10 @@ export default function ParentDashboard({
                 manualTabChangeRef.current = true
                 setActiveTab('settings')
               }}
-              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
             >
-              <Sliders size={20} className={activeTab === 'settings' ? 'text-white' : 'text-slate-600'} />
-              <span className="font-bold uppercase text-[11px] tracking-[0.15em]">{t('tabs.settings')}</span>
+              <Sliders size={20} className={activeTab === 'settings' ? 'text-white' : 'text-gray-400'} />
+              <span className="font-semibold text-sm">{t('tabs.settings')}</span>
             </button>
           </div>
         )}

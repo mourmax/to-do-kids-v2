@@ -220,16 +220,16 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`p-6 rounded-3xl border-2 border-dashed flex flex-col items-center gap-3 text-center transition-colors ${getProfileColorClasses(profile?.color).badge}`}
+            className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3"
           >
-            <div className="w-12 h-12 rounded-full bg-current opacity-20 flex items-center justify-center animate-bounce">
-              <ListChecks size={24} className="text-current" />
+            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 animate-bounce">
+              <ListChecks size={20} className="text-amber-600" />
             </div>
             <div>
-              <h4 className="font-black uppercase italic tracking-tighter text-lg">
+              <h4 className="font-semibold text-amber-800">
                 {t('validation.all_missions_done', { name: childName })}
               </h4>
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-70">
+              <p className="text-xs text-amber-600 mt-0.5">
                 {t('validation.validate_to_advance')}
               </p>
             </div>
