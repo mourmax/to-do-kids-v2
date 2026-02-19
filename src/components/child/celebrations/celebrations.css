@@ -180,8 +180,8 @@
 }
 
 @keyframes medalShine {
-  0%   { left: -120%; skewX(-20deg); }
-  100% { left:  160%; skewX(-20deg); }
+  0%   { left: -120%; transform: skewX(-20deg); }
+  100% { left:  160%; transform: skewX(-20deg); }
 }
 
 @keyframes stampIn {
