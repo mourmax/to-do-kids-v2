@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ClipboardCheck, Sliders, Baby, Bell } from 'lucide-react'
+import { ClipboardCheck, Sparkles, Trophy, Users, Baby, Bell, Menu, X, LogOut } from 'lucide-react'
 import ValidationTab from './tabs/ValidationTab'
 import SettingsTab from './tabs/SettingsTab'
 import NotificationBanner from '../ui/NotificationBanner'
@@ -9,14 +9,25 @@ import OnboardingCompletionModal from '../ui/OnboardingCompletionModal'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 import { NotificationService } from '../../services/notificationService'
-import { getProfileColorClasses } from '../../utils/colors'
+import { useTheme } from '../../hooks/useTheme'
 
-const AVATAR_COLORS = {
-  rose:    'bg-rose-100 text-rose-600',
-  sky:     'bg-sky-100 text-sky-600',
-  emerald: 'bg-emerald-100 text-emerald-600',
-  amber:   'bg-amber-100 text-amber-600',
-  violet:  'bg-violet-100 text-violet-600',
+// Hex colors for child avatar pills (inline style)
+const CHILD_COLORS = {
+  rose:    '#f43f5e',
+  sky:     '#0ea5e9',
+  emerald: '#22c55e',
+  amber:   '#f59e0b',
+  violet:  '#8b5cf6',
+}
+
+// Hex swatches for theme selector
+const SWATCH_COLORS = {
+  violet:  '#8b5cf6',
+  sky:     '#0ea5e9',
+  emerald: '#22c55e',
+  rose:    '#f43f5e',
+  amber:   '#f59e0b',
+  indigo:  '#6366f1',
 }
 
 export default function ParentDashboard({
@@ -36,18 +47,18 @@ export default function ParentDashboard({
   onboardingStep = 'child',
   setOnboardingStep,
   preventStepRecalc,
-  onFinishOnboarding
+  onFinishOnboarding,
+  onLogout
 }) {
   const { t } = useTranslation()
+  const { theme, themeKey, setTheme, THEMES } = useTheme()
   const [activeTab, setActiveTab] = useState(initialTab)
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab)
   const [notifications, setNotifications] = useState([])
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const manualTabChangeRef = useRef(false)
 
   // 🛡️ CRITICAL: Sync activeTab when isNewUser changes after mount
-  // This fixes the issue where useState captures 'validation' but user should be in 'settings'
-  // Resync tabs when props change (crucial for onboarding -> normal transition)
-  // Resync tabs when props change (crucial for onboarding -> normal transition)
   useEffect(() => {
     if (activeTab !== initialTab) {
       console.log("[DEBUG] Syncing activeTab:", initialTab)
@@ -56,8 +67,6 @@ export default function ParentDashboard({
   }, [initialTab])
 
   useEffect(() => {
-    // ONLY sync sub-tab if we are in onboarding AND in settings tab
-    // This prevents jumping to "Gestion des enfants" when the app refreshes or completes onboarding
     if (isNewUser && onboardingStep !== 'done' && activeTab === 'settings' && initialSubTab !== activeSubTab) {
       console.log("[DEBUG] Syncing activeSubTab:", initialSubTab)
       setActiveSubTab(initialSubTab)
@@ -69,8 +78,6 @@ export default function ParentDashboard({
 
   const childProfiles = profiles?.filter(p => !p.is_parent) || []
 
-  // LOGIQUE DE FILTRAGE DES PROFILS (UI-ONLY)
-  // Cache les placeholders "Mon enfant" s'il y a déjà au moins un enfant configuré pendant l'onboarding.
   const isConfigured = (p) => p.child_name && p.child_name !== "Mon enfant"
   const hasConfiguredAny = childProfiles.some(isConfigured)
 
@@ -82,10 +89,8 @@ export default function ParentDashboard({
   useEffect(() => {
     if (!family?.id) return
 
-    // Ensemble des profile_id appartenant à cette famille (guard client-side)
     const familyChildIds = new Set(childProfiles.map(p => p.id))
 
-    // 1. Charger l'état initial des notifications
     const checkPendingValidations = async () => {
       const today = new Date().toISOString().split('T')[0]
       const childIds = childProfiles.map(p => p.id)
@@ -121,9 +126,6 @@ export default function ParentDashboard({
 
     checkPendingValidations()
 
-    // 2. Abonnement Realtime aux changements (Daily Logs)
-    // Le filtre profile_id limite les events aux enfants de cette famille.
-    // Un guard client-side vérifie en plus que l'id appartient bien à nos enfants.
     const channel = supabase
       .channel(`parent-sync-${family.id}`)
       .on(
@@ -136,7 +138,6 @@ export default function ParentDashboard({
         },
         async (payload) => {
           const childId = payload.new?.profile_id || payload.old?.profile_id
-          // Guard client-side : ignorer les events hors de notre famille
           if (!familyChildIds.has(childId)) return
 
           refresh(true)
@@ -177,7 +178,6 @@ export default function ParentDashboard({
       )
       .subscribe()
 
-    // 3. Fallback visibilitychange : refresh quand l'onglet redevient actif
     const handleVisibilityChange = () => {
       if (!document.hidden) refresh(true)
     }
@@ -223,16 +223,35 @@ export default function ParentDashboard({
     }
   }, [isNewUser, onboardingStep, activeTab])
 
+  // ── Sidebar nav items ──
+  const NAV_ITEMS = [
+    { id: 'validation', tab: 'validation', subTab: null,        icon: ClipboardCheck, labelKey: 'tabs.validation' },
+    { id: 'missions',   tab: 'settings',   subTab: 'missions',  icon: Sparkles,       labelKey: 'common.missions' },
+    { id: 'challenge',  tab: 'settings',   subTab: 'challenge', icon: Trophy,         labelKey: 'common.challenge' },
+    { id: 'children',   tab: 'settings',   subTab: 'children',  icon: Users,          labelKey: 'common.children_tab' },
+  ]
+
+  const activeNavId =
+    activeTab === 'validation'     ? 'validation'
+    : activeSubTab === 'missions'  ? 'missions'
+    : activeSubTab === 'challenge' ? 'challenge'
+    : 'children'
+
+  const handleNavClick = (item) => {
+    manualTabChangeRef.current = true
+    setActiveTab(item.tab)
+    if (item.subTab) setActiveSubTab(item.subTab)
+    setMobileNavOpen(false)
+  }
 
   return (
-    <div className="max-w-4xl lg:max-w-6xl mx-auto space-y-5 relative z-10 font-nunito">
-      {/* Onboarding Completion Modal - Final Step */}
+    <div className={`min-h-screen ${theme.bg} font-nunito`}>
+
+      {/* Onboarding Completion Modal */}
       {isNewUser && onboardingStep === 'done' && (
         <OnboardingCompletionModal
           isOpen={true}
-          onClose={() => {
-            if (onFinishOnboarding) onFinishOnboarding()
-          }}
+          onClose={() => { if (onFinishOnboarding) onFinishOnboarding() }}
           inviteCode={childProfiles.find(isConfigured)?.invite_code || childProfiles[0]?.invite_code || ''}
           onComplete={() => {
             if (onFinishOnboarding) onFinishOnboarding()
@@ -240,9 +259,6 @@ export default function ParentDashboard({
           }}
         />
       )}
-
-      {/* Light gradient background overlay */}
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-br from-violet-50 via-white to-sky-50 z-[-1]" />
 
       <NotificationBanner
         notifications={notifications}
@@ -252,199 +268,275 @@ export default function ParentDashboard({
           setNotifications(prev => prev.filter(n => n.profile_id !== childId))
         }}
         onDismiss={(childId) => {
-          // Add to dismissed list
           dismissedIdsRef.current.add(childId)
           setNotifications(prev => prev.filter(n => n.profile_id !== childId))
         }}
       />
 
-      <header className="space-y-4">
-        {/* Onboarding Stepper - Hide immediately if invite dismissed (check localStorage directly for instant hide) */}
-        {/* Onboarding Stepper - Hide if done (it shows the modal) */}
-        {isNewUser && !localStorage.getItem('onboarding_invite_dismissed') && onboardingStep && onboardingStep !== 'done' && (
-          <OnboardingStepper
-            currentStep={onboardingStep}
-            onStepClick={(step) => {
-              if (setOnboardingStep) {
-                setOnboardingStep(step)
-                setActiveTab('settings')
-                // Map step to sub-tab
-                if (step === 'child') setActiveSubTab('children')
-                else if (step === 'mission') setActiveSubTab('missions')
-                else if (step === 'challenge') setActiveSubTab('challenge')
-              }
-            }}
-          />
-        )}
+      {/* ── STICKY HEADER ── */}
+      <header className={`sticky top-0 z-30 ${theme.headerBg} backdrop-blur-sm border-b ${theme.borderLight}`}>
+        <div className="px-4 h-14 flex items-center justify-between gap-2">
 
-        {/* Header row: title left, actions right */}
-        <div className="flex items-center justify-between gap-3">
-          {/* Left: title + family badge */}
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-gray-800 leading-tight">
-              {t('dashboard.parent_title')}
-            </h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-gray-500">
-                {family?.name || t('common.family_active')}
-              </span>
+          {/* Left: hamburger (mobile only) + logo */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              className={`lg:hidden w-9 h-9 rounded-xl bg-white/70 border ${theme.border} flex items-center justify-center text-slate-500`}
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            >
+              {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shrink-0">T</div>
+            <div className="hidden sm:block">
+              <span className="font-black text-slate-800 text-base">{t('dashboard.parent_title')}</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="text-xs text-slate-400 font-semibold">{family?.name || t('common.family_active')}</span>
+              </div>
             </div>
           </div>
 
-          {/* Right: alert bell + Mode Enfant */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Right: child pills + alerts + mode enfant */}
+          <div className="flex items-center gap-1.5 min-w-0">
+
+            {/* Child pills (only when multiple children) */}
+            {filteredProfilesForUI.length > 1 && (
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+                {filteredProfilesForUI.map(p => {
+                  const isActive = profile?.id === p.id
+                  const hasPending = notifications.some(n => n.profile_id === p.id)
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => { onSwitchProfile(p.id); setActiveTab('validation') }}
+                      className={`relative flex items-center gap-1.5 h-9 px-3 rounded-xl font-bold text-sm transition-all shrink-0 ${
+                        isActive
+                          ? 'text-white shadow-sm'
+                          : `bg-white/70 border ${theme.border} text-slate-600 hover:bg-white`
+                      }`}
+                      style={isActive ? { background: CHILD_COLORS[p.color] || '#8b5cf6' } : {}}
+                    >
+                      <span className="text-xs font-black">{p.child_name?.[0]?.toUpperCase()}</span>
+                      <span className="hidden sm:inline">{p.child_name}</span>
+                      {hasPending && (
+                        <span className={`text-[10px] font-black px-1 rounded-full ${
+                          isActive ? 'bg-white/30 text-white' : 'bg-amber-100 text-amber-600'
+                        }`}>!</span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Alerts bell */}
             {NotificationService.getPermissionStatus() !== 'granted' && (
               <button
                 onClick={() => NotificationService.requestPermission().then(refresh)}
-                className="min-h-[44px] px-3 py-2 bg-white border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-600 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm"
+                className={`min-h-[36px] px-2.5 py-1.5 bg-white border ${theme.border} hover:bg-amber-50 hover:border-amber-200 text-gray-600 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm shrink-0`}
                 title="Activer les alertes de validation"
               >
                 <Bell size={15} className="text-amber-500" />
                 <span className="hidden sm:inline text-gray-600">Alertes</span>
               </button>
             )}
+
+            {/* Mode Enfant */}
             <button
               onClick={onExit}
-              className="min-h-[44px] px-3 py-2 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shadow-sm shadow-violet-200"
+              className="min-h-[36px] px-3 py-1.5 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm shadow-violet-200 shrink-0"
             >
               <Baby size={15} />
               <span className="hidden sm:inline">Mode Enfant</span>
             </button>
           </div>
         </div>
-
-        {/* Child selector — horizontal scroll with fade on mobile */}
-        {filteredProfilesForUI.length > 1 && (
-          <div className="relative">
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
-              {filteredProfilesForUI.map(p => {
-                const isActive = profile?.id === p.id
-                const colors = getProfileColorClasses(p.color)
-                const hasPending = notifications.some(n => n.profile_id === p.id)
-                const avatarColors = AVATAR_COLORS[p.color] || AVATAR_COLORS.violet
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      onSwitchProfile(p.id)
-                      setActiveTab('validation')
-                    }}
-                    className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all shrink-0 min-h-[48px] ${
-                      isActive
-                        ? `${colors.active} shadow-md`
-                        : 'bg-white border border-gray-200 text-gray-700 hover:border-violet-200 hover:bg-violet-50'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shrink-0 ${isActive ? 'bg-white/20 text-white' : avatarColors}`}>
-                      {p.child_name?.[0]?.toUpperCase()}
-                    </div>
-                    <span className="leading-none">{p.child_name}</span>
-                    {hasPending && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] rounded-full flex items-center justify-center font-black leading-none">!</span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-            {/* Fade gradient hint on mobile */}
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/90 to-transparent pointer-events-none sm:hidden" />
-          </div>
-        )}
-
-        {/* Tab Switcher - Hidden during onboarding */}
-        {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
-          <div className="bg-white border border-gray-100 shadow-sm p-1 rounded-2xl flex relative max-w-sm mx-auto">
-            <motion.div
-              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-violet-500 rounded-xl shadow-md z-0"
-              animate={{ x: activeTab === 'settings' ? '100%' : '0%' }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{ left: '4px' }}
-            />
-
-            <button
-              onClick={() => {
-                manualTabChangeRef.current = true
-                setActiveTab('validation')
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'validation' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              <ClipboardCheck size={18} className={activeTab === 'validation' ? 'text-white' : 'text-gray-400'} />
-              <span className="font-semibold text-sm">{t('tabs.validation')}</span>
-              {notifications.length > 0 && (
-                <span className={`min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center text-[10px] font-black leading-none ${activeTab === 'validation' ? 'bg-white/25 text-white' : 'bg-rose-500 text-white'}`}>
-                  {notifications.length}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => {
-                manualTabChangeRef.current = true
-                setActiveTab('settings')
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl relative z-10 transition-colors ${activeTab === 'settings' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              <Sliders size={18} className={activeTab === 'settings' ? 'text-white' : 'text-gray-400'} />
-              <span className="font-semibold text-sm">{t('tabs.settings')}</span>
-            </button>
-          </div>
-        )}
       </header>
 
-      <main className={isNewUser && onboardingStep && onboardingStep !== 'done' ? 'mt-4' : 'mt-6'}>
-        <AnimatePresence mode="wait">
-          {activeTab === 'validation' ? (
-            <motion.div
-              key="validation"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ValidationTab
-                challenge={challenge}
-                missions={missions}
-                profile={profile}
-                profiles={profiles}
-                childName={profile?.child_name}
-                refresh={refresh}
-                onExit={onExit}
-                onEditSettings={(target) => {
-                  manualTabChangeRef.current = true
-                  setActiveTab('settings')
-                  if (target) setActiveSubTab(target)
+      {/* ── BODY: sidebar + main content ── */}
+      <div className="flex min-h-[calc(100vh-56px)]">
+
+        {/* Mobile overlay backdrop */}
+        {mobileNavOpen && (
+          <div
+            className="fixed inset-0 bg-black/10 z-40 lg:hidden"
+            onClick={() => setMobileNavOpen(false)}
+          />
+        )}
+
+        {/* ── SIDEBAR ──
+            Mobile: fixed drawer, slides in/out
+            Desktop: static, always visible */}
+        <aside className={`
+          fixed lg:static
+          top-14 left-0 bottom-0
+          z-50
+          w-52 flex-shrink-0
+          ${theme.bg} lg:bg-transparent
+          border-r ${theme.borderLight} lg:border-0
+          transition-transform duration-200 ease-in-out
+          lg:translate-x-0
+          ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}
+          flex flex-col
+          px-3 py-5
+        `}>
+
+          {/* Desktop title */}
+          <div className="hidden lg:block px-3 mb-5">
+            <h1 className="text-base font-black text-slate-800">{t('dashboard.parent_title')}</h1>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-xs text-slate-400 font-semibold">{family?.name || t('common.family_active')}</span>
+            </div>
+          </div>
+
+          {/* Nav links */}
+          <div className="flex flex-col gap-1">
+            {NAV_ITEMS.map(item => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all text-left w-full ${
+                  activeNavId === item.id
+                    ? 'bg-violet-500 text-white shadow-md shadow-violet-200'
+                    : `text-slate-600 ${theme.sidebarHover} hover:shadow-sm`
+                }`}
+              >
+                <item.icon
+                  size={16}
+                  className={activeNavId === item.id ? 'text-white' : 'text-slate-400'}
+                />
+                <span className="flex-1">{t(item.labelKey)}</span>
+                {item.id === 'validation' && notifications.length > 0 && (
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${
+                    activeNavId === 'validation'
+                      ? 'bg-white/30 text-white'
+                      : 'bg-amber-100 text-amber-600'
+                  }`}>{notifications.length}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Theme switcher — right after nav links */}
+          <div className={`mt-3 pt-3 border-t ${theme.border}`}>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">
+              Thème
+            </div>
+            <div className="flex gap-2 flex-wrap px-3 py-1">
+              {Object.entries(THEMES).map(([key, tItem]) => (
+                <button
+                  key={key}
+                  onClick={() => setTheme(key)}
+                  title={tItem.name}
+                  className={`w-5 h-5 rounded-full transition-all hover:scale-110 ${
+                    themeKey === key ? 'ring-2 ring-offset-2 ring-violet-500 scale-110' : ''
+                  }`}
+                  style={{ background: SWATCH_COLORS[key] }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Logout — at the very bottom */}
+          <div className="mt-auto pt-4">
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 text-sm font-semibold transition-all w-full"
+              >
+                <LogOut size={15} />
+                <span className="text-[11px] font-bold uppercase tracking-wider">Déconnexion</span>
+              </button>
+            )}
+          </div>
+        </aside>
+
+        {/* ── MAIN CONTENT ──
+            Takes all remaining space. Inner content centred at max-w-2xl. */}
+        <main className="flex-1 min-w-0 px-4 lg:px-8 pt-3 lg:pt-4 pb-5 lg:pb-6">
+          <div className="max-w-2xl mx-auto space-y-4">
+
+            {/* Onboarding Stepper */}
+            {isNewUser && !localStorage.getItem('onboarding_invite_dismissed') && onboardingStep && onboardingStep !== 'done' && (
+              <OnboardingStepper
+                currentStep={onboardingStep}
+                onStepClick={(step) => {
+                  if (setOnboardingStep) {
+                    setOnboardingStep(step)
+                    setActiveTab('settings')
+                    if (step === 'child') setActiveSubTab('children')
+                    else if (step === 'mission') setActiveSubTab('missions')
+                    else if (step === 'challenge') setActiveSubTab('challenge')
+                  }
                 }}
               />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="settings"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <SettingsTab
-                family={family}
-                profile={profile}
-                profiles={profiles}
-                challenge={challenge}
-                missions={allMissions}
-                refresh={refresh}
-                updateProfile={updateProfile} // Pass the optimistic update helper
-                activeSubMenu={activeSubTab}
-                onSubMenuChange={setActiveSubTab}
-                isNewUser={isNewUser}
-                onTabChange={setActiveTab}
-                onboardingStep={onboardingStep}
-                setOnboardingStep={setOnboardingStep}
-                preventStepRecalc={preventStepRecalc}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+            )}
+
+            {/* Mobile page title */}
+            <div className="lg:hidden">
+              <h1 className="text-lg font-black text-slate-800">
+                {t(NAV_ITEMS.find(n => n.id === activeNavId)?.labelKey || 'tabs.validation')}
+              </h1>
+            </div>
+
+            {/* Tab content */}
+            <AnimatePresence mode="wait">
+              {activeTab === 'validation' ? (
+                <motion.div
+                  key="validation"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ValidationTab
+                    theme={theme}
+                    challenge={challenge}
+                    missions={missions}
+                    profile={profile}
+                    profiles={profiles}
+                    childName={profile?.child_name}
+                    refresh={refresh}
+                    onExit={onExit}
+                    onEditSettings={(target) => {
+                      manualTabChangeRef.current = true
+                      setActiveTab('settings')
+                      if (target) setActiveSubTab(target)
+                    }}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="settings"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <SettingsTab
+                    theme={theme}
+                    family={family}
+                    profile={profile}
+                    profiles={profiles}
+                    challenge={challenge}
+                    missions={allMissions}
+                    refresh={refresh}
+                    updateProfile={updateProfile}
+                    activeSubMenu={activeSubTab}
+                    onSubMenuChange={setActiveSubTab}
+                    isNewUser={isNewUser}
+                    onTabChange={setActiveTab}
+                    onboardingStep={onboardingStep}
+                    setOnboardingStep={setOnboardingStep}
+                    preventStepRecalc={preventStepRecalc}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

@@ -254,6 +254,15 @@ export default function App() {
     manualStepChangeRef.current = true
   }
 
+  const handleLogout = async () => {
+    localStorage.removeItem('child_family_id')
+    localStorage.removeItem('active_profile_id')
+    localStorage.removeItem('hasSeenTutorial_v1')
+    localStorage.removeItem('reset_pin_mode')
+    await supabase.auth.signOut()
+    window.location.reload()
+  }
+
   // --- RENDU PRINCIPAL DE L'APPLICATION ---
   return (
     <div className={`min-h-screen transition-colors duration-500 ${isParentMode ? 'bg-[#020617] text-slate-100 dark' : 'bg-[#F8FAFF] text-indigo-950'} font-sans selection:bg-indigo-500/30`}>
@@ -263,8 +272,8 @@ export default function App() {
         {showTutorial && <TutorialModal onClose={handleCloseTutorial} />}
       </AnimatePresence>
 
-      {/* HEADER FIXE */}
-      <div className={`fixed top-0 left-0 right-0 z-50 bg-gradient-to-b ${isParentMode ? 'from-[#020617] via-[#020617]/90' : 'from-[#F8FAFF] via-[#F8FAFF]/90'} to-transparent transition-colors duration-500`}>
+      {/* HEADER FIXE — masqué en mode parent (ParentDashboard gère son propre header) */}
+      <div className={isParentMode ? 'hidden' : 'fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#F8FAFF] via-[#F8FAFF]/90 to-transparent'}>
         <div className={`p-4 mx-auto flex justify-between items-center transition-all ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
           {/* Logo/Title (Discret) */}
           <div className="flex items-center gap-2">
@@ -313,14 +322,7 @@ export default function App() {
 
             {/* Bouton Déconnexion */}
             <button
-              onClick={async () => {
-                localStorage.removeItem('child_family_id')
-                localStorage.removeItem('active_profile_id')
-                localStorage.removeItem('hasSeenTutorial_v1') // Nettoyage pour tests
-                localStorage.removeItem('reset_pin_mode')
-                await supabase.auth.signOut()
-                window.location.reload()
-              }}
+              onClick={handleLogout}
               className={`border p-2 rounded-xl transition-all shadow-sm ${isParentMode ? 'bg-slate-900 border-white/5 text-slate-400 hover:text-rose-400' : 'bg-white border-indigo-100 text-indigo-400 hover:text-rose-500'}`}
               title={t('actions.logout')}
             >
@@ -332,7 +334,7 @@ export default function App() {
 
       {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
       {!showTutorial && !shouldShowTutorial && (
-        <div className={`pt-20 pb-4 px-4 mx-auto transition-all duration-500 ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
+        <div className={isParentMode ? '' : 'pt-20 pb-4 px-4 mx-auto max-w-3xl lg:max-w-6xl transition-all duration-500'}>
           <AnimatePresence mode="wait">
             {isParentMode ? (
               family ? (
@@ -360,6 +362,7 @@ export default function App() {
                   onboardingStep={onboardingStep}
                   setOnboardingStep={handleManualStepChange}
                   preventStepRecalc={preventStepRecalc}
+                  onLogout={handleLogout}
                   onFinishOnboarding={finishOnboarding}
                 />
               ) : familyError ? (
@@ -403,17 +406,19 @@ export default function App() {
         </div>
       )}
 
-      {/* FOOTER DISCRET */}
-      <footer className="pb-8 px-4 text-center">
-        <a
-          href="/legal.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-colors"
-        >
-          Mentions Légales & Confidentialité
-        </a>
-      </footer>
+      {/* FOOTER DISCRET — masqué en mode parent */}
+      {!isParentMode && (
+        <footer className="pb-8 px-4 text-center">
+          <a
+            href="/legal.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-colors"
+          >
+            Mentions Légales & Confidentialité
+          </a>
+        </footer>
+      )}
 
       {/* MODAL PIN (pour passer en mode parent) */}
       <AnimatePresence>

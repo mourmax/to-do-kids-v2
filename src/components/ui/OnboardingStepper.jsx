@@ -54,9 +54,9 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
                                 {/* Label */}
                                 <span
                                     className={`text-xs font-bold uppercase tracking-wider whitespace-nowrap ${isCurrent
-                                        ? 'text-white'
+                                        ? 'text-violet-600'
                                         : isCompleted
-                                            ? 'text-emerald-400'
+                                            ? 'text-emerald-600'
                                             : 'text-slate-500'
                                         }`}
                                 >
@@ -66,7 +66,7 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
 
                             {/* Connector Line */}
                             {index < steps.length - 1 && (
-                                <div className="flex-1 h-1 mx-4 bg-slate-700 rounded-full overflow-hidden">
+                                <div className="flex-1 h-1 mx-4 bg-violet-100 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={false}
                                         animate={{
@@ -108,7 +108,7 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
                                 </motion.div>
 
                                 {index < steps.length - 1 && (
-                                    <div className="w-8 h-1 mx-1 bg-slate-700 rounded-full overflow-hidden">
+                                    <div className="w-8 h-1 mx-1 bg-violet-100 rounded-full overflow-hidden">
                                         <motion.div
                                             initial={false}
                                             animate={{
@@ -129,7 +129,7 @@ export default function OnboardingStepper({ currentStep, onStepClick }) {
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">
                         {t('onboarding.step')} {Math.min(currentIndex + 1, steps.length)}/{steps.length}
                     </p>
-                    <p className="text-white text-sm font-black uppercase tracking-wider">
+                    <p className="text-violet-700 text-sm font-black uppercase tracking-wider">
                         {steps[currentIndex]?.label}
                     </p>
                 </div>

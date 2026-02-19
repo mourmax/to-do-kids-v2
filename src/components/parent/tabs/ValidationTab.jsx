@@ -11,9 +11,16 @@ import ValidationMissionList from './ValidationMissionList'
 import ChallengeRenewalView from './ChallengeRenewalView'
 import { useTranslation } from 'react-i18next'
 import { ListChecks } from 'lucide-react'
-import { getProfileColorClasses } from '../../../utils/colors'
 
-export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName, profile, profiles }) {
+const CHILD_HEX = {
+  rose: '#f43f5e',
+  sky: '#0ea5e9',
+  emerald: '#22c55e',
+  amber: '#f59e0b',
+  violet: '#8b5cf6',
+}
+
+export default function ValidationTab({ theme, challenge, missions, refresh, onEditSettings, onExit, childName, profile, profiles }) {
   const { t } = useTranslation()
 
   const [showVictoryAnimation, setShowVictoryAnimation] = useState(false)
@@ -44,6 +51,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   if (!challenge || !challenge.is_active) {
     return (
       <ChallengeRenewalView
+        theme={theme}
         challenge={challenge}
         missions={missions}
         profiles={profiles}
@@ -96,10 +104,8 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     await supabase.from('challenges').update({ current_streak: newStreak }).eq('id', challenge.id)
 
     const today = new Date().toISOString().split('T')[0]
-    const missionIds = missions.map(m => m.id)
 
     // ✅ SUCCESS: On met à jour le résultat pour notifier l'enfant en temps réel
-    // Note: On NE reset PAS child_validated/parent_validated pour garder l'historique propre "Fait & Validé"
     const { error: logError } = await supabase.from('daily_logs').update({
       validation_result: 'success',
       validation_requested: false // 🔄 On libère la demande
@@ -127,15 +133,9 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     const { error: challError } = await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
     if (challError) console.error("Error resetting streak:", challError)
 
-    // ❌ FAILURE: On met à jour pour notifier l'enfant (Aïe c'est raté)
-    // L'enfant devra cliquer sur "J'ai compris" pour supprimer les logs lui-même via son dashboard
+    // ❌ FAILURE: On met à jour pour notifier l'enfant
     const { error: logError } = await supabase.from('daily_logs').update({
       validation_result: 'failure',
-      // On garde child_validated pour qu'il voie ce qu'il avait fait ? 
-      // Non, on laisse tel quel, l'important est le statut failure.
-      // Mais on enlève validation_requested pour débloquer le parent ? 
-      // Si on enlève validation_requested, le parent ne voit plus le bouton ?
-      // Le parent a fini son action.
       validation_requested: false
     })
       .eq('profile_id', profile.id)
@@ -158,7 +158,6 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       await supabase.from('challenges').update({ is_active: false }).eq('id', challenge.id)
     }
     refresh(true)
-    // On reste ici pour afficher le ChallengeRenewalView
   }
 
   const handleStartNewChallenge = async (newSettings = {}) => {
@@ -206,13 +205,31 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     }
   }
 
+  const childColor = CHILD_HEX[profile?.color] || '#8b5cf6'
+
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-3">
 
       {/* 🌟 TOAST */}
       <AnimatePresence>
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       </AnimatePresence>
+
+      {/* 👶 CHILD HEADER */}
+      {profile && (
+        <div className="flex items-center gap-3 px-1">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-lg shrink-0 shadow-sm"
+            style={{ background: childColor }}
+          >
+            {(profile.child_name || childName || '?').charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div className="font-black text-slate-800 text-base leading-tight">{profile.child_name || childName}</div>
+            <div className="text-xs text-slate-400 font-semibold uppercase tracking-widest">Validation du jour</div>
+          </div>
+        </div>
+      )}
 
       {/* 🟢 NOTIFICATION: ENFANT A TOUT FINI */}
       <AnimatePresence>
@@ -236,7 +253,9 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
           </motion.div>
         )}
       </AnimatePresence>
+
       <ValidationHeader
+        theme={theme}
         isChallengeFinished={isChallengeFinished}
         allMissionsDone={allMissionsDone}
         isDaySuccess={isDaySuccess}
@@ -245,10 +264,12 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
         onStartNewChallenge={handleStartNewChallenge}
         onDayResult={handleDayResultClick}
         onEditSettings={(target) => onEditSettings(target)}
+        childColor={childColor}
       />
 
       {/* 2. Liste des Missions */}
       <ValidationMissionList
+        theme={theme}
         missions={isDaySuccess
           ? missions.map(m => ({ ...m, is_completed: false, parent_validated: false }))
           : missions

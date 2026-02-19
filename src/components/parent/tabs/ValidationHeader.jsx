@@ -1,7 +1,7 @@
 import { Trophy, RefreshCw, ListChecks, Clock, Gift, Skull, AlertCircle, Edit2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export default function ValidationHeader({ isChallengeFinished, allMissionsDone, isDaySuccess, challenge, missionsCount, onStartNewChallenge, onDayResult, onEditSettings }) {
+export default function ValidationHeader({ theme, isChallengeFinished, allMissionsDone, isDaySuccess, challenge, missionsCount, onStartNewChallenge, onDayResult, onEditSettings, childColor }) {
   const { t } = useTranslation()
 
   const streakPercent = challenge
@@ -12,7 +12,7 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
   const RecapItem = ({ icon: Icon, label, value, onClick }) => (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between bg-gray-50 hover:bg-violet-50 p-3 rounded-xl border border-gray-100 hover:border-violet-200 transition-all group"
+      className={`w-full flex items-center justify-between ${theme.bg} hover:bg-violet-50 p-3 rounded-xl border ${theme.borderLight} hover:border-violet-200 transition-all group`}
     >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center shrink-0">
@@ -23,14 +23,14 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
           <p className="text-sm font-bold text-gray-700">{value}</p>
         </div>
       </div>
-      <div className="bg-gray-100 group-hover:bg-violet-100 p-2 rounded-lg transition-colors">
+      <div className={`${theme.progressBg} group-hover:bg-violet-100 p-2 rounded-lg transition-colors`}>
         <Edit2 size={12} className="text-gray-400 group-hover:text-violet-500 transition-colors" />
       </div>
     </button>
   )
 
   return (
-    <section className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+    <section className={`rounded-2xl border ${theme.borderLight} bg-white shadow-sm overflow-hidden`}>
       {isChallengeFinished ? (
         // --- CHALLENGE FINISHED VIEW ---
         <>
@@ -67,10 +67,10 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
                 {challenge?.current_streak || 0} / {challenge?.duration_days} {t('child.days')}
               </span>
             </div>
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className={`h-1.5 ${theme.progressBg} rounded-full overflow-hidden`}>
               <div
-                className="h-full bg-gradient-to-r from-violet-400 to-violet-600 rounded-full transition-all duration-500"
-                style={{ width: `${streakPercent}%` }}
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${streakPercent}%`, background: childColor ? `linear-gradient(90deg, ${childColor}cc, ${childColor})` : 'linear-gradient(90deg, #a78bfa, #7c3aed)' }}
               />
             </div>
           </div>
@@ -89,7 +89,7 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
               </div>
             </div>
           ) : (
-            <div className={`p-4 border-t ${!allMissionsDone ? 'bg-amber-50 border-amber-100' : 'bg-white border-gray-100'}`}>
+            <div className={`p-4 border-t ${!allMissionsDone ? 'bg-amber-50 border-amber-100' : `bg-white border-gray-100`}`}>
               {!allMissionsDone && (
                 <div className="flex items-center gap-2 text-amber-700 text-xs font-semibold mb-3 bg-amber-100 rounded-lg px-3 py-2">
                   <AlertCircle size={14} className="shrink-0" />
@@ -103,7 +103,7 @@ export default function ValidationHeader({ isChallengeFinished, allMissionsDone,
                   className={`min-h-[52px] rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                     allMissionsDone
                       ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-[0.98] shadow-sm'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : `${theme.progressBg} text-gray-400 cursor-not-allowed`
                   }`}
                 >
                   ✓ {t('validation.success')}

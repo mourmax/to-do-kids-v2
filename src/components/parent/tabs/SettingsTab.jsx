@@ -12,7 +12,7 @@ import FamilySection from '../settings/FamilySection'
 import ChallengeSection from '../settings/ChallengeSection'
 import MissionsSection from '../settings/MissionsSection'
 
-export default function SettingsTab({ family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange, onboardingStep, setOnboardingStep, preventStepRecalc }) {
+export default function SettingsTab({ theme = {}, family, profile, profiles, challenge, missions, refresh, updateProfile, activeSubMenu: propSubMenu, onSubMenuChange, isNewUser, onTabChange, onboardingStep, setOnboardingStep, preventStepRecalc }) {
   const { t } = useTranslation()
   const [toastMessage, setToastMessage] = useState(null)
   const [localPin, setLocalPin] = useState('')
@@ -44,45 +44,13 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
     setTimeout(() => setToastMessage(null), 2500)
   }
 
-  const subTabs = [
-    { id: 'missions', label: t('common.missions'), icon: <Sparkles size={15} /> },
-    { id: 'challenge', label: t('common.challenge'), icon: <Trophy size={15} /> },
-    { id: 'children', label: t('common.children_tab'), icon: <Users size={15} /> },
-  ]
-
-  const activeColors = {
-    missions: 'bg-violet-500 text-white shadow-sm',
-    challenge: 'bg-amber-500 text-white shadow-sm',
-    children: 'bg-sky-500 text-white shadow-sm',
-  }
-
   return (
     <div className="space-y-6 pb-10">
       <AnimatePresence>
         {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       </AnimatePresence>
 
-      {/* 🟢 SUB-NAVIGATION PERSISTANTE - Masquée pendant l'onboarding */}
-      {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
-        <div className="flex justify-center -mt-2 mb-6">
-          <div className="inline-flex items-center gap-1 p-1 bg-white border border-gray-100 shadow-sm rounded-2xl">
-            {subTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSubMenu(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-semibold min-h-[44px] ${
-                  activeSubMenu === tab.id
-                    ? activeColors[tab.id]
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <span className={`${activeSubMenu === tab.id ? 'opacity-100' : 'opacity-60'}`}>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Sub-nav handled by sidebar — no pill row here */}
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -111,7 +79,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
                   maxLength={4}
                   value={localPin || ''}
                   onChange={(e) => setLocalPin(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full bg-white border-2 border-gray-200 focus:border-violet-400 text-center text-4xl font-black tracking-[1rem] rounded-2xl py-6 text-gray-800 focus:outline-none transition-all shadow-sm"
+                  className={`w-full bg-white border-2 ${theme.border || 'border-violet-200'} focus:border-violet-400 text-center text-4xl font-black tracking-[1rem] rounded-2xl py-6 text-gray-800 focus:outline-none transition-all shadow-sm`}
                   placeholder="••••"
                   autoFocus
                 />
@@ -153,6 +121,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
           {activeSubMenu === 'children' && (
             <div className="space-y-6">
               <IdentitySection
+                theme={theme}
                 familyId={family?.id}
                 profile={profile}
                 profiles={profiles}
@@ -165,8 +134,8 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
               />
               {(!isNewUser || !onboardingStep || onboardingStep === 'done') && (
                 <>
-                  <FamilySection family={family} />
-                  <SecuritySection profile={profile} onShowSuccess={showSuccess} />
+                  <FamilySection theme={theme} family={family} />
+                  <SecuritySection theme={theme} profile={profile} onShowSuccess={showSuccess} />
                 </>
               )}
             </div>
@@ -174,6 +143,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
 
           {activeSubMenu === 'missions' && (
             <MissionsSection
+              theme={theme}
               missions={missions}
               profiles={profiles}
               familyId={family?.id}
@@ -188,7 +158,9 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
 
           {activeSubMenu === 'challenge' && (
             <ChallengeSection
+              theme={theme}
               challenge={challenge}
+              profile={profile}
               onShowSuccess={showSuccess}
               refresh={refresh}
               isNewUser={isNewUser}
@@ -207,7 +179,7 @@ export default function SettingsTab({ family, profile, profiles, challenge, miss
 
       {/* LIEN LÉGAL DISCRET */}
       {!isNewUser && (
-        <div className="pt-10 text-center border-t border-gray-100">
+        <div className={`pt-10 text-center border-t ${theme.borderLight || 'border-gray-100'}`}>
           <a
             href="/legal.html"
             target="_blank"
