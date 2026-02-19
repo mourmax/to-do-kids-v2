@@ -4,76 +4,120 @@ import { useTranslation } from 'react-i18next'
 export default function ValidationHeader({ isChallengeFinished, allMissionsDone, isDaySuccess, challenge, missionsCount, onStartNewChallenge, onDayResult, onEditSettings }) {
   const { t } = useTranslation()
 
-  // Petit composant interne pour les lignes du récap
+  const streakPercent = challenge
+    ? Math.min(100, Math.round(((challenge.current_streak || 0) / (challenge.duration_days || 1)) * 100))
+    : 0
+
+  // Recap item for the challenge-finished view
   const RecapItem = ({ icon: Icon, label, value, onClick }) => (
-    <button onClick={onClick} className="w-full flex items-center justify-between bg-black/20 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between bg-gray-50 hover:bg-violet-50 p-3 rounded-xl border border-gray-100 hover:border-violet-200 transition-all group"
+    >
       <div className="flex items-center gap-3">
-        <Icon size={16} className="text-white/60 group-hover:text-white transition-colors" />
+        <div className="w-9 h-9 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center shrink-0">
+          <Icon size={15} className="text-gray-500 group-hover:text-violet-500 transition-colors" />
+        </div>
         <div className="text-left">
-          <p className="text-[8px] uppercase text-white/50 font-bold tracking-wider">{label}</p>
-          <p className="text-sm font-bold text-white">{value}</p>
+          <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">{label}</p>
+          <p className="text-sm font-bold text-gray-700">{value}</p>
         </div>
       </div>
-      <div className="bg-white/10 p-2 rounded-lg group-hover:bg-white/20 transition-colors text-white">
-        <Edit2 size={12} />
+      <div className="bg-gray-100 group-hover:bg-violet-100 p-2 rounded-lg transition-colors">
+        <Edit2 size={12} className="text-gray-400 group-hover:text-violet-500 transition-colors" />
       </div>
     </button>
   )
 
   return (
-    <section className={`rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden transition-all duration-500 ${isChallengeFinished ? 'bg-gradient-to-br from-orange-500 to-red-600' : isDaySuccess ? 'bg-emerald-600 shadow-[0_0_50px_rgba(16,185,129,0.4)]' : allMissionsDone ? 'bg-indigo-600' : 'bg-slate-900 [.light-theme_&]:bg-indigo-500/15 border border-white/5 [.light-theme_&]:border-indigo-500/10 [.light-theme_&]:shadow-indigo-500/10'}`}>
-
+    <section className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
       {isChallengeFinished ? (
-        // --- UI FIN DE SÉRIE ---
-        <div className="relative z-10 flex flex-col gap-6">
-          <div className="text-center space-y-1">
-            <div className="bg-white/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+        // --- CHALLENGE FINISHED VIEW ---
+        <>
+          <div className="bg-gradient-to-br from-orange-400 via-orange-500 to-rose-500 p-6 text-center">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
               <Trophy size={24} className="text-white" />
             </div>
-            <h3 className="text-white font-black uppercase tracking-tight text-xl">{t('validation.streak_finished')}</h3>
-            <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest">{t('validation.reward_unlocked')}</p>
+            <h3 className="text-white font-black text-xl leading-tight">{t('validation.streak_finished')}</h3>
+            <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mt-1">{t('validation.reward_unlocked')}</p>
           </div>
 
-          <div className="space-y-2 bg-black/10 p-4 rounded-3xl border border-white/10">
+          <div className="p-4 space-y-2">
             <RecapItem icon={ListChecks} label={t('common.missions')} value={t('validation.active_count', { count: missionsCount })} onClick={() => onEditSettings('missions')} />
             <RecapItem icon={Clock} label={t('validation.duration_label')} value={`${challenge?.duration_days} ${t('child.days')}`} onClick={() => onEditSettings('challenge')} />
             <RecapItem icon={Gift} label={t('validation.reward_label')} value={challenge?.reward_name} onClick={() => onEditSettings('challenge')} />
             <RecapItem icon={Skull} label={t('validation.malus_label')} value={challenge?.malus_message} onClick={() => onEditSettings('challenge')} />
+
+            <button
+              onClick={onStartNewChallenge}
+              className="w-full mt-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white py-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all"
+            >
+              <RefreshCw size={16} /> {t('validation.start_new')}
+            </button>
+          </div>
+        </>
+      ) : (
+        // --- DAILY VERDICT VIEW ---
+        <>
+          {/* Streak progress bar */}
+          <div className="px-4 pt-4 pb-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">{t('validation.verdict')}</h3>
+              <span className="text-xs font-bold text-gray-500">
+                {challenge?.current_streak || 0} / {challenge?.duration_days} {t('child.days')}
+              </span>
+            </div>
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-violet-400 to-violet-600 rounded-full transition-all duration-500"
+                style={{ width: `${streakPercent}%` }}
+              />
+            </div>
           </div>
 
-          <button
-            onClick={onStartNewChallenge}
-            className="w-full bg-white text-orange-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 hover:bg-orange-50 active:scale-95 transition-all"
-          >
-            <RefreshCw size={16} /> {t('validation.start_new')}
-          </button>
-        </div>
-      ) : (
-        // --- UI VERDICT JOUR ---
-        <div className="relative z-10 flex flex-col gap-4 text-center">
-
-          <h3 className="text-white/90 dark:text-white/70 text-[10px] font-black uppercase tracking-widest [.light-theme_&]:text-slate-400">{t('validation.verdict')}</h3>
+          {/* Verdict content */}
           {isDaySuccess ? (
-            <div className="flex flex-col items-center gap-2 py-2">
-              <div className="bg-white/20 p-2 rounded-full animate-bounce">
-                <Trophy size={20} className="text-white" />
+            <div className="bg-emerald-50 border-t border-emerald-100 p-4 flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0 animate-bounce">
+                <Trophy size={20} className="text-emerald-600" />
               </div>
-              <p className="text-white font-black uppercase text-xs tracking-tighter">{t('dashboard.day_validated')}</p>
+              <div>
+                <p className="font-black text-emerald-700 text-sm sm:text-base">{t('dashboard.day_validated')}</p>
+                {challenge?.reward_name && (
+                  <p className="text-xs text-emerald-600/70 mt-0.5">{challenge.reward_name}</p>
+                )}
+              </div>
             </div>
           ) : (
-            <>
+            <div className={`p-4 border-t ${!allMissionsDone ? 'bg-amber-50 border-amber-100' : 'bg-white border-gray-100'}`}>
               {!allMissionsDone && (
-                <div className="flex items-center justify-center gap-2 text-white dark:text-orange-400 [.light-theme_&]:text-orange-500 text-[8px] font-black uppercase bg-white/20 dark:bg-orange-400/10 [.light-theme_&]:bg-orange-50 py-2 rounded-xl">
-                  <AlertCircle size={12} /> {t('validation.waiting_validations')}
+                <div className="flex items-center gap-2 text-amber-700 text-xs font-semibold mb-3 bg-amber-100 rounded-lg px-3 py-2">
+                  <AlertCircle size={14} className="shrink-0" />
+                  {t('validation.waiting_validations')}
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
-                <button onClick={() => onDayResult(true)} className={`py-4 rounded-2xl font-black uppercase text-[10px] shadow-xl transition-all ${allMissionsDone ? 'bg-white text-indigo-600 active:scale-95' : 'bg-white text-emerald-600 dark:bg-slate-800 dark:text-slate-600 cursor-not-allowed opacity-50 [.light-theme_&]:opacity-100 [.light-theme_&]:bg-emerald-500 [.light-theme_&]:text-white [.light-theme_&]:shadow-emerald-200'}`}>{t('validation.success')}</button>
-                <button onClick={() => onDayResult(false)} className="bg-white text-red-600 dark:bg-red-500 dark:text-white py-4 rounded-2xl font-black uppercase text-[10px] shadow-xl active:scale-95 transition-all [.light-theme_&]:bg-red-500 [.light-theme_&]:text-white [.light-theme_&]:shadow-red-200">{t('validation.fail')}</button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => onDayResult(true)}
+                  disabled={!allMissionsDone}
+                  className={`min-h-[52px] rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                    allMissionsDone
+                      ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-[0.98] shadow-sm'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  ✓ {t('validation.success')}
+                </button>
+                <button
+                  onClick={() => onDayResult(false)}
+                  className="min-h-[52px] bg-rose-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-rose-600 active:scale-[0.98] transition-all shadow-sm"
+                >
+                  ✗ {t('validation.fail')}
+                </button>
               </div>
-            </>
+            </div>
           )}
-        </div>
+        </>
       )}
     </section>
   )

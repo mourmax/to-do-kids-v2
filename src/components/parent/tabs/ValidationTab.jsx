@@ -207,7 +207,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
 
       {/* 🌟 TOAST */}
       <AnimatePresence>
@@ -218,18 +218,18 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       <AnimatePresence>
         {childFinishedAll && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3"
+            className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 shadow-sm"
           >
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 animate-bounce">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 animate-bounce">
               <ListChecks size={20} className="text-amber-600" />
             </div>
             <div>
-              <h4 className="font-semibold text-amber-800">
+              <h4 className="font-bold text-amber-800 text-sm sm:text-base">
                 {t('validation.all_missions_done', { name: childName })}
               </h4>
-              <p className="text-xs text-amber-600 mt-0.5">
+              <p className="text-xs text-amber-600/80 mt-0.5">
                 {t('validation.validate_to_advance')}
               </p>
             </div>

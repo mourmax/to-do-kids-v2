@@ -6,6 +6,7 @@
   --color-app-text: var(--app-text);
   --color-app-text-muted: var(--app-text-muted);
   --color-app-border: var(--app-border);
+  --font-nunito: 'Nunito', sans-serif;
 }
 
 :root {
