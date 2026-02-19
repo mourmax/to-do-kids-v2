@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ClipboardCheck, Sparkles, Trophy, Users, Baby, Bell, Menu, X } from 'lucide-react'
+import { ClipboardCheck, Sparkles, Trophy, Users, Baby, Bell, Menu, X, LogOut } from 'lucide-react'
 import ValidationTab from './tabs/ValidationTab'
 import SettingsTab from './tabs/SettingsTab'
 import NotificationBanner from '../ui/NotificationBanner'
@@ -47,7 +47,8 @@ export default function ParentDashboard({
   onboardingStep = 'child',
   setOnboardingStep,
   preventStepRecalc,
-  onFinishOnboarding
+  onFinishOnboarding,
+  onLogout
 }) {
   const { t } = useTranslation()
   const { theme, themeKey, setTheme, THEMES } = useTheme()
@@ -357,7 +358,7 @@ export default function ParentDashboard({
         {/* Mobile overlay backdrop */}
         {mobileNavOpen && (
           <div
-            className="fixed inset-0 bg-black/10 z-20 lg:hidden"
+            className="fixed inset-0 bg-black/10 z-40 lg:hidden"
             onClick={() => setMobileNavOpen(false)}
           />
         )}
@@ -368,7 +369,7 @@ export default function ParentDashboard({
         <aside className={`
           fixed lg:static
           top-14 left-0 bottom-0
-          z-20
+          z-50
           w-52 flex-shrink-0
           ${theme.bg} lg:bg-transparent
           border-r ${theme.borderLight} lg:border-0
@@ -435,6 +436,15 @@ export default function ParentDashboard({
                   />
                 ))}
               </div>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="mt-3 flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 text-sm font-semibold transition-all w-full"
+                >
+                  <LogOut size={15} />
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Déconnexion</span>
+                </button>
+              )}
             </div>
           </div>
         </aside>

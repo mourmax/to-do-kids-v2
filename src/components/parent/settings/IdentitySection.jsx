@@ -116,100 +116,96 @@ export default function IdentitySection({ theme = {}, familyId, profiles, onShow
         />
       )}
       <SectionCard theme={theme} icon={User} colorClass="text-indigo-500" title={t('settings.identity_title')}>
-        <div className="space-y-4">
-          {displayedChildren.map(p => {
+        <div className="space-y-0">
+          {displayedChildren.map((p, idx) => {
             const draft = onboardingDrafts[p.id] || p
             return (
-              <div key={p.id} className={`${theme.bg || 'bg-violet-50'} p-5 rounded-2xl border ${theme.borderLight || 'border-violet-100'} space-y-4 shadow-sm`}>
-                <div className="flex gap-4 items-start">
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center justify-between px-1">
-                      <label className="text-[10px] text-orange-500 uppercase font-black tracking-widest leading-none">
-                        {t('settings.child_name_label')}
-                      </label>
-                    </div>
-
-                    <div className="relative">
-                      <input
-                        value={editingId === p.id ? editName : (draft.child_name === "Mon enfant" ? "" : draft.child_name)}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          setEditName(val)
-                          if (isNewUser) {
-                            handleUpdateProfile(p.id, { child_name: val })
-                          }
-                        }}
-                        onFocus={() => {
-                          setEditingId(p.id)
-                          setEditName(draft.child_name === "Mon enfant" ? "" : draft.child_name)
-                        }}
-                        onBlur={() => {
-                          if (!isNewUser) {
-                            handleUpdateProfile(p.id, { child_name: editName || "Mon enfant" })
-                          }
-                          setEditingId(null)
-                        }}
-                        placeholder="Ex: Arthur"
-                        className={`w-full bg-white border-2 rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
-                          ? 'border-violet-400 text-slate-800 shadow-sm'
-                          : `${theme.border || 'border-violet-200'} text-slate-700 animate-orange-pulse`
-                          }`}
-                      />
-
-                      {editingId === p.id && !isNewUser && (
-                        <button
-                          onClick={() => handleUpdateProfile(p.id, { child_name: editName })}
-                          className="absolute right-2 top-2 bottom-2 bg-violet-500 px-5 rounded-xl text-white font-black text-[10px] uppercase shadow-sm active:scale-95 transition-all"
-                        >
-                          {t('actions.save')}
-                        </button>
-                      )}
-                    </div>
+              <div key={p.id} className={`space-y-4 ${idx < displayedChildren.length - 1 ? "mb-4 pb-5 border-b border-violet-100" : ""}`}>
+                {/* Name input */}
+                <div className="space-y-2">
+                  <label className="text-[10px] text-orange-500 uppercase font-black tracking-widest leading-none block px-1">
+                    {t('settings.child_name_label')}
+                  </label>
+                  <div className="relative">
+                    <input
+                      value={editingId === p.id ? editName : (draft.child_name === "Mon enfant" ? "" : draft.child_name)}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setEditName(val)
+                        if (isNewUser) {
+                          handleUpdateProfile(p.id, { child_name: val })
+                        }
+                      }}
+                      onFocus={() => {
+                        setEditingId(p.id)
+                        setEditName(draft.child_name === "Mon enfant" ? "" : draft.child_name)
+                      }}
+                      onBlur={() => {
+                        if (!isNewUser) {
+                          handleUpdateProfile(p.id, { child_name: editName || "Mon enfant" })
+                        }
+                        setEditingId(null)
+                      }}
+                      placeholder="Ex: Arthur"
+                      className={`w-full bg-white border-2 rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
+                        ? 'border-violet-400 text-slate-800 shadow-sm'
+                        : `${theme.border || 'border-violet-200'} text-slate-700 animate-orange-pulse`
+                        }`}
+                    />
+                    {editingId === p.id && !isNewUser && (
+                      <button
+                        onClick={() => handleUpdateProfile(p.id, { child_name: editName })}
+                        className="absolute right-2 top-2 bottom-2 bg-violet-500 px-5 rounded-xl text-white font-black text-[10px] uppercase shadow-sm active:scale-95 transition-all"
+                      >
+                        {t('actions.save')}
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {/* Color Selector & Invite Code */}
-                <div className="flex flex-col md:flex-row gap-6 md:items-end">
-                  <div className="space-y-2">
-                    <label className="text-[9px] text-slate-500 uppercase font-black ml-1 tracking-widest">
-                      {t('settings.associated_color') || 'Couleur associée'}
-                    </label>
-                    <div className="flex gap-2">
-                      {COLORS.map(color => (
-                        <button
-                          key={color.name}
-                          disabled={updatingId === p.id}
-                          onClick={() => handleUpdateProfile(p.id, { color: color.name })}
-                          className={`w-10 h-10 rounded-full transition-all border-4 ${(draft.color || 'violet') === color.name
-                            ? `${color.bg} border-white scale-110 shadow-lg ${color.shadow}`
-                            : 'bg-gray-100 border-gray-200 hover:border-gray-300'
-                            } ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
-                        >
-                          {(draft.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-40`} />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Invite Code Block */}
-                  <div className="flex-1 space-y-2">
-                    <label className="text-[9px] text-violet-500 uppercase font-black ml-1 tracking-widest">
-                      {t('settings.invite_code_description')}
-                    </label>
-                    <div className={`${theme.codeBg || 'bg-violet-50'} border ${theme.borderLight || 'border-violet-100'} rounded-2xl p-4 flex items-center justify-between group hover:border-violet-200 transition-all`}>
-                      <span className="text-2xl font-black text-violet-700 tracking-[0.3em] uppercase">
-                        {p.invite_code || '------'}
-                      </span>
+                {/* Color Selector */}
+                <div className="space-y-2">
+                  <label className="text-[9px] text-slate-500 uppercase font-black ml-1 tracking-widest block">
+                    {t('settings.associated_color') || 'Couleur associée'}
+                  </label>
+                  <div className="flex gap-2">
+                    {COLORS.map(color => (
                       <button
-                        onClick={() => handleCopyCode(p.invite_code)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 ${copiedId === p.invite_code
-                          ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
-                          : `bg-white border ${theme.borderLight || 'border-violet-100'} text-slate-400 hover:text-violet-600 hover:border-violet-200`
-                          }`}
-                      >
-                        {copiedId === p.invite_code ? <Check size={18} /> : <Copy size={18} />}
-                      </button>
-                    </div>
+                        key={color.name}
+                        disabled={updatingId === p.id}
+                        onClick={() => handleUpdateProfile(p.id, { color: color.name })}
+                        className={`w-9 h-9 rounded-full transition-all border-2 border-white shadow-sm hover:scale-110 ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
+                        style={{
+                          background: { rose: '#f43f5e', sky: '#0ea5e9', emerald: '#22c55e', amber: '#f59e0b', violet: '#8b5cf6' }[color.name],
+                          outline: (draft.color || 'violet') === color.name ? '2px solid #7c3aed' : 'none',
+                          outlineOffset: '2px'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Invite Code — featured card */}
+                <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span>🔑</span>
+                    <div className="font-bold text-violet-700 text-sm">Code d'activation enfant</div>
+                  </div>
+                  <div className="text-xs text-violet-500 mb-3">{t('settings.invite_code_description') || 'Donnez ce code à votre enfant pour rejoindre l\'app'}</div>
+                  <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-violet-200">
+                    <span className="font-black text-violet-700 tracking-widest text-xl flex-1">
+                      {p.invite_code || '------'}
+                    </span>
+                    <button
+                      onClick={() => handleCopyCode(p.invite_code)}
+                      className={`text-xs font-bold px-3 py-2 rounded-lg transition-all text-white ${
+                        copiedId === p.invite_code
+                          ? 'bg-emerald-500'
+                          : 'bg-violet-500 hover:bg-violet-600'
+                      }`}
+                    >
+                      {copiedId === p.invite_code ? '✓ Copié' : '📋 Copier'}
+                    </button>
                   </div>
                 </div>
               </div>
