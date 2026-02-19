@@ -1,7 +1,7 @@
 import { CheckCircle, Timer as TimerIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export default function ValidationMissionList({ missions, onValidate }) {
+export default function ValidationMissionList({ theme, missions, onValidate }) {
   const { t } = useTranslation()
   return (
     <section className="space-y-3">
@@ -17,12 +17,12 @@ export default function ValidationMissionList({ missions, onValidate }) {
                   ? 'border-violet-200 shadow-violet-50'
                   : m.parent_validated
                     ? 'border-emerald-100'
-                    : 'border-gray-100'
+                    : `${theme.borderLight}`
               }`}
             >
               {/* Mission icon */}
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-xl ${
-                isWaitingForParent ? 'bg-violet-50' : m.parent_validated ? 'bg-emerald-50' : 'bg-gray-50'
+                isWaitingForParent ? 'bg-violet-50' : m.parent_validated ? 'bg-emerald-50' : theme.bg
               }`}>
                 {m.icon}
               </div>
@@ -36,7 +36,7 @@ export default function ValidationMissionList({ missions, onValidate }) {
                       ✓ {t('validation.child_ok')}
                     </span>
                   ) : (
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                    <span className={`text-xs text-slate-500 ${theme.progressBg} px-2 py-0.5 rounded-full`}>
                       ○ {t('validation.child_waiting')}
                     </span>
                   )}
@@ -46,7 +46,7 @@ export default function ValidationMissionList({ missions, onValidate }) {
                     </span>
                   )}
                   {(m.scheduled_times || []).map((time, idx) => (
-                    <span key={idx} className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span key={idx} className={`text-xs text-slate-400 ${theme.bg} px-2 py-0.5 rounded-full flex items-center gap-1`}>
                       <TimerIcon size={10} /> {time}
                     </span>
                   ))}
@@ -61,7 +61,7 @@ export default function ValidationMissionList({ missions, onValidate }) {
                     ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-100'
                     : isWaitingForParent
                       ? 'bg-violet-100 text-violet-600 hover:bg-violet-500 hover:text-white'
-                      : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                      : `${theme.progressBg} text-slate-400 hover:bg-gray-200`
                 }`}
               >
                 <CheckCircle size={18} />

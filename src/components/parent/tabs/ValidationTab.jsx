@@ -11,9 +11,8 @@ import ValidationMissionList from './ValidationMissionList'
 import ChallengeRenewalView from './ChallengeRenewalView'
 import { useTranslation } from 'react-i18next'
 import { ListChecks } from 'lucide-react'
-import { getProfileColorClasses } from '../../../utils/colors'
 
-export default function ValidationTab({ challenge, missions, refresh, onEditSettings, onExit, childName, profile, profiles }) {
+export default function ValidationTab({ theme, challenge, missions, refresh, onEditSettings, onExit, childName, profile, profiles }) {
   const { t } = useTranslation()
 
   const [showVictoryAnimation, setShowVictoryAnimation] = useState(false)
@@ -44,6 +43,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
   if (!challenge || !challenge.is_active) {
     return (
       <ChallengeRenewalView
+        theme={theme}
         challenge={challenge}
         missions={missions}
         profiles={profiles}
@@ -96,10 +96,8 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     await supabase.from('challenges').update({ current_streak: newStreak }).eq('id', challenge.id)
 
     const today = new Date().toISOString().split('T')[0]
-    const missionIds = missions.map(m => m.id)
 
     // ✅ SUCCESS: On met à jour le résultat pour notifier l'enfant en temps réel
-    // Note: On NE reset PAS child_validated/parent_validated pour garder l'historique propre "Fait & Validé"
     const { error: logError } = await supabase.from('daily_logs').update({
       validation_result: 'success',
       validation_requested: false // 🔄 On libère la demande
@@ -127,15 +125,9 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
     const { error: challError } = await supabase.from('challenges').update({ current_streak: 0 }).eq('id', challenge.id)
     if (challError) console.error("Error resetting streak:", challError)
 
-    // ❌ FAILURE: On met à jour pour notifier l'enfant (Aïe c'est raté)
-    // L'enfant devra cliquer sur "J'ai compris" pour supprimer les logs lui-même via son dashboard
+    // ❌ FAILURE: On met à jour pour notifier l'enfant
     const { error: logError } = await supabase.from('daily_logs').update({
       validation_result: 'failure',
-      // On garde child_validated pour qu'il voie ce qu'il avait fait ? 
-      // Non, on laisse tel quel, l'important est le statut failure.
-      // Mais on enlève validation_requested pour débloquer le parent ? 
-      // Si on enlève validation_requested, le parent ne voit plus le bouton ?
-      // Le parent a fini son action.
       validation_requested: false
     })
       .eq('profile_id', profile.id)
@@ -158,7 +150,6 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
       await supabase.from('challenges').update({ is_active: false }).eq('id', challenge.id)
     }
     refresh(true)
-    // On reste ici pour afficher le ChallengeRenewalView
   }
 
   const handleStartNewChallenge = async (newSettings = {}) => {
@@ -236,7 +227,9 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
           </motion.div>
         )}
       </AnimatePresence>
+
       <ValidationHeader
+        theme={theme}
         isChallengeFinished={isChallengeFinished}
         allMissionsDone={allMissionsDone}
         isDaySuccess={isDaySuccess}
@@ -249,6 +242,7 @@ export default function ValidationTab({ challenge, missions, refresh, onEditSett
 
       {/* 2. Liste des Missions */}
       <ValidationMissionList
+        theme={theme}
         missions={isDaySuccess
           ? missions.map(m => ({ ...m, is_completed: false, parent_validated: false }))
           : missions

@@ -7,7 +7,7 @@ import SectionCard from './SectionCard'
 import OnboardingInfoBlock from '../../ui/OnboardingInfoBlock'
 import ProfileCompletionModal from '../../ui/ProfileCompletionModal'
 
-export default function IdentitySection({ familyId, profiles, onShowSuccess, refresh, updateProfile, isNewUser, onNextStep, onboardingStep }) {
+export default function IdentitySection({ theme = {}, familyId, profiles, onShowSuccess, refresh, updateProfile, isNewUser, onNextStep, onboardingStep }) {
   const { t } = useTranslation()
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
@@ -115,12 +115,12 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
           icon={User}
         />
       )}
-      <SectionCard icon={User} colorClass="text-indigo-400" title={t('settings.identity_title')}>
+      <SectionCard theme={theme} icon={User} colorClass="text-indigo-500" title={t('settings.identity_title')}>
         <div className="space-y-4">
           {displayedChildren.map(p => {
             const draft = onboardingDrafts[p.id] || p
             return (
-              <div key={p.id} className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/5 p-5 rounded-[2.5rem] border border-white/5 [.light-theme_&]:border-indigo-100 space-y-4 shadow-xl">
+              <div key={p.id} className={`${theme.bg || 'bg-violet-50'} p-5 rounded-2xl border ${theme.borderLight || 'border-violet-100'} space-y-4 shadow-sm`}>
                 <div className="flex gap-4 items-start">
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between px-1">
@@ -150,16 +150,16 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                           setEditingId(null)
                         }}
                         placeholder="Ex: Arthur"
-                        className={`w-full bg-slate-950 border-2 rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
-                          ? 'border-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]'
-                          : 'border-orange-500 text-slate-300 animate-orange-pulse'
+                        className={`w-full bg-white border-2 rounded-2xl px-5 py-4 font-bold outline-none transition-all ${editingId === p.id
+                          ? 'border-violet-400 text-slate-800 shadow-sm'
+                          : `${theme.border || 'border-violet-200'} text-slate-700 animate-orange-pulse`
                           }`}
                       />
 
                       {editingId === p.id && !isNewUser && (
                         <button
                           onClick={() => handleUpdateProfile(p.id, { child_name: editName })}
-                          className="absolute right-2 top-2 bottom-2 bg-indigo-600 px-5 rounded-xl text-white font-black text-[10px] uppercase shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
+                          className="absolute right-2 top-2 bottom-2 bg-violet-500 px-5 rounded-xl text-white font-black text-[10px] uppercase shadow-sm active:scale-95 transition-all"
                         >
                           {t('actions.save')}
                         </button>
@@ -171,7 +171,7 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                 {/* Color Selector & Invite Code */}
                 <div className="flex flex-col md:flex-row gap-6 md:items-end">
                   <div className="space-y-2">
-                    <label className="text-[9px] text-slate-600 uppercase font-black ml-1 tracking-widest">
+                    <label className="text-[9px] text-slate-500 uppercase font-black ml-1 tracking-widest">
                       {t('settings.associated_color') || 'Couleur associée'}
                     </label>
                     <div className="flex gap-2">
@@ -181,30 +181,30 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
                           disabled={updatingId === p.id}
                           onClick={() => handleUpdateProfile(p.id, { color: color.name })}
                           className={`w-10 h-10 rounded-full transition-all border-4 ${(draft.color || 'violet') === color.name
-                            ? `${color.bg} border-white/20 scale-110 shadow-lg ${color.shadow}`
-                            : 'bg-slate-950 border-white/5 hover:border-white/10'
+                            ? `${color.bg} border-white scale-110 shadow-lg ${color.shadow}`
+                            : 'bg-gray-100 border-gray-200 hover:border-gray-300'
                             } ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
                         >
-                          {(draft.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-20`} />}
+                          {(draft.color || 'violet') !== color.name && <div className={`w-3 h-3 rounded-full mx-auto ${color.bg} opacity-40`} />}
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* New Prominent Code Block */}
+                  {/* Invite Code Block */}
                   <div className="flex-1 space-y-2">
-                    <label className="text-[9px] text-indigo-400 uppercase font-black ml-1 tracking-widest">
+                    <label className="text-[9px] text-violet-500 uppercase font-black ml-1 tracking-widest">
                       {t('settings.invite_code_description')}
                     </label>
-                    <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-4 flex items-center justify-between group hover:border-indigo-500/30 transition-all [.light-theme_&]:bg-indigo-600/10 [.light-theme_&]:border-indigo-200">
-                      <span className="text-2xl font-black text-white tracking-[0.3em] italic uppercase [.light-theme_&]:text-indigo-900">
+                    <div className={`${theme.codeBg || 'bg-violet-50'} border ${theme.borderLight || 'border-violet-100'} rounded-2xl p-4 flex items-center justify-between group hover:border-violet-200 transition-all`}>
+                      <span className="text-2xl font-black text-violet-700 tracking-[0.3em] uppercase">
                         {p.invite_code || '------'}
                       </span>
                       <button
                         onClick={() => handleCopyCode(p.invite_code)}
                         className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 ${copiedId === p.invite_code
-                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                          : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 [.light-theme_&]:bg-white [.light-theme_&]:text-indigo-400 [.light-theme_&]:hover:text-indigo-600'
+                          ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+                          : `bg-white border ${theme.borderLight || 'border-violet-100'} text-slate-400 hover:text-violet-600 hover:border-violet-200`
                           }`}
                       >
                         {copiedId === p.invite_code ? <Check size={18} /> : <Copy size={18} />}
@@ -220,15 +220,15 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
             <button
               onClick={handleAddChild}
               disabled={isAdding}
-              className={`w-full bg-indigo-500/10 border border-indigo-500/20 border-dashed py-4 rounded-2xl flex items-center justify-center gap-2 group hover:bg-indigo-500/20 transition-all active:scale-[0.98] mt-2 [.light-theme_&]:bg-orange-50 [.light-theme_&]:border-orange-300 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full ${theme.bg || 'bg-violet-50'} border border-dashed ${theme.border || 'border-violet-200'} py-4 rounded-2xl flex items-center justify-center gap-2 group hover:opacity-80 transition-all active:scale-[0.98] mt-2 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              <Plus size={18} className={`text-indigo-400 group-hover:scale-110 transition-transform [.light-theme_&]:text-orange-500 ${isAdding ? 'animate-spin' : ''}`} />
-              <span className="font-black uppercase text-[10px] tracking-widest text-indigo-300 [.light-theme_&]:text-orange-600">
+              <Plus size={18} className={`text-violet-500 group-hover:scale-110 transition-transform ${isAdding ? 'animate-spin' : ''}`} />
+              <span className="font-black uppercase text-[10px] tracking-widest text-violet-600">
                 {isAdding ? t('common.creating') : t('settings.add_child')}
               </span>
-              <div className="flex items-center gap-1 bg-amber-500/20 border border-amber-500/30 px-2 py-1 rounded-full">
-                <Crown size={12} className="text-amber-400" />
-                <span className="text-[8px] font-black uppercase tracking-wider text-amber-300">Premium</span>
+              <div className="flex items-center gap-1 bg-amber-100 border border-amber-200 px-2 py-1 rounded-full">
+                <Crown size={12} className="text-amber-500" />
+                <span className="text-[8px] font-black uppercase tracking-wider text-amber-600">Premium</span>
               </div>
             </button>
           )}
@@ -237,19 +237,19 @@ export default function IdentitySection({ familyId, profiles, onShowSuccess, ref
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-indigo-600/10 border border-indigo-500/20 p-6 rounded-[2.5rem] flex flex-col items-center gap-4 text-center mt-8"
+              className={`${theme.bg || 'bg-violet-50'} border ${theme.border || 'border-violet-200'} p-6 rounded-2xl flex flex-col items-center gap-4 text-center mt-8`}
             >
-              <div className="bg-emerald-500 p-2 rounded-full text-white shadow-lg shadow-emerald-500/30">
+              <div className="bg-emerald-500 p-2 rounded-full text-white shadow-sm shadow-emerald-200">
                 <Check size={20} />
               </div>
               <div className="space-y-1">
-                <h4 className="text-sm font-black uppercase text-indigo-400 tracking-widest">{t('onboarding.profile_configured')}</h4>
+                <h4 className="text-sm font-black uppercase text-violet-600 tracking-widest">{t('onboarding.profile_configured')}</h4>
                 <p className="text-[10px] text-slate-400 uppercase tracking-widest">{t('onboarding.profile_configured_subtitle')}</p>
               </div>
               <button
                 disabled={updatingId === 'saving-all'}
                 onClick={handleOnboardingFinalSave}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-600/10 transition-all active:scale-95 disabled:opacity-50 animate-heartbeat"
+                className="bg-violet-500 hover:bg-violet-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm shadow-violet-200 transition-all active:scale-95 disabled:opacity-50 animate-heartbeat"
               >
                 {updatingId === 'saving-all' ? t('actions.saving') : t('onboarding.next_step_missions')}
               </button>

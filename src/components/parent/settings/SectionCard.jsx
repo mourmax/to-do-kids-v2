@@ -1,8 +1,9 @@
-export default function SectionCard({ icon: Icon, colorClass, title, children }) {
+export default function SectionCard({ icon: Icon, colorClass, title, children, theme = {} }) {
   return (
-    <section className="bg-slate-900/40 [.light-theme_&]:bg-indigo-500/15 p-4 rounded-3xl border border-white/5 [.light-theme_&]:border-indigo-500/10 space-y-4 shadow-xl">
+    <section className={`bg-white p-4 sm:p-5 rounded-2xl border ${theme.border || 'border-violet-200'} shadow-sm space-y-4`}>
       <div className={`flex items-center gap-2 ${colorClass} font-black uppercase text-[10px] tracking-widest`}>
-        <Icon size={16} /> {title}
+        {Icon && <Icon size={14} />}
+        {title}
       </div>
       {children}
     </section>
