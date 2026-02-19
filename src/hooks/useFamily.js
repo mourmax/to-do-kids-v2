@@ -17,14 +17,12 @@ export function useFamily(userId, familyId = null) {
 
     try {
       if (!isSilent) setIsLoading(true)
-      console.log("[useFamily] Loading data for:", { userId, familyId })
 
       let fam = null
       let famError = null
 
       // 1. Get or Create Family
       if (userId) {
-        console.log("[useFamily] Fetching family for parent:", userId)
         let { data, error } = await supabase
           .from('families')
           .select('*')
@@ -34,25 +32,17 @@ export function useFamily(userId, familyId = null) {
         fam = data?.[0] || null
         famError = error
 
-        if (famError) {
-          console.error("[useFamily] Error fetching family:", famError)
-          throw famError
-        }
+        if (famError) throw famError
 
         if (!fam) {
-          console.log("[useFamily] No family found, creating one for parent:", userId)
           const { data: newFam, error: createFamError } = await supabase
             .from('families')
             .insert([{ parent_owner_id: userId }])
             .select()
             .single()
 
-          if (createFamError) {
-            console.error("[useFamily] Error creating family:", createFamError)
-            throw createFamError
-          }
+          if (createFamError) throw createFamError
           fam = newFam
-          console.log("[useFamily] Family created successfully:", fam.id)
         }
       } else if (familyId) {
         // Child path: find by family ID
@@ -67,11 +57,9 @@ export function useFamily(userId, familyId = null) {
       }
 
       if (famError) {
-        console.error("[useFamily] Final family check error:", famError)
         throw new Error(`SQL_${famError.code || 'UNKNOWN'}: ${famError.message}`)
       }
       if (!fam) {
-        console.warn("[useFamily] No family found after creation attempt")
         throw new Error("Missing family")
       }
 
@@ -86,8 +74,6 @@ export function useFamily(userId, familyId = null) {
       if (profsFetchError) throw new Error(`SQL_PROFS_${profsFetchError.code}: ${profsFetchError.message}`)
 
       if (!profs || profs.length === 0) {
-        console.log("Creating initial profiles for family:", fam.id)
-        // 🛠️ FIX: Ensure we wait for the insert to finish and return the data
         const { data: newProfs, error: profError } = await supabase
           .from('profiles')
           .insert([
@@ -104,36 +90,25 @@ export function useFamily(userId, familyId = null) {
           ])
           .select()
 
-        if (profError) {
-          console.error("[useFamily] Critical error creating profiles:", profError)
-          throw new Error(`SQL_CREATE_PROFS_${profError.code}: ${profError.message}`)
-        }
+        if (profError) throw new Error(`SQL_CREATE_PROFS_${profError.code}: ${profError.message}`)
         profs = newProfs || []
-        console.log("[useFamily] Profiles created successfully")
 
       } else {
         // --- LOGIQUE AUTO-GUÉRISSEUSE (SELF-HEALING) ---
-        // Nettoyage automatique des profils "Mon enfant" en trop ou inutiles
         const configuredChildren = profs.filter(p => !p.is_parent && p.child_name !== "Mon enfant")
         const placeholderChildren = profs.filter(p => !p.is_parent && p.child_name === "Mon enfant")
 
         let idsToDelete = []
 
         if (configuredChildren.length > 0 && placeholderChildren.length > 0) {
-          // Cas 1 : On a déjà configuré un vrai enfant => supprimer TOUS les placeholders
-          console.log("[useFamily] Cleanup: Deleting placeholder profiles because a real child exists.")
           idsToDelete = placeholderChildren.map(p => p.id)
         } else if (placeholderChildren.length > 1) {
-          // Cas 2 : On a que des placeholders mais en double => n'en garder qu'un seul
-          console.log("[useFamily] Cleanup: removing duplicate placeholders.")
-          // On garde le premier, on supprime le reste
-          const [keep, ...remove] = placeholderChildren
+          const [, ...remove] = placeholderChildren
           idsToDelete = remove.map(p => p.id)
         }
 
         if (idsToDelete.length > 0) {
           await supabase.from('profiles').delete().in('id', idsToDelete)
-          // Mise à jour de la liste locale pour ne pas afficher les supprimés
           profs = profs.filter(p => !idsToDelete.includes(p.id))
         }
       }
@@ -141,7 +116,8 @@ export function useFamily(userId, familyId = null) {
       setProfiles(profs || [])
 
       // 2.2 Default Missions creation recovery - ONLY if no missions exist yet
-      // (Moved outside profile check to be more resilient)
+      // Pre-declare with let so the inner try block can assign it without TDZ issues
+      let prefetchedMissions = null
       try {
         const { count } = await supabase
           .from('missions')
@@ -149,26 +125,23 @@ export function useFamily(userId, familyId = null) {
           .eq('family_id', fam.id)
 
         if (count === 0) {
-          console.log("[useFamily] No missions found, creating default missions...")
           const defaultMissions = [
             { title: "missions.do_homework", icon: "📚", family_id: fam.id, order_index: 1 },
             { title: "missions.tidy_toys", icon: "🧸", family_id: fam.id, order_index: 2 },
             { title: "missions.set_table", icon: "🍽️", family_id: fam.id, order_index: 3 }
           ]
           await supabase.from('missions').insert(defaultMissions)
-          // Re-fetch missions right after creation
+          // Re-fetch right after creation and store in local variable (fixes TDZ bug)
           const { data: refreshedMissions } = await supabase
             .from('missions')
             .select('*')
             .eq('family_id', fam.id)
             .order('order_index')
-          if (refreshedMissions) curMissions = refreshedMissions
+          if (refreshedMissions) prefetchedMissions = refreshedMissions
         }
       } catch (mErr) {
         console.warn("Default missions creation check failed:", mErr)
       }
-
-      console.log("[useFamily] All data loaded successfully for family:", fam.id)
 
       // 2.5 Patch ALL existing profiles without invite codes
       const profilesToPatch = (profs || []).filter(p => !p.is_parent && !p.invite_code)
@@ -198,14 +171,12 @@ export function useFamily(userId, familyId = null) {
       let currentProfId = activeProfileId
       const parentProf = profs.find(p => p.is_parent)
 
-      // Double check if parent has family_id (recovery if RLS was messed up)
+      // Recovery if parent profile is missing family_id (RLS edge case)
       if (parentProf && !parentProf.family_id && fam.id) {
-        console.warn("Parent profile missing family_id, patching...")
         await supabase.from('profiles').update({ family_id: fam.id }).eq('id', parentProf.id)
       }
 
       if (!currentProfId || !profs.find(p => p.id === currentProfId)) {
-        // Default to first child profile
         const firstChild = profs.find(p => p.role === 'child') || profs[0]
         currentProfId = firstChild?.id
         setActiveProfileId(currentProfId)
@@ -215,11 +186,16 @@ export function useFamily(userId, familyId = null) {
       // 4. Fetch Missions & Logs
       const today = new Date().toISOString().split('T')[0]
 
-      const { data: curMissions } = await supabase
-        .from('missions')
-        .select('*')
-        .eq('family_id', fam.id)
-        .order('order_index')
+      // Use prefetchedMissions if available (freshly created defaults), else fetch from DB
+      let curMissions = prefetchedMissions
+      if (!curMissions) {
+        const { data: fetchedMissions } = await supabase
+          .from('missions')
+          .select('*')
+          .eq('family_id', fam.id)
+          .order('order_index')
+        curMissions = fetchedMissions
+      }
 
       const { data: todayLogs } = await supabase
         .from('daily_logs')
@@ -232,7 +208,7 @@ export function useFamily(userId, familyId = null) {
         .from('challenges')
         .select('*')
         .eq('family_id', fam.id)
-        .eq('assigned_to', currentProfId) // 🛠️ CRUCIAL: Seulement les challenges de cet enfant
+        .eq('assigned_to', currentProfId)
         .order('created_at', { ascending: false })
         .limit(1)
 
@@ -240,12 +216,11 @@ export function useFamily(userId, familyId = null) {
       let chall = challs?.[0] || null
 
       if (!chall) {
-        console.log("No challenge found for profile, creating one:", currentProfId)
         const { data: newChall, error: createError } = await supabase
           .from('challenges')
           .insert([{
             family_id: fam.id,
-            assigned_to: currentProfId, // 🛠️ CRUCIAL: Assigner à l'enfant actif
+            assigned_to: currentProfId,
             reward_name: "Cadeau Surprise",
             duration_days: 2,
             is_active: true,
@@ -338,6 +313,6 @@ export function useFamily(userId, familyId = null) {
     error,
     refresh: loadFamilyData,
     switchProfile,
-    updateProfile // New helper for instant UI feedback
+    updateProfile
   }
 }

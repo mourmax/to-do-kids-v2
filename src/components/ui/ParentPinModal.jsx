@@ -4,17 +4,31 @@ import { Delete, LogOut } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
-export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
+// La vérification du PIN se fait côté serveur via la RPC verify_parent_pin.
+// Le PIN n'est plus jamais transmis au client.
+// Props :
+//   profileId  : uuid du profil parent (remplace correctPin)
+//   hasPinSet  : false si le parent n'a pas encore configuré de PIN
+export default function ParentPinModal({ onSuccess, onClose, profileId, hasPinSet = true }) {
   const { t } = useTranslation()
   const [pin, setPin] = useState('')
   const [error, setError] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
 
-  const handleNumberClick = (num) => {
-    if (pin.length < 4) {
-      const newPin = pin + num
-      setPin(newPin)
-      if (newPin.length === 4) {
-        if (newPin === correctPin) {
+  const handleNumberClick = async (num) => {
+    if (pin.length >= 4 || isChecking) return
+    const newPin = pin + num
+    setPin(newPin)
+
+    if (newPin.length === 4) {
+      setIsChecking(true)
+      try {
+        const { data: isValid, error: rpcError } = await supabase.rpc('verify_parent_pin', {
+          p_profile_id: profileId,
+          p_input_pin: newPin
+        })
+
+        if (!rpcError && isValid === true) {
           onSuccess()
         } else {
           setError(true)
@@ -23,6 +37,11 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
             setError(false)
           }, 400)
         }
+      } catch {
+        setError(true)
+        setTimeout(() => { setPin(''); setError(false) }, 400)
+      } finally {
+        setIsChecking(false)
       }
     }
   }
@@ -32,16 +51,10 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
     setError(false)
   }
 
-  // 🔥 FONCTION CLÉ : CODE OUBLIÉ
   const handleForgotPin = async () => {
     if (confirm("Code oublié ?\n\nSécurité : Vous allez être déconnecté.\nReconnectez-vous avec votre email ou Google pour définir un nouveau code.")) {
-      // 1. On pose le "drapeau" pour dire qu'on veut reset le PIN
       localStorage.setItem('reset_pin_mode', 'true')
-
-      // 2. On déconnecte
       await supabase.auth.signOut()
-
-      // 3. On recharge la page pour renvoyer vers l'Auth
       window.location.reload()
     }
   }
@@ -65,55 +78,77 @@ export default function ParentPinModal({ onSuccess, onClose, correctPin }) {
           <p className="text-slate-400 text-[10px] font-bold uppercase">{t('pin.enter_code')}</p>
         </div>
 
-        {/* --- INDICATEURS PIN --- */}
-        <div className="flex justify-center gap-4 mb-8">
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className={`w-4 h-4 rounded-full transition-all duration-300 ${error
-                  ? 'bg-red-500 scale-110'
-                  : pin.length > i
-                    ? 'bg-indigo-600 scale-100'
-                    : 'bg-slate-100'
-                }`}
-            />
-          ))}
-        </div>
-
-        {/* --- CLAVIER NUMÉRIQUE --- */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+        {/* Cas : aucun PIN configuré — bloquer l'accès */}
+        {!hasPinSet ? (
+          <div className="text-center space-y-4 py-4">
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest leading-relaxed">
+              {t('pin.no_pin_set', 'Aucun code PIN configuré. Connectez-vous en tant que parent pour en créer un.')}
+            </p>
             <button
-              key={num}
-              onClick={() => handleNumberClick(num)}
-              className="h-16 rounded-2xl bg-slate-50 text-xl font-black text-slate-700 active:bg-indigo-50 active:scale-95 transition-all shadow-sm border border-slate-100"
+              onClick={onClose}
+              className="w-full py-3 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-xs tracking-widest"
             >
-              {num}
+              {t('actions.close', 'Fermer')}
             </button>
-          ))}
-          <div className="pointer-events-none"></div>
-          <button
-            onClick={() => handleNumberClick(0)}
-            className="h-16 rounded-2xl bg-slate-50 text-xl font-black text-slate-700 active:bg-indigo-50 active:scale-95 transition-all shadow-sm border border-slate-100"
-          >
-            0
-          </button>
-          <button
-            onClick={handleDelete}
-            className="h-16 rounded-2xl bg-red-50 text-red-400 flex items-center justify-center active:bg-red-100 active:scale-95 transition-all"
-          >
-            <Delete size={24} />
-          </button>
-        </div>
+          </div>
+        ) : (
+          <>
+            {/* --- INDICATEURS PIN --- */}
+            <div className="flex justify-center gap-4 mb-8">
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                    error
+                      ? 'bg-red-500 scale-110'
+                      : isChecking
+                      ? 'bg-indigo-300 animate-pulse'
+                      : pin.length > i
+                      ? 'bg-indigo-600 scale-100'
+                      : 'bg-slate-100'
+                  }`}
+                />
+              ))}
+            </div>
 
-        {/* --- BOUTON CODE OUBLIÉ --- */}
-        <button
-          onClick={handleForgotPin}
-          className="w-full py-3 text-center text-slate-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border-t border-slate-100 mt-2"
-        >
-          <LogOut size={12} /> {t('pin.forgot_code')}
-        </button>
+            {/* --- CLAVIER NUMÉRIQUE --- */}
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                <button
+                  key={num}
+                  onClick={() => handleNumberClick(num)}
+                  disabled={isChecking}
+                  className="h-16 rounded-2xl bg-slate-50 text-xl font-black text-slate-700 active:bg-indigo-50 active:scale-95 transition-all shadow-sm border border-slate-100 disabled:opacity-50"
+                >
+                  {num}
+                </button>
+              ))}
+              <div className="pointer-events-none"></div>
+              <button
+                onClick={() => handleNumberClick(0)}
+                disabled={isChecking}
+                className="h-16 rounded-2xl bg-slate-50 text-xl font-black text-slate-700 active:bg-indigo-50 active:scale-95 transition-all shadow-sm border border-slate-100 disabled:opacity-50"
+              >
+                0
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isChecking}
+                className="h-16 rounded-2xl bg-red-50 text-red-400 flex items-center justify-center active:bg-red-100 active:scale-95 transition-all disabled:opacity-50"
+              >
+                <Delete size={24} />
+              </button>
+            </div>
 
+            {/* --- BOUTON CODE OUBLIÉ --- */}
+            <button
+              onClick={handleForgotPin}
+              className="w-full py-3 text-center text-slate-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border-t border-slate-100 mt-2"
+            >
+              <LogOut size={12} /> {t('pin.forgot_code')}
+            </button>
+          </>
+        )}
       </motion.div>
     </div>
   )
