@@ -363,7 +363,7 @@ export default function App() {
 
       {/* CONTENU PRINCIPAL (Dashboard) - Hide during tutorial OR if tutorial should show */}
       {!showTutorial && !shouldShowTutorial && (
-        <div className={isParentMode ? '' : 'pt-20 pb-4 px-4 mx-auto max-w-3xl lg:max-w-6xl transition-all duration-500'}>
+        <div>
           <AnimatePresence mode="wait">
             {isParentMode ? (
               family ? (
