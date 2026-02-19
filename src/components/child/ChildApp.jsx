@@ -1,8 +1,5 @@
-'use client'
-
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
-import { useChildProfile } from '@/hooks/useChildProfile'
+import { useChildProfile } from '../../hooks/useChildProfile'
 import UniversePicker from './UniversePicker'
 import AvatarPicker from './AvatarPicker'
 import ChildDashboard from './ChildDashboard'
