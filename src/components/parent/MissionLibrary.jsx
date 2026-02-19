@@ -79,7 +79,7 @@ export default function MissionLibrary({ onClose, onSelect, currentCount }) {
                 </div>
 
                 {/* Content */}
-                <div className="p-6 overflow-y-auto space-y-8 pb-12">
+                <div className="p-6 overflow-y-auto space-y-8 pb-12 custom-scrollbar">
                     {MISSION_CATALOG.map((cat) => (
                         <div key={cat.category} className="space-y-4">
                             <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] ml-2">

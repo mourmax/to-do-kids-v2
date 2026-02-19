@@ -417,35 +417,37 @@ export default function ParentDashboard({
             ))}
           </div>
 
-          {/* Theme switcher at bottom */}
-          <div className="mt-auto">
-            <div className={`mt-2 pt-3 border-t ${theme.border}`}>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">
-                Thème
-              </div>
-              <div className="flex gap-1.5 px-3 flex-wrap">
-                {Object.entries(THEMES).map(([key, tItem]) => (
-                  <button
-                    key={key}
-                    onClick={() => setTheme(key)}
-                    title={tItem.name}
-                    className={`w-7 h-7 rounded-full transition-all hover:scale-110 ${
-                      themeKey === key ? 'ring-2 ring-violet-500 ring-offset-2 scale-110' : ''
-                    }`}
-                    style={{ background: SWATCH_COLORS[key] }}
-                  />
-                ))}
-              </div>
-              {onLogout && (
-                <button
-                  onClick={onLogout}
-                  className="mt-3 flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 text-sm font-semibold transition-all w-full"
-                >
-                  <LogOut size={15} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Déconnexion</span>
-                </button>
-              )}
+          {/* Theme switcher — right after nav links */}
+          <div className={`mt-3 pt-3 border-t ${theme.border}`}>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">
+              Thème
             </div>
+            <div className="flex gap-2 flex-wrap px-3 py-1">
+              {Object.entries(THEMES).map(([key, tItem]) => (
+                <button
+                  key={key}
+                  onClick={() => setTheme(key)}
+                  title={tItem.name}
+                  className={`w-5 h-5 rounded-full transition-all hover:scale-110 ${
+                    themeKey === key ? 'ring-2 ring-offset-2 ring-violet-500 scale-110' : ''
+                  }`}
+                  style={{ background: SWATCH_COLORS[key] }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Logout — at the very bottom */}
+          <div className="mt-auto pt-4">
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 text-sm font-semibold transition-all w-full"
+              >
+                <LogOut size={15} />
+                <span className="text-[11px] font-bold uppercase tracking-wider">Déconnexion</span>
+              </button>
+            )}
           </div>
         </aside>
 

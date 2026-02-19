@@ -36,12 +36,12 @@ export default function ValidationMissionList({ theme, missions, onValidate }) {
                       ✓ {t('validation.child_ok')}
                     </span>
                   ) : (
-                    <span className={`text-xs text-slate-500 ${theme.progressBg} px-2 py-0.5 rounded-full`}>
+                    <span className="bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-full border border-amber-200">
                       ○ {t('validation.child_waiting')}
                     </span>
                   )}
                   {isWaitingForParent && (
-                    <span className="text-xs text-violet-600 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full font-semibold animate-pulse">
+                    <span className="bg-amber-100 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-full border border-amber-200 animate-pulse">
                       {t('validation.to_validate')}
                     </span>
                   )}

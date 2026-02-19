@@ -307,19 +307,26 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
         <div className={`flex gap-2 p-1.5 bg-white border ${theme.border || 'border-violet-200'} rounded-2xl overflow-x-auto no-scrollbar`}>
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'all' ? 'bg-violet-500 text-white shadow-md shadow-violet-200' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`px-4 py-2 rounded-xl transition-all shrink-0 flex flex-col items-center ${activeTab === 'all' ? 'bg-violet-500 text-white shadow-md shadow-violet-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
-            {t('common.all')}
+            <span className="text-[10px] font-black uppercase tracking-widest">{t('common.all')}</span>
+            <span className={`text-xs font-semibold ${activeTab === 'all' ? 'text-violet-100' : 'text-slate-400'}`}>
+              {getMissionCountFor(null)} mission{getMissionCountFor(null) > 1 ? 's' : ''}
+            </span>
           </button>
           {childProfiles.map(p => {
             const colorClass = getColorClasses(p.color)
+            const count = getMissionCountFor(p.id)
             return (
               <button
                 key={p.id}
                 onClick={() => setActiveTab(p.id)}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === p.id ? `${colorClass} text-white shadow-md` : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex flex-col items-center ${activeTab === p.id ? `${colorClass} text-white shadow-md` : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
               >
-                {p.child_name}
+                <span className="text-[10px] font-black uppercase tracking-widest">{p.child_name}</span>
+                <span className={`text-xs font-semibold ${activeTab === p.id ? 'text-white/80' : 'text-slate-400'}`}>
+                  {count} mission{count > 1 ? 's' : ''}
+                </span>
               </button>
             )
           })}
@@ -328,65 +335,55 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
         <div className="space-y-3">
           {/* 🟣 ACTIONS PRINCIPALES : BIBLIOTHÈQUE & CUSTOM */}
           <div className="grid grid-cols-2 gap-2">
-            {/* Bibliothèque - Orange pulsant */}
+            {/* Bibliothèque - Violet */}
             <button
               onClick={() => !isLimitReached && setShowLibrary(true)}
               disabled={isLimitReached}
               className={`border-2 py-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 group transition-all active:scale-[0.98] ${isLimitReached
                 ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-50'
-                : 'bg-orange-500 border-orange-400 hover:bg-orange-600 shadow-md shadow-orange-500/20 animate-heartbeat'
+                : 'bg-violet-500 border-violet-500 hover:bg-violet-600 shadow-md shadow-violet-500/20'
                 }`}
             >
               <Sparkles size={24} className={isLimitReached ? 'text-slate-400' : 'text-white group-hover:rotate-12 transition-transform'} />
               <span className={`font-black uppercase text-[10px] tracking-widest ${isLimitReached ? 'text-slate-400' : 'text-white'}`}>{t('library.library_button')}</span>
             </button>
 
-            {/* Custom - Contour orange */}
+            {/* Custom - Contour violet */}
             <button
               onClick={() => !isLimitReached && setShowCustomModal(true)}
               disabled={isLimitReached}
               className={`border-2 py-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 group transition-all active:scale-[0.98] ${isLimitReached
                 ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-50'
-                : 'bg-white border-orange-300 hover:border-orange-500 shadow-sm'
+                : 'bg-white border-violet-400 hover:border-violet-500 shadow-sm'
                 }`}
             >
-              <Plus size={24} className={isLimitReached ? 'text-slate-400' : 'text-orange-500 group-hover:scale-110 transition-transform'} />
-              <span className={`font-black uppercase text-[10px] tracking-widest ${isLimitReached ? 'text-slate-400' : 'text-orange-500'}`}>{t('library.custom_button')}</span>
+              <Plus size={24} className={isLimitReached ? 'text-slate-400' : 'text-violet-600 group-hover:scale-110 transition-transform'} />
+              <span className={`font-black uppercase text-[10px] tracking-widest ${isLimitReached ? 'text-slate-400' : 'text-violet-600'}`}>{t('library.custom_button')}</span>
             </button>
           </div>
 
           {/* Mission Counter & Limit Notice */}
-          <div className={`p-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${isLimitReached
-            ? 'bg-rose-50 border-2 border-rose-200 animate-pulse'
-            : `bg-white border ${theme.borderLight || 'border-violet-100'}`
-            }`}>
-            <div className={`flex items-center gap-2 ${isLimitReached ? 'text-rose-400' : 'text-slate-400'}`}>
-              <Crown size={20} className={isLimitReached ? 'text-rose-400' : 'text-slate-400'} />
-              <p className={`text-xs font-black uppercase tracking-widest ${isLimitReached ? 'text-rose-600' : 'text-slate-500'}`}>
-                {isLimitReached ? 'Limite atteinte !' : 'Quota Missions Gratuites'}
+          {isLimitReached ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-bold text-amber-700 flex-1">
+                Limite gratuite atteinte (5/5) — Passez en Premium pour en ajouter plus 🚀
               </p>
+              <button className="bg-violet-500 text-white text-xs px-3 py-1 rounded-lg font-bold shrink-0 hover:bg-violet-600 transition-colors">
+                Voir Premium
+              </button>
             </div>
-
-            <div className="flex flex-col items-center">
-              <div className={`text-3xl font-black tabular-nums transition-colors ${isLimitReached
-                ? 'text-rose-500'
-                : currentLevelCount >= 4
-                  ? 'text-orange-500'
-                  : 'text-indigo-500'
-                }`}>
-                {currentLevelCount} <span className="text-lg opacity-40">/ 5</span>
+          ) : (
+            <div className={`flex items-center justify-between px-4 py-2.5 bg-white border ${theme.borderLight || 'border-violet-100'} rounded-xl`}>
+              <div className="flex items-center gap-2">
+                <Crown size={16} className="text-slate-400" />
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Quota gratuit</span>
               </div>
-              {!isLimitReached && (
-                <div className={`h-1.5 w-32 ${theme.progressBg || 'bg-violet-100'} rounded-full mt-2 overflow-hidden border ${theme.borderLight || 'border-violet-100'}`}>
-                  <motion.div
-                    initial={false}
-                    animate={{ width: `${(currentLevelCount / 5) * 100}%` }}
-                    className={`h-full transition-colors ${currentLevelCount >= 4 ? 'bg-orange-500' : 'bg-indigo-500'}`}
-                  />
-                </div>
-              )}
+              <div>
+                <span className={`text-sm font-black tabular-nums ${currentLevelCount >= 4 ? 'text-orange-500' : 'text-indigo-500'}`}>{currentLevelCount}</span>
+                <span className="text-xs text-slate-400 font-medium"> / 5</span>
+              </div>
             </div>
-          </div>
+          )}
 
           <AnimatePresence>
             {showLibrary && (

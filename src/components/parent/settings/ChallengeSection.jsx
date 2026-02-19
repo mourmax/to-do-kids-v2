@@ -69,16 +69,8 @@ export default function ChallengeSection({ theme = {}, challenge, onShowSuccess,
 
   return (
     <div className="space-y-3">
-      {showOnboarding && (
-        <OnboardingInfoBlock
-          step="4"
-          title={t('onboarding.challenge_title')}
-          description={t('onboarding.challenge_description')}
-          icon={Trophy}
-        />
-      )}
 
-      {/* ── Hero banner ── */}
+      {/* ── Hero banner — remplace l'OnboardingInfoBlock pâle ── */}
       <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6"
         style={{ background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 60%, #0ea5e9 100%)" }}>
         <div className="absolute -top-4 -right-4 text-7xl opacity-10 select-none">🏆</div>
