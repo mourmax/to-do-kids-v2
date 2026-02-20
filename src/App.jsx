@@ -160,6 +160,17 @@ export default function App() {
 
   // --- TODOKIDS DATA (ChildApp) ---
 
+  const dedupMissions = (list) => {
+    const seen = new Set()
+    return (list || []).filter(m => {
+      // Clé composite agressive : titre et icône uniquement
+      const key = `${m.title}-${m.icon}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
   const fetchChildData = useCallback(async (activeProf, familyId) => {
     if (!activeProf?.id || !familyId) return
 
@@ -178,15 +189,17 @@ export default function App() {
 
     // Filtrer les missions assignées à cet enfant (ou à tous)
     const rawMissions = missionsRes.data || []
-    const filteredMissions = rawMissions.filter(m => !m.assigned_to || m.assigned_to === activeProf.id)
+    const deduped = dedupMissions(rawMissions)
+    const filteredMissions = deduped.filter(m => !m.assigned_to || m.assigned_to === activeProf.id)
 
     // Merger avec les logs (is_completed, child_validated, etc.)
     const mergedMissions = filteredMissions.map(m => {
       const log = logsRes.data?.find(l => l.mission_id === m.id)
       return {
         ...m,
-        child_done: log?.child_validated || false,
-        parent_validated: log?.parent_validated || false
+        done: log?.child_validated || false,
+        parent_validated: log?.parent_validated || false,
+        pendingValidation: (log?.child_validated && !log?.parent_validated)
       }
     })
 
@@ -215,7 +228,7 @@ export default function App() {
     }, { onConflict: 'mission_id, profile_id, date' })
 
     if (error) console.error("[App] Erreur mission toggle:", error)
-    setTkMissions(prev => prev.map(m => m.id === missionId ? { ...m, child_done: done } : m))
+    setTkMissions(prev => prev.map(m => m.id === missionId ? { ...m, done: done } : m))
   }, [activeProfile?.id])
 
   // --- HANDLERS ---
@@ -338,8 +351,8 @@ export default function App() {
       </AnimatePresence>
 
       {/* HEADER FIXE — masqué en mode parent (ParentDashboard gère son propre header) */}
-      <div className={isParentMode ? 'hidden' : 'fixed top-0 left-0 right-0 z-50 bg-transparent'}>
-        <div className={`p-4 mx-auto flex justify-between items-center transition-all ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
+      <div className={isParentMode ? 'hidden' : 'fixed top-0 left-0 right-0 z-50 bg-transparent pointer-events-none'}>
+        <div className={`p-4 mx-auto flex justify-between items-center transition-all pointer-events-auto ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
           {/* Logo/Title (Discret) */}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg overflow-hidden shadow-lg border border-white/10">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../../supabaseClient'
 import AvatarDisplay from './AvatarDisplay'
 import { KidModal, AdoModal } from './celebrations/StreakModal'
@@ -138,7 +139,7 @@ function KidMissionCard({ mission, u, onToggle, isToggling }) {
             textDecoration: mission.done ? 'line-through' : 'none',
             opacity: mission.done ? 0.7 : 1,
           }}>
-            {mission.title}
+            {t(mission.title)}
           </span>
         </div>
         {mission.time && (
@@ -196,7 +197,7 @@ function AdoMissionRow({ mission, u, onToggle, isToggling }) {
           textDecoration: mission.done ? 'line-through' : 'none',
           fontFamily: "'Space Grotesk', sans-serif",
         }}>
-          {mission.title}
+          {t(mission.title)}
         </div>
         {mission.time && (
           <div style={{ fontSize: 11, color: u.textMuted, marginTop: 2 }}>
@@ -235,6 +236,7 @@ export default function ChildDashboard({
   onMissionToggle,
   onEditAvatar,
 }) {
+  const { t } = useTranslation()
   const [togglingId, setTogglingId] = useState(null)
   const [showStreakModal, setShowStreakModal] = useState(false)
   const [showVictoryModal, setShowVictoryModal] = useState(false)
@@ -381,7 +383,7 @@ export default function ChildDashboard({
         {/* ── Missions header ──────────────────────────────────── */}
         <div style={{ padding: '4px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: isAdo ? 12 : 16, fontWeight: 900, color: u.textPrimary, textTransform: isAdo ? 'uppercase' : 'none', letterSpacing: isAdo ? 2 : 0 }}>
-            {isAdo ? 'MES MISSIONS' : 'Mes missions du jour'}
+            {isAdo ? t('child.my_missions').toUpperCase() : t('child.my_missions')}
           </div>
           <div style={{
             fontSize: 13, fontWeight: 700,
