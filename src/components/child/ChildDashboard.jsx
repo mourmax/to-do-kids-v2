@@ -248,18 +248,16 @@ export default function ChildDashboard({
   const isAdo = universeKey === 'ado'
 
   const allDone = missions.length > 0 && missions.every((m) => m.done)
+  const allValidated = missions.length > 0 && missions.every((m) => m.parent_validated)
   const doneCount = missions.filter((m) => m.done).length
 
-  // Le streak affiché est incrémenté si toutes les missions sont faites (validation imminente)
-  const displayStreak = allDone ? (streak + 1) : streak
-
-  // ── 1. Streak modal — quand toutes les missions passent à done ─
+  // ── 1. Streak modal — quand TOUTES les missions sont validées par le PARENT ─
   useEffect(() => {
-    if (allDone && missions.length > 0) {
+    if (allValidated && missions.length > 0) {
       const timer = setTimeout(() => setShowStreakModal(true), 600)
       return () => clearTimeout(timer)
     }
-  }, [allDone, missions.length])
+  }, [allValidated, missions.length])
 
   // ── 2. Victory modal — quand challenge.status passe à "won" ───
   useEffect(() => {
@@ -343,7 +341,7 @@ export default function ChildDashboard({
                 {isAdo ? 'STREAK' : 'Jours consécutifs'}
               </div>
               <div style={{ fontSize: 22, fontWeight: 900, color: u.textPrimary }}>
-                {displayStreak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{displayStreak > 1 ? 's' : ''}</span>
+                {streak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{streak > 1 ? 's' : ''}</span>
               </div>
             </div>
           </div>
@@ -450,21 +448,21 @@ export default function ChildDashboard({
         )}
 
         {/* ── All done banner ───────────────────────────────────── */}
-        {allDone && (
+        {allDone && !allValidated && (
           <div style={{
             margin: '20px 20px 0',
-            padding: '18px 20px',
+            padding: '24px',
             borderRadius: isAdo ? 12 : 24,
             background: 'rgba(255,255,255,0.25)',
             border: `2px solid rgba(255,255,255,0.5)`,
             textAlign: 'center',
           }}>
-            <div style={{ fontSize: isAdo ? 28 : 40, marginBottom: 8 }}>🎉</div>
+            <div style={{ fontSize: isAdo ? 28 : 40, marginBottom: 8 }}>⏳</div>
             <div style={{ fontSize: isAdo ? 16 : 20, fontWeight: 900, color: u.textPrimary }}>
-              {isAdo ? 'Toutes les missions validées !' : 'Bravo, toutes les missions sont faites !'}
+              {isAdo ? 'En attente de validation' : 'Missions finies !'}
             </div>
             <div style={{ fontSize: 13, color: u.textMuted, marginTop: 4, fontWeight: 600 }}>
-              {isAdo ? 'Papa/maman peut valider ta journée' : 'Papa ou maman va valider ta super journée !'}
+              {isAdo ? 'Tes parents vont valider ça' : 'Papa ou maman va valider ta super journée !'}
             </div>
           </div>
         )}
@@ -478,14 +476,14 @@ export default function ChildDashboard({
           <AdoModal
             childName={childName}
             gender={gender}
-            streak={displayStreak}
+            streak={streak}
             onClose={() => setShowStreakModal(false)}
           />
         ) : (
           <KidModal
             universeKey={universeKey}
             childName={childName}
-            streak={displayStreak}
+            streak={streak}
             onClose={() => setShowStreakModal(false)}
           />
         )

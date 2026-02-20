@@ -211,6 +211,38 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (!isParentMode && activeProfile?.id && family?.id) {
+      console.log(`[Realtime] Subscribing for profile: ${activeProfile.id}`)
+
+      const channel = supabase
+        .channel(`sync-${activeProfile.id}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'daily_logs',
+          filter: `profile_id=eq.${activeProfile.id}`
+        }, () => {
+          console.log('[Realtime] Change detected in daily_logs, refreshing...')
+          fetchChildData(activeProfile, family.id)
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'challenges',
+          filter: `family_id=eq.${family.id}`
+        }, () => {
+          console.log('[Realtime] Change detected in challenges, refreshing...')
+          fetchChildData(activeProfile, family.id)
+        })
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [isParentMode, activeProfile?.id, family?.id, fetchChildData])
+
+  useEffect(() => {
     if (!isParentMode && activeProfile && family?.id) {
       fetchChildData(activeProfile, family.id)
     }
