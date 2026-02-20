@@ -92,6 +92,7 @@ const UNIVERSES = {
 
 // ── Mission card (kid) ─────────────────────────────────────────
 function KidMissionCard({ mission, u, onToggle, isToggling }) {
+  const { t } = useTranslation()
   return (
     <div
       key={mission.id}
@@ -159,6 +160,7 @@ function KidMissionCard({ mission, u, onToggle, isToggling }) {
 
 // ── Mission row (ado) ──────────────────────────────────────────
 function AdoMissionRow({ mission, u, onToggle, isToggling }) {
+  const { t } = useTranslation()
   return (
     <div
       style={{
