@@ -69,7 +69,8 @@ export default function IdentitySection({ theme = {}, familyId, profiles, onShow
       const draft = onboardingDrafts[profileToSave.id] || {}
       const finalUpdates = {
         child_name: draft.child_name || profileToSave.child_name,
-        color: draft.color || profileToSave.color
+        color: draft.color || profileToSave.color,
+        gender: draft.gender || profileToSave.gender || 'boy'
       }
 
       await updateProfile(profileToSave.id, finalUpdates)
@@ -163,25 +164,52 @@ export default function IdentitySection({ theme = {}, familyId, profiles, onShow
                   </div>
                 </div>
 
-                {/* Color Selector */}
-                <div className="space-y-2">
-                  <label className="text-[9px] text-slate-500 uppercase font-black ml-1 tracking-widest block">
-                    {t('settings.associated_color') || 'Couleur associée'}
-                  </label>
-                  <div className="flex gap-2">
-                    {COLORS.map(color => (
-                      <button
-                        key={color.name}
-                        disabled={updatingId === p.id}
-                        onClick={() => handleUpdateProfile(p.id, { color: color.name })}
-                        className={`w-9 h-9 rounded-full transition-all border-2 border-white shadow-sm hover:scale-110 ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
-                        style={{
-                          background: { rose: '#f43f5e', sky: '#0ea5e9', emerald: '#22c55e', amber: '#f59e0b', violet: '#8b5cf6' }[color.name],
-                          outline: (draft.color || 'violet') === color.name ? '2px solid #7c3aed' : 'none',
-                          outlineOffset: '2px'
-                        }}
-                      />
-                    ))}
+                {/* Color and Gender Selectors */}
+                <div className="flex flex-wrap gap-6 items-start">
+                  {/* Color Selector */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] text-slate-500 uppercase font-black ml-1 tracking-widest block">
+                      {t('settings.associated_color') || 'Couleur associée'}
+                    </label>
+                    <div className="flex gap-2">
+                      {COLORS.map(color => (
+                        <button
+                          key={color.name}
+                          disabled={updatingId === p.id}
+                          onClick={() => handleUpdateProfile(p.id, { color: color.name })}
+                          className={`w-9 h-9 rounded-full transition-all border-2 border-white shadow-sm hover:scale-110 ${updatingId === p.id ? 'opacity-50 animate-pulse' : ''}`}
+                          style={{
+                            background: { rose: '#f43f5e', sky: '#0ea5e9', emerald: '#22c55e', amber: '#f59e0b', violet: '#8b5cf6' }[color.name],
+                            outline: (draft.color || 'violet') === color.name ? '2px solid #7c3aed' : 'none',
+                            outlineOffset: '2px'
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Gender Selector */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] text-slate-500 uppercase font-black ml-1 tracking-widest block">
+                      Genre (pour animations)
+                    </label>
+                    <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
+                      {['boy', 'girl'].map((g) => {
+                        const active = (draft.gender || 'boy') === g
+                        return (
+                          <button
+                            key={g}
+                            onClick={() => handleUpdateProfile(p.id, { gender: g })}
+                            className={`px-4 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all ${active
+                                ? 'bg-white text-violet-600 shadow-sm'
+                                : 'text-slate-500 hover:bg-white/50'
+                              }`}
+                          >
+                            {g === 'boy' ? '👦 Garçon' : '👧 Fille'}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
 
@@ -198,11 +226,10 @@ export default function IdentitySection({ theme = {}, familyId, profiles, onShow
                     </span>
                     <button
                       onClick={() => handleCopyCode(p.invite_code)}
-                      className={`text-xs font-bold px-3 py-2 rounded-lg transition-all text-white ${
-                        copiedId === p.invite_code
+                      className={`text-xs font-bold px-3 py-2 rounded-lg transition-all text-white ${copiedId === p.invite_code
                           ? 'bg-emerald-500'
                           : 'bg-violet-500 hover:bg-violet-600'
-                      }`}
+                        }`}
                     >
                       {copiedId === p.invite_code ? '✓ Copié' : '📋 Copier'}
                     </button>

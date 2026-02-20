@@ -268,15 +268,12 @@ export default function ChildDashboard({
     }
   }, [challenge?.status])
 
-  // ── Toggle mission (Supabase) ──────────────────────────────────
+  // ── Toggle mission ───────────────────────────────────────────
   const handleMissionToggle = useCallback(async (missionId) => {
     setTogglingId(missionId)
     try {
-      await supabase
-        .from('todokids_missions')
-        .update({ child_done: true })
-        .eq('id', missionId)
-      onMissionToggle?.(missionId)
+      // On délègue la persistance (upsert daily_logs) au parent via App.jsx
+      await onMissionToggle?.(missionId, true)
     } finally {
       setTogglingId(null)
     }

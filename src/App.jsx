@@ -35,7 +35,6 @@ export default function App() {
   const [tkMissions, setTkMissions] = useState([])
   const [tkChallenge, setTkChallenge] = useState(null)
   const [tkProfile, setTkProfile] = useState(null)
-  const [tkProfileId, setTkProfileId] = useState(null)
 
   // Onboarding stepper state (will be calculated dynamically)
   const [onboardingStep, setOnboardingStep] = useState('pin')
@@ -162,43 +161,40 @@ export default function App() {
   // --- TODOKIDS DATA (ChildApp) ---
 
   const fetchChildData = useCallback(async (activeProf, familyId) => {
-    if (!activeProf?.child_name || !familyId) return
+    if (!activeProf?.id || !familyId) return
 
-    // Étape 1 : résoudre le bon todokids_profile par family_id ET le nom (MARIE, lolo, etc.)
-    const { data: tkProfs, error: tkProfError } = await supabase
-      .from('todokids_profiles')
-      .select('*')
-      .eq('family_id', familyId)
-      .ilike('name', activeProf.child_name)
+    console.log(`[ChildData] Fetching for profile: ${activeProf.id} (${activeProf.child_name})`)
 
-    const tkProf = tkProfs?.[0]
-    const resolvedId = tkProf?.id
-    console.log(`[ChildData] Match sécurisé: "${activeProf.child_name}" (famille: ${familyId}) → ID résolu: ${resolvedId}`)
-
-    setTkProfileId(resolvedId)
-
-    if (!resolvedId) {
-      console.warn('[ChildData] Aucun todokids_profile trouvé pour le nom:', activeProf.child_name)
-      setTkMissions([])
-      setTkChallenge(null)
-      setTkProfile(null)
-      return
-    }
-
-    // Étape 2 : charger les données avec le bon ID
     const today = new Date().toISOString().split('T')[0]
-    console.log('[ChildData] Requête missions avec profile_id:', resolvedId, 'date:', today)
 
-    const [missionsRes, challengeRes] = await Promise.all([
-      supabase.from('todokids_missions').select('*').eq('profile_id', resolvedId).eq('date', today),
-      supabase.from('todokids_challenges').select('*').eq('profile_id', resolvedId).maybeSingle(),
+    // Étape 1 : Charger les missions de la famille (originales) et les logs du jour
+    const [missionsRes, logsRes, challengeRes] = await Promise.all([
+      supabase.from('missions').select('*').eq('family_id', familyId).order('order_index'),
+      supabase.from('daily_logs').select('*').eq('profile_id', activeProf.id).eq('date', today),
+      supabase.from('challenges').select('*').eq('family_id', familyId).maybeSingle(),
     ])
 
-    console.log('[ChildData] missions trouvées:', missionsRes.data?.length ?? 0)
+    if (missionsRes.error) console.error('[ChildData] Erreur missions:', missionsRes.error)
 
-    setTkMissions(missionsRes.data ?? [])
+    // Filtrer les missions assignées à cet enfant (ou à tous)
+    const rawMissions = missionsRes.data || []
+    const filteredMissions = rawMissions.filter(m => !m.assigned_to || m.assigned_to === activeProf.id)
+
+    // Merger avec les logs (is_completed, child_validated, etc.)
+    const mergedMissions = filteredMissions.map(m => {
+      const log = logsRes.data?.find(l => l.mission_id === m.id)
+      return {
+        ...m,
+        child_done: log?.child_validated || false,
+        parent_validated: log?.parent_validated || false
+      }
+    })
+
+    console.log('[ChildData] missions trouvées:', mergedMissions.length)
+
+    setTkMissions(mergedMissions)
     setTkChallenge(challengeRes.data ?? null)
-    setTkProfile(tkProf)
+    setTkProfile(activeProf)
   }, [])
 
   useEffect(() => {
@@ -208,9 +204,19 @@ export default function App() {
   }, [isParentMode, activeProfile, family?.id, fetchChildData])
 
   const handleMissionToggle = useCallback(async (missionId, done) => {
-    await supabase.from('todokids_missions').update({ child_done: done }).eq('id', missionId)
+    const today = new Date().toISOString().split('T')[0]
+
+    // Utiliser daily_logs pour la persistance unified
+    const { error } = await supabase.from('daily_logs').upsert({
+      mission_id: missionId,
+      profile_id: activeProfile.id,
+      child_validated: done,
+      date: today
+    }, { onConflict: 'mission_id, profile_id, date' })
+
+    if (error) console.error("[App] Erreur mission toggle:", error)
     setTkMissions(prev => prev.map(m => m.id === missionId ? { ...m, child_done: done } : m))
-  }, [])
+  }, [activeProfile?.id])
 
   // --- HANDLERS ---
 
@@ -332,7 +338,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* HEADER FIXE — masqué en mode parent (ParentDashboard gère son propre header) */}
-      <div className={isParentMode ? 'hidden' : 'fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#F8FAFF] via-[#F8FAFF]/90 to-transparent'}>
+      <div className={isParentMode ? 'hidden' : 'fixed top-0 left-0 right-0 z-50 bg-transparent'}>
         <div className={`p-4 mx-auto flex justify-between items-center transition-all ${isParentMode ? 'max-w-4xl lg:max-w-6xl' : 'max-w-3xl lg:max-w-6xl'}`}>
           {/* Logo/Title (Discret) */}
           <div className="flex items-center gap-2">
@@ -450,9 +456,9 @@ export default function App() {
             ) : (
               <ChildApp
                 key="child"
-                profileId={tkProfileId || activeProfile?.id}
-                childName={tkProfile?.name ?? activeProfile?.child_name ?? ''}
-                gender={tkProfile?.gender ?? 'boy'}
+                profileId={activeProfile?.id}
+                childName={tkProfile?.child_name ?? activeProfile?.child_name ?? ''}
+                gender={activeProfile?.gender ?? 'boy'}
                 missions={tkMissions}
                 streak={tkChallenge?.streak ?? 0}
                 challenge={tkChallenge ? {

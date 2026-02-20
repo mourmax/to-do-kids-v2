@@ -62,6 +62,7 @@ export function useProfiles() {
             role: 'child',
             is_parent: false,
             color: 'violet',
+            gender: 'boy',
             invite_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
             preferred_theme: 'dark'
           }
