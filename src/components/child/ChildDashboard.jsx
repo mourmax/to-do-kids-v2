@@ -250,6 +250,9 @@ export default function ChildDashboard({
   const allDone = missions.length > 0 && missions.every((m) => m.done)
   const doneCount = missions.filter((m) => m.done).length
 
+  // Le streak affiché est incrémenté si toutes les missions sont faites (validation imminente)
+  const displayStreak = allDone ? (streak + 1) : streak
+
   // ── 1. Streak modal — quand toutes les missions passent à done ─
   useEffect(() => {
     if (allDone && missions.length > 0) {
@@ -336,11 +339,11 @@ export default function ChildDashboard({
           }}>
             <span style={{ fontSize: isAdo ? 28 : 32 }}>🔥</span>
             <div>
-              <div style={{ fontSize: isAdo ? 12 : 13, color: u.textMuted, fontWeight: 700, textTransform: isAdo ? 'uppercase' : 'none', letterSpacing: isAdo ? 2 : 0 }}>
+              <div style={{ fontSize: 13, color: u.textMuted, fontWeight: 700, textTransform: isAdo ? 'uppercase' : 'none', letterSpacing: isAdo ? 2 : 0 }}>
                 {isAdo ? 'STREAK' : 'Jours consécutifs'}
               </div>
               <div style={{ fontSize: 22, fontWeight: 900, color: u.textPrimary }}>
-                {streak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{streak > 1 ? 's' : ''}</span>
+                {displayStreak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{displayStreak > 1 ? 's' : ''}</span>
               </div>
             </div>
           </div>
@@ -475,14 +478,14 @@ export default function ChildDashboard({
           <AdoModal
             childName={childName}
             gender={gender}
-            streak={streak}
+            streak={displayStreak}
             onClose={() => setShowStreakModal(false)}
           />
         ) : (
           <KidModal
             universeKey={universeKey}
             childName={childName}
-            streak={streak}
+            streak={displayStreak}
             onClose={() => setShowStreakModal(false)}
           />
         )
