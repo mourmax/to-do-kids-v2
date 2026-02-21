@@ -580,14 +580,14 @@ export default function ChildDashboard({
           <AdoModal
             childName={childName}
             gender={gender}
-            streak={streak}
+            streak={displayStreak}
             onClose={() => setShowStreakModal(false)}
           />
         ) : (
           <KidModal
             universeKey={universeKey}
             childName={childName}
-            streak={streak}
+            streak={displayStreak}
             onClose={() => setShowStreakModal(false)}
           />
         )
