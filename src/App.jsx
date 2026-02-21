@@ -199,6 +199,7 @@ export default function App() {
         ...m,
         done: log?.child_validated || false,
         parent_validated: log?.parent_validated || false,
+        validation_result: log?.validation_result || null,
         pendingValidation: (log?.child_validated && !log?.parent_validated)
       }
     })
@@ -206,7 +207,19 @@ export default function App() {
     console.log('[ChildData] missions trouvées:', mergedMissions.length)
 
     setTkMissions(mergedMissions)
-    setTkChallenge(challengeRes.data ?? null)
+    if (challengeRes.data) {
+      setTkChallenge({
+        ...challengeRes.data,
+        streak: challengeRes.data.current_streak,
+        reward_text: challengeRes.data.reward_name,
+        malus_text: challengeRes.data.malus_message,
+        days_completed: challengeRes.data.current_streak,
+        days_total: challengeRes.data.duration_days,
+        status: challengeRes.data.is_active ? 'active' : 'won',
+      })
+    } else {
+      setTkChallenge(null)
+    }
     setTkProfile(activeProf)
   }, [])
 
@@ -233,6 +246,16 @@ export default function App() {
         }, () => {
           console.log('[Realtime] Change detected in challenges, refreshing...')
           fetchChildData(activeProfile, family.id)
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${activeProfile.id}`
+        }, (payload) => {
+          console.log('[Realtime] Profile update detected:', payload.new)
+          setActiveProfile(payload.new)
+          fetchChildData(payload.new, family.id)
         })
         .subscribe()
 
@@ -509,8 +532,8 @@ export default function App() {
                 challenge={tkChallenge ? {
                   reward_text: tkChallenge.reward_text,
                   malus_text: tkChallenge.malus_text,
-                  days_completed: tkChallenge.days_completed,
-                  days_total: tkChallenge.days_total,
+                  daysCompleted: tkChallenge.days_completed,
+                  daysTotal: tkChallenge.days_total,
                   status: tkChallenge.status,
                 } : null}
                 onMissionToggle={handleMissionToggle}

@@ -248,7 +248,7 @@ export default function ChildDashboard({
   const isAdo = universeKey === 'ado'
 
   const allDone = missions.length > 0 && missions.every((m) => m.done)
-  const allValidated = missions.length > 0 && missions.every((m) => m.parent_validated)
+  const allValidated = missions.length > 0 && missions.every((m) => m.parent_validated || m.validation_result === 'success')
   const doneCount = missions.filter((m) => m.done).length
 
   // ── 1. Streak modal — quand TOUTES les missions sont validées par le PARENT ─

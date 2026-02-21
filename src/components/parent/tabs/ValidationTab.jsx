@@ -108,6 +108,7 @@ export default function ValidationTab({ theme, challenge, missions, refresh, onE
     // ✅ SUCCESS: On met à jour le résultat pour notifier l'enfant en temps réel
     const { error: logError } = await supabase.from('daily_logs').update({
       validation_result: 'success',
+      parent_validated: true, // 🛠️ CRUCIAL: Marquer toutes les missions comme validées par le parent
       validation_requested: false // 🔄 On libère la demande
     })
       .eq('profile_id', profile.id)
