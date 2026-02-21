@@ -282,16 +282,18 @@ export default function App() {
   const handleMissionToggle = useCallback(async (missionId, done) => {
     const today = new Date().toISOString().split('T')[0]
 
-    // Utiliser daily_logs pour la persistance unified
+    // Persist to daily_logs — set validation_requested when marking as done
+    // so the parent realtime subscription immediately shows it
     const { error } = await supabase.from('daily_logs').upsert({
       mission_id: missionId,
       profile_id: activeProfile.id,
       child_validated: done,
+      validation_requested: done, // 🔑 triggers parent notification
       date: today
     }, { onConflict: 'mission_id, profile_id, date' })
 
     if (error) console.error("[App] Erreur mission toggle:", error)
-    setTkMissions(prev => prev.map(m => m.id === missionId ? { ...m, done: done } : m))
+    setTkMissions(prev => prev.map(m => m.id === missionId ? { ...m, done: done, pendingValidation: done } : m))
   }, [activeProfile?.id])
 
   // --- HANDLERS ---

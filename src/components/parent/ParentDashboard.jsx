@@ -184,9 +184,16 @@ export default function ParentDashboard({
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
+    // 🛡️ Polling fallback: refresh every 10s in case realtime WebSocket is blocked
+    const pollingInterval = setInterval(() => {
+      console.log('[ParentDashboard] Polling refresh...')
+      refresh(true)
+    }, 10000)
+
     return () => {
       supabase.removeChannel(channel)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(pollingInterval)
     }
   }, [family?.id, childProfiles, refresh])
 

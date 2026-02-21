@@ -260,6 +260,11 @@ export default function ChildDashboard({
     }
   }, [allValidated, missions.length])
 
+  // ── Streak display: quand le modal s'ouvre, le parent vient d'incrémenter
+  // current_streak mais le realtime n'a pas encore propagé le nouveau chiffre →
+  // on affiche au minimum 1 pour éviter "0 jour consécutif"
+  const displayStreak = allValidated ? Math.max(1, streak) : streak
+
   // ── 2. Victory modal — quand challenge.status passe à "won" ───
   useEffect(() => {
     if (challenge?.status === 'won') {
@@ -398,13 +403,37 @@ export default function ChildDashboard({
         </div>
 
         {/* ── Missions list ─────────────────────────────────────── */}
-        {allValidated && !acknowledgedDay ? (
+        {allValidated && acknowledgedDay ? (
+          /* ── Waiting for next day ─────────────────────────── */
+          <div style={{ padding: '0 20px' }}>
+            <div style={{
+              borderRadius: isAdo ? 12 : 24,
+              padding: '36px 24px',
+              textAlign: 'center',
+              background: u.cardBg,
+              border: `2px solid ${u.cardBorder}`,
+              boxShadow: `0 8px 32px rgba(0,0,0,0.08)`,
+            }}>
+              <div style={{ fontSize: 52, marginBottom: 16, animation: 'emojiFloat 2.5s ease-in-out infinite' }}>
+                🌙
+              </div>
+              <div style={{ fontSize: isAdo ? 18 : 22, fontWeight: 900, color: u.textPrimary, lineHeight: 1.2 }}>
+                {isAdo ? 'RDV demain pour la suite !' : 'À demain pour la suite !'}
+              </div>
+              <div style={{ fontSize: 14, color: u.textMuted, marginTop: 10, fontWeight: 600 }}>
+                {isAdo
+                  ? 'Tes missions du jour suivant seront disponibles demain. 🔥'
+                  : 'Tes nouvelles missions arrivent demain. Bien joué aujourd\'hui ! ⭐'}
+              </div>
+            </div>
+          </div>
+        ) : allValidated && !acknowledgedDay ? (
           /* Day Complete State */
           <div style={{ padding: '0 20px' }}>
             <div style={{
               borderRadius: isAdo ? 12 : 24, padding: '32px 24px', textAlign: 'center',
-              background: u.cardBg, border: `2px solid ${u.accent}`,
-              boxShadow: `0 8px 32px ${u.accent}20`,
+              background: u.cardBg, border: `2px solid ${u.cardBorder}`,
+              boxShadow: `0 8px 32px rgba(0,0,0,0.08)`,
               animation: 'scaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
             }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>

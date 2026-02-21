@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import './celebrations.css'
 import { RainbowStreak, CosmosStreak, ChampionStreak, AdoStreak } from './StreakAnimations'
 
@@ -42,10 +43,49 @@ const KID_CONFIG = {
   },
 }
 
+// ── Circular countdown SVG ────────────────────────────────────
+function CountdownRing({ seconds, total = 5, color = '#fff' }) {
+  const r = 16
+  const circumference = 2 * Math.PI * r
+  const progress = (seconds / total) * circumference
+  return (
+    <svg width={40} height={40} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+      <circle cx={20} cy={20} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={3} />
+      <circle
+        cx={20} cy={20} r={r} fill="none"
+        stroke={color} strokeWidth={3}
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference - progress}
+        strokeLinecap="round"
+        style={{ transition: 'stroke-dashoffset 1s linear' }}
+      />
+      <text
+        x={20} y={20}
+        textAnchor="middle" dominantBaseline="middle"
+        fill={color} fontSize={13} fontWeight={800}
+        style={{ transform: 'rotate(90deg)', transformOrigin: '20px 20px' }}
+      >{seconds}</text>
+    </svg>
+  )
+}
+
 // ── KidModal — universe rainbow / cosmos / champion ───────────
 export function KidModal({ universeKey, childName, streak, onClose }) {
   const cfg = KID_CONFIG[universeKey] ?? KID_CONFIG.rainbow
   const StreakComp = cfg.StreakComp
+  const AUTO_CLOSE_DELAY = 5
+
+  const [countdown, setCountdown] = useState(AUTO_CLOSE_DELAY)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) { clearInterval(interval); onClose(); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [onClose])
 
   return (
     <>
@@ -66,76 +106,43 @@ export function KidModal({ universeKey, childName, streak, onClose }) {
       {/* Particles */}
       {['🌟', '✨', '💫', '⭐', '🎉', '🎊'].map((emoji, i) => (
         <span key={i} style={{
-          position: 'fixed',
-          top: -30,
-          left: `${(i + 1) * 14}%`,
-          zIndex: 1001,
-          fontSize: 22,
+          position: 'fixed', top: -30, left: `${(i + 1) * 14}%`,
+          zIndex: 1001, fontSize: 22,
           animation: `particleFall ${2.5 + i * 0.4}s linear infinite`,
-          animationDelay: `${i * 0.5}s`,
-          pointerEvents: 'none',
+          animationDelay: `${i * 0.5}s`, pointerEvents: 'none',
         }}>{emoji}</span>
       ))}
 
       {/* Modal */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1001,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px',
-          pointerEvents: 'none',
-        }}
-      >
+      <div role="dialog" aria-modal="true" style={{
+        position: 'fixed', inset: 0, zIndex: 1001,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '16px', pointerEvents: 'none',
+      }}>
         <div style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 380,
-          borderRadius: 32,
-          overflow: 'hidden',
+          position: 'relative', width: '100%', maxWidth: 380,
+          borderRadius: 32, overflow: 'hidden',
           background: cfg.bg,
           boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
           animation: 'modalBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both',
-          fontFamily: "'Nunito', sans-serif",
-          pointerEvents: 'all',
+          fontFamily: "'Nunito', sans-serif", pointerEvents: 'all',
         }}>
           {/* Header */}
           <div style={{ padding: '32px 24px 16px', textAlign: 'center' }}>
             <div style={{
-              fontSize: 13,
-              fontWeight: 800,
-              color: 'rgba(255,255,255,0.7)',
-              textTransform: 'uppercase',
-              letterSpacing: 3,
-              marginBottom: 8,
+              fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.7)',
+              textTransform: 'uppercase', letterSpacing: 3, marginBottom: 8,
               animation: 'fadeUp 0.4s ease both 0.3s',
-            }}>
-              Bravo {childName} !
-            </div>
+            }}>Bravo {childName} !</div>
             <div style={{
-              fontSize: 40,
-              fontWeight: 900,
-              color: '#fff',
-              textShadow: '0 3px 12px rgba(0,0,0,0.2)',
-              lineHeight: 1,
+              fontSize: 40, fontWeight: 900, color: '#fff',
+              textShadow: '0 3px 12px rgba(0,0,0,0.2)', lineHeight: 1,
               animation: 'logoReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) both 0.1s',
-            }}>
-              {cfg.title}
-            </div>
+            }}>{cfg.title}</div>
             <div style={{
-              fontSize: 16,
-              fontWeight: 700,
-              color: 'rgba(255,255,255,0.85)',
-              marginTop: 8,
-              animation: 'fadeUp 0.4s ease both 0.4s',
-            }}>
-              {cfg.subtitle}
-            </div>
+              fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+              marginTop: 8, animation: 'fadeUp 0.4s ease both 0.4s',
+            }}>{cfg.subtitle}</div>
           </div>
 
           {/* Streak animation */}
@@ -161,28 +168,27 @@ export function KidModal({ universeKey, childName, streak, onClose }) {
             </div>
           </div>
 
-          {/* Close button */}
+          {/* Close button — visually obvious with solid bg + pulsing ring + countdown */}
           <div style={{ padding: '0 20px 24px' }}>
             <button
               onClick={onClose}
               style={{
-                width: '100%',
-                padding: '14px',
+                width: '100%', padding: '14px 20px',
                 borderRadius: 16,
-                background: cfg.closeBg,
-                color: '#fff',
-                fontSize: 16,
-                fontWeight: 900,
+                background: '#fff',
+                color: cfg.closeBg,
+                fontSize: 15, fontWeight: 900,
                 fontFamily: "'Nunito', sans-serif",
-                border: 'none',
+                border: `3px solid ${cfg.closeBg}`,
                 cursor: 'pointer',
-                textTransform: 'uppercase',
-                letterSpacing: 2,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                animation: 'fadeUp 0.4s ease both 0.7s',
+                textTransform: 'uppercase', letterSpacing: 2,
+                boxShadow: `0 6px 24px rgba(0,0,0,0.25), 0 0 0 4px ${cfg.closeBg}40`,
+                animation: 'fadeUp 0.4s ease both 0.7s, ctaPulse 1.5s ease-in-out infinite 1.5s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
               }}
             >
-              SUPER ! 🎉
+              <span>SUPER ! 🎉</span>
+              <CountdownRing seconds={countdown} total={AUTO_CLOSE_DELAY} color={cfg.closeBg} />
             </button>
           </div>
         </div>

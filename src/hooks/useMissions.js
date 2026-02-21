@@ -55,8 +55,8 @@ export function useMissions() {
 
       const defaultMissions = [
         { title: "missions.do_homework", icon: "📚", family_id: familyId, order_index: 1 },
-        { title: "missions.tidy_toys",   icon: "🧸", family_id: familyId, order_index: 2 },
-        { title: "missions.set_table",   icon: "🍽️", family_id: familyId, order_index: 3 },
+        { title: "missions.tidy_toys", icon: "🧸", family_id: familyId, order_index: 2 },
+        { title: "missions.set_table", icon: "🍽️", family_id: familyId, order_index: 3 },
       ]
       await supabase.from('missions').insert(defaultMissions)
 
@@ -110,10 +110,13 @@ export function useMissions() {
       const log = todayLogs?.find(l => l.mission_id === m.id)
       return {
         ...m,
-        is_completed:         log?.child_validated      || false,
-        parent_validated:     log?.parent_validated     || false,
+        // Normalise: child_validated is the authoritative source
+        child_validated: log?.child_validated || false,
+        is_completed: log?.child_validated || false, // alias
+        parent_validated: log?.parent_validated || false,
         validation_requested: log?.validation_requested || false,
-        validation_result:    log?.validation_result    || null,
+        validation_result: log?.validation_result || null,
+        log_id: log?.id || null,
       }
     })
 
