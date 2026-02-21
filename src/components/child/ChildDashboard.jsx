@@ -397,7 +397,25 @@ export default function ChildDashboard({
         </div>
 
         {/* ── Missions list ─────────────────────────────────────── */}
-        {isAdo ? (
+        {allValidated ? (
+          /* Day Complete State */
+          <div style={{ padding: '0 20px' }}>
+            <div style={{
+              borderRadius: isAdo ? 12 : 24, padding: '32px 24px', textAlign: 'center',
+              background: u.cardBg, border: `2px solid ${u.accent}`,
+              boxShadow: `0 8px 32px ${u.accent}20`,
+              animation: 'scaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
+            }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
+              <div style={{ fontSize: isAdo ? 20 : 24, fontWeight: 900, color: u.textPrimary, lineHeight: 1.2 }}>
+                {isAdo ? t('dashboard.day_validated_success').toUpperCase() : t('dashboard.day_validated_success')}
+              </div>
+              <div style={{ fontSize: 14, color: u.textMuted, marginTop: 12, fontWeight: 600 }}>
+                {isAdo ? 'RDV demain pour la suite ! 🔥' : 'Tes missions ont été validées bravo ! 🎉'}
+              </div>
+            </div>
+          </div>
+        ) : isAdo ? (
           /* Ado: list style */
           <div style={{
             margin: '0 20px',
