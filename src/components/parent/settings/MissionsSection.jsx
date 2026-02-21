@@ -365,24 +365,29 @@ export default function MissionsSection({ theme = {}, missions, profiles, family
 
           {/* Mission Counter & Limit Notice */}
           {isLimitReached ? (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 shadow-sm">
               <p className="text-sm font-bold text-amber-700 flex-1">
                 Limite gratuite atteinte (5/5) — Passez en Premium pour en ajouter plus 🚀
               </p>
-              <button className="bg-violet-500 text-white text-xs px-3 py-1 rounded-lg font-bold shrink-0 hover:bg-violet-600 transition-colors">
-                Voir Premium
+              <button className="bg-violet-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-black uppercase tracking-widest hover:bg-violet-600 transition-colors shadow-sm shadow-violet-200">
+                Premium
               </button>
             </div>
           ) : (
-            <div className={`flex items-center justify-between px-4 py-2.5 bg-white border ${theme.borderLight || 'border-violet-100'} rounded-xl`}>
-              <div className="flex items-center gap-2">
-                <Crown size={16} className="text-slate-400" />
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Quota gratuit</span>
+            <div className="space-y-2">
+              <div className={`flex items-center justify-between px-4 py-2.5 bg-white border ${theme.borderLight || 'border-violet-100'} rounded-xl shadow-sm`}>
+                <div className="flex items-center gap-2">
+                  <Crown size={16} className="text-slate-400" />
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Quota gratuit</span>
+                </div>
+                <div>
+                  <span className={`text-sm font-black tabular-nums ${currentLevelCount >= 4 ? 'text-orange-500' : 'text-violet-600'}`}>{currentLevelCount}</span>
+                  <span className="text-xs text-slate-400 font-medium"> / 5</span>
+                </div>
               </div>
-              <div>
-                <span className={`text-sm font-black tabular-nums ${currentLevelCount >= 4 ? 'text-orange-500' : 'text-violet-600'}`}>{currentLevelCount}</span>
-                <span className="text-xs text-slate-400 font-medium"> / 5</span>
-              </div>
+              <p className="text-[10px] text-center font-bold text-violet-500 uppercase tracking-widest animate-pulse">
+                ✨ Missions illimitées avec le compte Premium
+              </p>
             </div>
           )}
 

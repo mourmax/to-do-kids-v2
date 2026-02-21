@@ -201,8 +201,8 @@ export default function IdentitySection({ theme = {}, familyId, profiles, onShow
                             key={g}
                             onClick={() => handleUpdateProfile(p.id, { gender: g })}
                             className={`px-4 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all ${active
-                                ? 'bg-white text-violet-600 shadow-sm'
-                                : 'text-slate-500 hover:bg-white/50'
+                              ? 'bg-white text-violet-600 shadow-sm'
+                              : 'text-slate-500 hover:bg-white/50'
                               }`}
                           >
                             {g === 'boy' ? '👦 Garçon' : '👧 Fille'}
@@ -213,47 +213,60 @@ export default function IdentitySection({ theme = {}, familyId, profiles, onShow
                   </div>
                 </div>
 
-                {/* Invite Code — featured card */}
-                <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-2xl p-4">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span>🔑</span>
-                    <div className="font-bold text-violet-700 text-sm">Code d'activation enfant</div>
-                  </div>
-                  <div className="text-xs text-violet-500 mb-3">{t('settings.invite_code_description') || 'Donnez ce code à votre enfant pour rejoindre l\'app'}</div>
-                  <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-violet-200">
-                    <span className="font-black text-violet-700 tracking-widest text-xl flex-1">
-                      {p.invite_code || '------'}
-                    </span>
-                    <button
-                      onClick={() => handleCopyCode(p.invite_code)}
-                      className={`text-xs font-bold px-3 py-2 rounded-lg transition-all text-white ${copiedId === p.invite_code
+                {/* Invite Code — HIDE DURING ONBOARDING S2 */}
+                {(!isNewUser || onboardingStep === 'done') && (
+                  <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span>🔑</span>
+                      <div className="font-bold text-violet-700 text-sm">Code d'activation enfant</div>
+                    </div>
+                    <div className="text-xs text-violet-500 mb-3">{t('settings.invite_code_description') || 'Donnez ce code à votre enfant pour rejoindre l\'app'}</div>
+                    <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-violet-200">
+                      <span className="font-black text-violet-700 tracking-widest text-xl flex-1">
+                        {p.invite_code || '------'}
+                      </span>
+                      <button
+                        onClick={() => handleCopyCode(p.invite_code)}
+                        className={`text-xs font-bold px-3 py-2 rounded-lg transition-all text-white ${copiedId === p.invite_code
                           ? 'bg-emerald-500'
                           : 'bg-violet-500 hover:bg-violet-600'
-                        }`}
-                    >
-                      {copiedId === p.invite_code ? '✓ Copié' : '📋 Copier'}
-                    </button>
+                          }`}
+                      >
+                        {copiedId === p.invite_code ? '✓ Copié' : '📋 Copier'}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )
           })}
 
           {(!isNewUser || (hasConfiguredAny && !childProfiles.some(p => !isConfigured(p)))) && (
-            <button
-              onClick={handleAddChild}
-              disabled={isAdding}
-              className={`w-full ${theme.bg || 'bg-violet-50'} border border-dashed ${theme.border || 'border-violet-200'} py-4 rounded-2xl flex items-center justify-center gap-2 group hover:opacity-80 transition-all active:scale-[0.98] mt-2 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <Plus size={18} className={`text-violet-500 group-hover:scale-110 transition-transform ${isAdding ? 'animate-spin' : ''}`} />
-              <span className="font-black uppercase text-[10px] tracking-widest text-violet-600">
-                {isAdding ? t('common.creating') : t('settings.add_child')}
-              </span>
-              <div className="flex items-center gap-1 bg-amber-100 border border-amber-200 px-2 py-1 rounded-full">
-                <Crown size={12} className="text-amber-500" />
-                <span className="text-[8px] font-black uppercase tracking-wider text-amber-600">Premium</span>
+            <div className="mt-8 pt-8 border-t border-violet-100">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-amber-100 p-2 rounded-xl text-amber-600 shadow-sm">
+                  <Crown size={18} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-800">Plusieurs enfants ?</h4>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Fonctionnalité Premium</p>
+                </div>
               </div>
-            </button>
+
+              <button
+                onClick={handleAddChild}
+                disabled={isAdding}
+                className={`w-full ${theme.bg || 'bg-violet-50'} border-2 border-dashed ${theme.border || 'border-violet-300'} py-6 rounded-3xl flex flex-col items-center justify-center gap-2 group hover:bg-violet-100 transition-all active:scale-[0.98] ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <div className="bg-white p-3 rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                  <Plus size={24} className={`text-violet-500 ${isAdding ? 'animate-spin' : ''}`} />
+                </div>
+                <span className="font-black uppercase text-[10px] tracking-widest text-violet-600 mt-1">
+                  {isAdding ? t('common.creating') : t('settings.add_child')}
+                </span>
+                <p className="text-[9px] text-slate-400 font-black uppercase tracking-tighter italic">Gérez toute la fratrie d'un seul coup</p>
+              </button>
+            </div>
           )}
 
           {isNewUser && hasConfiguredAny && (

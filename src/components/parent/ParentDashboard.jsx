@@ -310,8 +310,8 @@ export default function ParentDashboard({
                       key={p.id}
                       onClick={() => { onSwitchProfile(p.id); setActiveTab('validation') }}
                       className={`relative flex items-center gap-1.5 h-9 px-3 rounded-xl font-bold text-sm transition-all shrink-0 ${isActive
-                          ? 'text-white shadow-sm'
-                          : `bg-white/70 border ${theme.border} text-slate-600 hover:bg-white`
+                        ? 'text-white shadow-sm'
+                        : `bg-white/70 border ${theme.border} text-slate-600 hover:bg-white`
                         }`}
                       style={isActive ? { background: CHILD_COLORS[p.color] || '#8b5cf6' } : {}}
                     >
@@ -339,14 +339,16 @@ export default function ParentDashboard({
               </button>
             )}
 
-            {/* Mode Enfant */}
-            <button
-              onClick={onExit}
-              className="min-h-[36px] px-3 py-1.5 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm shadow-violet-200 shrink-0"
-            >
-              <Baby size={15} />
-              <span className="hidden sm:inline">Mode Enfant</span>
-            </button>
+            {/* Mode Enfant - HIDE DURING ONBOARDING */}
+            {(!isNewUser || onboardingStep === 'done') && (
+              <button
+                onClick={onExit}
+                className="min-h-[36px] px-3 py-1.5 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm shadow-violet-200 shrink-0"
+              >
+                <Baby size={15} />
+                <span className="hidden sm:inline">Mode Enfant</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -364,88 +366,87 @@ export default function ParentDashboard({
 
         {/* ── SIDEBAR ──
             Mobile: fixed drawer, slides in/out
-            Desktop: static, always visible */}
-        <aside className={`
-          fixed lg:static
-          top-14 left-0 bottom-0
-          z-50
-          w-52 flex-shrink-0
-          ${theme.bg} lg:bg-transparent
-          border-r ${theme.borderLight} lg:border-0
-          transition-transform duration-200 ease-in-out
-          lg:translate-x-0
-          ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}
-          flex flex-col
-          px-3 py-5
-        `}>
-
-          {/* Desktop title */}
-          <div className="hidden lg:block px-3 mb-5">
-            <h1 className="text-base font-black text-slate-800">{t('dashboard.parent_title')}</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="text-xs text-slate-400 font-semibold">{family?.name || t('common.family_active')}</span>
+            Desktop: static, always visible
+            HIDE DURING ONBOARDING */}
+        {(!isNewUser || onboardingStep === 'done') && (
+          <aside className={`
+            fixed lg:static
+            top-14 left-0 bottom-0
+            z-50
+            w-52 flex-shrink-0
+            ${theme.bg} lg:bg-transparent
+            border-r ${theme.borderLight} lg:border-0
+            transition-transform duration-200 ease-in-out
+            lg:translate-x-0
+            ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}
+            flex flex-col
+            px-3 py-5
+          `}>
+            {/* Sidebar content... */}
+            <div className="hidden lg:block px-3 mb-5">
+              <h1 className="text-base font-black text-slate-800">{t('dashboard.parent_title')}</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="text-xs text-slate-400 font-semibold">{family?.name || t('common.family_active')}</span>
+              </div>
             </div>
-          </div>
 
-          {/* Nav links */}
-          <div className="flex flex-col gap-1">
-            {NAV_ITEMS.map(item => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all text-left w-full ${activeNavId === item.id
+            {/* Nav links */}
+            <div className="flex flex-col gap-1">
+              {NAV_ITEMS.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all text-left w-full ${activeNavId === item.id
                     ? 'bg-violet-500 text-white shadow-md shadow-violet-200'
                     : `text-slate-600 ${theme.sidebarHover} hover:shadow-sm`
-                  }`}
-              >
-                <item.icon
-                  size={16}
-                  className={activeNavId === item.id ? 'text-white' : 'text-slate-400'}
-                />
-                <span className="flex-1">{t(item.labelKey)}</span>
-                {item.id === 'validation' && notifications.length > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${activeNavId === 'validation'
+                    }`}
+                >
+                  <item.icon
+                    size={16}
+                    className={activeNavId === item.id ? 'text-white' : 'text-slate-400'}
+                  />
+                  <span className="flex-1">{t(item.labelKey)}</span>
+                  {item.id === 'validation' && notifications.length > 0 && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${activeNavId === 'validation'
                       ? 'bg-white/30 text-white'
                       : 'bg-amber-100 text-amber-600'
-                    }`}>{notifications.length}</span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Theme switcher — right after nav links */}
-          <div className={`mt-3 pt-3 border-t ${theme.border}`}>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">
-              Thème
-            </div>
-            <div className="flex gap-2 flex-wrap px-3 py-1">
-              {Object.entries(THEMES).map(([key, tItem]) => (
-                <button
-                  key={key}
-                  onClick={() => setTheme(key)}
-                  title={tItem.name}
-                  className={`w-5 h-5 rounded-full transition-all hover:scale-110 ${themeKey === key ? 'ring-2 ring-offset-2 ring-violet-500 scale-110' : ''
-                    }`}
-                  style={{ background: SWATCH_COLORS[key] }}
-                />
+                      }`}>{notifications.length}</span>
+                  )}
+                </button>
               ))}
             </div>
-          </div>
 
-          {/* Logout — at the very bottom */}
-          <div className="mt-auto pt-4">
-            {onLogout && (
-              <button
-                onClick={onLogout}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 text-sm font-semibold transition-all w-full"
-              >
-                <LogOut size={15} />
-                <span className="text-[11px] font-bold uppercase tracking-wider">Déconnexion</span>
-              </button>
-            )}
-          </div>
-        </aside>
+            {/* Theme switcher */}
+            <div className={`mt-3 pt-3 border-t ${theme.border}`}>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Thème</div>
+              <div className="flex gap-2 flex-wrap px-3 py-1">
+                {Object.entries(THEMES).map(([key, tItem]) => (
+                  <button
+                    key={key}
+                    onClick={() => setTheme(key)}
+                    title={tItem.name}
+                    className={`w-5 h-5 rounded-full transition-all hover:scale-110 ${themeKey === key ? 'ring-2 ring-offset-2 ring-violet-500 scale-110' : ''}`}
+                    style={{ background: SWATCH_COLORS[key] }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Logout */}
+            <div className="mt-auto pt-4">
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 text-sm font-semibold transition-all w-full"
+                >
+                  <LogOut size={15} />
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Déconnexion</span>
+                </button>
+              )}
+            </div>
+          </aside>
+        )}
 
         {/* ── MAIN CONTENT ──
             Takes all remaining space. Inner content centred at max-w-2xl. */}

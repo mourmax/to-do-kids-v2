@@ -109,11 +109,16 @@ export default function SettingsTab({ theme = {}, family, profile, profiles, cha
                 </button>
               </div>
 
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  Ce code vous servira à accéder à cet espace parent depuis l'interface de votre enfant. Notez-le bien !
-                </p>
+              <div className="p-5 bg-amber-50 border-2 border-amber-300 rounded-[2rem] flex gap-4 shadow-sm shadow-amber-100 animate-orange-pulse">
+                <div className="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0">
+                  <span className="text-xl">✍️</span>
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-amber-800 mb-1">Information Cruciale</h4>
+                  <p className="text-xs text-amber-700 leading-relaxed font-bold">
+                    Ce code vous servira à accéder à cet espace parent depuis l'interface de votre enfant. <span className="text-amber-900 underline underline-offset-4 decoration-2">Notez-le bien précieusement !</span>
+                  </p>
+                </div>
               </div>
             </div>
           )}

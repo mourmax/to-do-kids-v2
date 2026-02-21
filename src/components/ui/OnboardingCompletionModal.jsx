@@ -61,14 +61,32 @@ export default function OnboardingCompletionModal({ isOpen, onClose, inviteCode,
                         </div>
                     </div>
 
-                    {/* Title */}
-                    <div className="text-center space-y-3 mb-8">
+                    {/* Title & Instructions */}
+                    <div className="text-center space-y-4 mb-8">
                         <h2 className="text-2xl font-black uppercase text-indigo-400 tracking-widest">
                             {t('onboarding.setup_complete')}
                         </h2>
-                        <p className="text-sm text-slate-300 max-w-md mx-auto">
-                            {t('onboarding.setup_complete_subtitle')}
-                        </p>
+                        <div className="bg-slate-900/50 p-4 rounded-2xl border border-indigo-500/20 space-y-3">
+                            <p className="text-xs font-black text-indigo-300 uppercase tracking-widest">Comment connecter l'enfant ?</p>
+                            <div className="flex flex-col gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-left">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">1</span>
+                                    <span>Ouvrir l'application sur son device</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">2</span>
+                                    <span>Sélectionner : <span className="text-indigo-400">"Je suis un enfant"</span></span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">3</span>
+                                    <span>Entrer le code ci-dessous</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">4</span>
+                                    <span>Accéder à son interface</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Invite Code Display */}
