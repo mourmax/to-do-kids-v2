@@ -246,7 +246,8 @@
         "oh_no": "Oh mince...",
         "day_not_validated": "La journée n'a pas été validée. Le compteur repart à zéro.",
         "malus_pay": "MALUS :",
-        "waiting_parent_config": "En attente de validation de tes parents pour le nouveau challenge"
+        "waiting_parent_config": "En attente de validation de tes parents pour le nouveau challenge",
+        "next_day_button": "Super ! On passe à demain"
     },
     "pin": {
         "access_title": "Accès Parents",

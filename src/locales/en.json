@@ -242,7 +242,8 @@
         "oh_no": "Oh no...",
         "day_not_validated": "The day was not validated. The counter resets to zero.",
         "malus_pay": "MALUS :",
-        "waiting_parent_config": "Waiting for parents to validate the new challenge"
+        "waiting_parent_config": "Waiting for parents to validate the new challenge",
+        "next_day_button": "Great! Let's move to tomorrow"
     },
     "pin": {
         "access_title": "Parent Access",

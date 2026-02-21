@@ -13,21 +13,21 @@ import { useTheme } from '../../hooks/useTheme'
 
 // Hex colors for child avatar pills (inline style)
 const CHILD_COLORS = {
-  rose:    '#f43f5e',
-  sky:     '#0ea5e9',
+  rose: '#f43f5e',
+  sky: '#0ea5e9',
   emerald: '#22c55e',
-  amber:   '#f59e0b',
-  violet:  '#8b5cf6',
+  amber: '#f59e0b',
+  violet: '#8b5cf6',
 }
 
 // Hex swatches for theme selector
 const SWATCH_COLORS = {
-  violet:  '#8b5cf6',
-  sky:     '#0ea5e9',
+  violet: '#8b5cf6',
+  sky: '#0ea5e9',
   emerald: '#22c55e',
-  rose:    '#f43f5e',
-  amber:   '#f59e0b',
-  indigo:  '#6366f1',
+  rose: '#f43f5e',
+  amber: '#f59e0b',
+  indigo: '#6366f1',
 }
 
 export default function ParentDashboard({
@@ -134,11 +134,12 @@ export default function ParentDashboard({
           event: '*',
           schema: 'public',
           table: 'daily_logs',
-          filter: `profile_id=in.(${childProfiles.map(p => p.id).join(',')})`,
         },
         async (payload) => {
           const childId = payload.new?.profile_id || payload.old?.profile_id
           if (!familyChildIds.has(childId)) return
+
+          console.log('[ParentDashboard] Realtime change detected for child:', childId)
 
           refresh(true)
 
@@ -225,17 +226,17 @@ export default function ParentDashboard({
 
   // ── Sidebar nav items ──
   const NAV_ITEMS = [
-    { id: 'validation', tab: 'validation', subTab: null,        icon: ClipboardCheck, labelKey: 'tabs.validation' },
-    { id: 'missions',   tab: 'settings',   subTab: 'missions',  icon: Sparkles,       labelKey: 'common.missions' },
-    { id: 'challenge',  tab: 'settings',   subTab: 'challenge', icon: Trophy,         labelKey: 'common.challenge' },
-    { id: 'children',   tab: 'settings',   subTab: 'children',  icon: Users,          labelKey: 'common.children_tab' },
+    { id: 'validation', tab: 'validation', subTab: null, icon: ClipboardCheck, labelKey: 'tabs.validation' },
+    { id: 'missions', tab: 'settings', subTab: 'missions', icon: Sparkles, labelKey: 'common.missions' },
+    { id: 'challenge', tab: 'settings', subTab: 'challenge', icon: Trophy, labelKey: 'common.challenge' },
+    { id: 'children', tab: 'settings', subTab: 'children', icon: Users, labelKey: 'common.children_tab' },
   ]
 
   const activeNavId =
-    activeTab === 'validation'     ? 'validation'
-    : activeSubTab === 'missions'  ? 'missions'
-    : activeSubTab === 'challenge' ? 'challenge'
-    : 'children'
+    activeTab === 'validation' ? 'validation'
+      : activeSubTab === 'missions' ? 'missions'
+        : activeSubTab === 'challenge' ? 'challenge'
+          : 'children'
 
   const handleNavClick = (item) => {
     manualTabChangeRef.current = true
@@ -308,19 +309,17 @@ export default function ParentDashboard({
                     <button
                       key={p.id}
                       onClick={() => { onSwitchProfile(p.id); setActiveTab('validation') }}
-                      className={`relative flex items-center gap-1.5 h-9 px-3 rounded-xl font-bold text-sm transition-all shrink-0 ${
-                        isActive
+                      className={`relative flex items-center gap-1.5 h-9 px-3 rounded-xl font-bold text-sm transition-all shrink-0 ${isActive
                           ? 'text-white shadow-sm'
                           : `bg-white/70 border ${theme.border} text-slate-600 hover:bg-white`
-                      }`}
+                        }`}
                       style={isActive ? { background: CHILD_COLORS[p.color] || '#8b5cf6' } : {}}
                     >
                       <span className="text-xs font-black">{p.child_name?.[0]?.toUpperCase()}</span>
                       <span className="hidden sm:inline">{p.child_name}</span>
                       {hasPending && (
-                        <span className={`text-[10px] font-black px-1 rounded-full ${
-                          isActive ? 'bg-white/30 text-white' : 'bg-amber-100 text-amber-600'
-                        }`}>!</span>
+                        <span className={`text-[10px] font-black px-1 rounded-full ${isActive ? 'bg-white/30 text-white' : 'bg-amber-100 text-amber-600'
+                          }`}>!</span>
                       )}
                     </button>
                   )
@@ -395,11 +394,10 @@ export default function ParentDashboard({
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all text-left w-full ${
-                  activeNavId === item.id
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all text-left w-full ${activeNavId === item.id
                     ? 'bg-violet-500 text-white shadow-md shadow-violet-200'
                     : `text-slate-600 ${theme.sidebarHover} hover:shadow-sm`
-                }`}
+                  }`}
               >
                 <item.icon
                   size={16}
@@ -407,11 +405,10 @@ export default function ParentDashboard({
                 />
                 <span className="flex-1">{t(item.labelKey)}</span>
                 {item.id === 'validation' && notifications.length > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${
-                    activeNavId === 'validation'
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${activeNavId === 'validation'
                       ? 'bg-white/30 text-white'
                       : 'bg-amber-100 text-amber-600'
-                  }`}>{notifications.length}</span>
+                    }`}>{notifications.length}</span>
                 )}
               </button>
             ))}
@@ -428,9 +425,8 @@ export default function ParentDashboard({
                   key={key}
                   onClick={() => setTheme(key)}
                   title={tItem.name}
-                  className={`w-5 h-5 rounded-full transition-all hover:scale-110 ${
-                    themeKey === key ? 'ring-2 ring-offset-2 ring-violet-500 scale-110' : ''
-                  }`}
+                  className={`w-5 h-5 rounded-full transition-all hover:scale-110 ${themeKey === key ? 'ring-2 ring-offset-2 ring-violet-500 scale-110' : ''
+                    }`}
                   style={{ background: SWATCH_COLORS[key] }}
                 />
               ))}
