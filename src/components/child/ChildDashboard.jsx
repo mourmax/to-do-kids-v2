@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../supabaseClient'
 import AvatarDisplay from './AvatarDisplay'
@@ -225,6 +225,86 @@ function AdoMissionRow({ mission, u, onToggle, isToggling }) {
   )
 }
 
+// ── Circular countdown ring ─────────────────────────────────────
+function CountdownRing({ seconds, total = 5, color = '#fff' }) {
+  const r = 14
+  const circ = 2 * Math.PI * r
+  const offset = circ - (seconds / total) * circ
+  return (
+    <svg width={36} height={36} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+      <circle cx={18} cy={18} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={3} />
+      <circle cx={18} cy={18} r={r} fill="none" stroke={color} strokeWidth={3}
+        strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
+        style={{ transition: 'stroke-dashoffset 1s linear' }}
+      />
+      <text x={18} y={18} textAnchor="middle" dominantBaseline="middle"
+        fill={color} fontSize={11} fontWeight={800}
+        style={{ transform: 'rotate(90deg)', transformOrigin: '18px 18px' }}
+      >{seconds}</text>
+    </svg>
+  )
+}
+
+// ── Day Complete Card — bouton avec countdown 5s ─────────────────
+function DayCompleteCard({ isAdo, u, onAcknowledge }) {
+  const [countdown, setCountdown] = useState(5)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) { clearInterval(interval); onAcknowledge(); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [onAcknowledge])
+
+  return (
+    <div style={{ padding: '0 20px' }}>
+      <div style={{
+        borderRadius: isAdo ? 12 : 24, padding: '32px 24px', textAlign: 'center',
+        background: u.cardBg, border: `2px solid ${u.cardBorder}`,
+        boxShadow: `0 8px 32px rgba(0,0,0,0.1)`,
+      }}>
+        <div style={{ fontSize: 52, marginBottom: 12 }}>🎉</div>
+        <div style={{ fontSize: isAdo ? 20 : 24, fontWeight: 900, color: u.textPrimary, lineHeight: 1.2 }}>
+          {isAdo ? 'JOURNÉE VALIDÉE !' : 'Tes missions ont été validées !'}
+        </div>
+        <div style={{ fontSize: 14, color: u.textMuted, marginTop: 10, fontWeight: 600 }}>
+          {isAdo ? 'Bravo bro, tu assures 🔥' : 'Bravo ! Tu es incroyable ⭐'}
+        </div>
+
+        {/* Bouton avec countdown */}
+        <button
+          onClick={onAcknowledge}
+          style={{
+            marginTop: 24,
+            width: '100%',
+            padding: '14px 20px',
+            borderRadius: isAdo ? 12 : 16,
+            background: u.checkBg,
+            color: u.checkColor,
+            fontWeight: 900,
+            fontSize: 14,
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+            border: `3px solid ${u.checkBg}`,
+            cursor: 'pointer',
+            boxShadow: `0 6px 20px rgba(0,0,0,0.2)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+          }}
+        >
+          <span>SUPER ! ON PASSE À DEMAIN 🌙</span>
+          <CountdownRing seconds={countdown} total={5} color={u.checkColor} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────
 export default function ChildDashboard({
   profileId,
@@ -305,29 +385,27 @@ export default function ChildDashboard({
         fontFamily: u.font,
         paddingBottom: 40,
       }}>
-        {/* ── Header ──────────────────────────────────────────── */}
-        <div style={{ padding: '48px 20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ fontSize: 14, color: u.textMuted, fontWeight: 600 }}>
-              {isAdo ? 'Ton dashboard' : 'Bonjour'}
-            </div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: u.textPrimary, lineHeight: 1.1 }}>
-              {childName} {isAdo ? '⚡' : '👋'}
-            </div>
-          </div>
-
-          {/* Avatar + edit */}
+        {/* ── Header — centré ──────────────────────────────────── */}
+        <div style={{ padding: '40px 20px 16px', textAlign: 'center' }}>
+          {/* Avatar centré */}
           <button
             onClick={onEditAvatar}
             aria-label="Modifier mon avatar"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'block', margin: '0 auto 12px' }}
           >
             <AvatarDisplay
               avatar={avatar}
-              size={56}
-              style={{ border: '3px solid rgba(255,255,255,0.5)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)' }}
+              size={72}
+              style={{ border: '3px solid rgba(255,255,255,0.6)', boxShadow: '0 6px 20px rgba(0,0,0,0.3)' }}
             />
           </button>
+          {/* Nom centré */}
+          <div style={{ fontSize: 13, color: u.textMuted, fontWeight: 600, marginBottom: 2 }}>
+            {isAdo ? 'Ton dashboard' : 'Bonjour'}
+          </div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: u.textPrimary, lineHeight: 1.1 }}>
+            {childName} {isAdo ? '⚡' : '👋'}
+          </div>
         </div>
 
         {/* ── Streak card ──────────────────────────────────────── */}
@@ -347,7 +425,7 @@ export default function ChildDashboard({
                 {isAdo ? 'STREAK' : 'Jours consécutifs'}
               </div>
               <div style={{ fontSize: 22, fontWeight: 900, color: u.textPrimary }}>
-                {streak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{streak > 1 ? 's' : ''}</span>
+                {displayStreak} <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.7 }}>jour{displayStreak > 1 ? 's' : ''}</span>
               </div>
             </div>
           </div>
@@ -428,45 +506,12 @@ export default function ChildDashboard({
             </div>
           </div>
         ) : allValidated && !acknowledgedDay ? (
-          /* Day Complete State */
-          <div style={{ padding: '0 20px' }}>
-            <div style={{
-              borderRadius: isAdo ? 12 : 24, padding: '32px 24px', textAlign: 'center',
-              background: u.cardBg, border: `2px solid ${u.cardBorder}`,
-              boxShadow: `0 8px 32px rgba(0,0,0,0.08)`,
-              animation: 'scaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
-            }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-              <div style={{ fontSize: isAdo ? 20 : 24, fontWeight: 900, color: u.textPrimary, lineHeight: 1.2 }}>
-                {isAdo ? t('dashboard.day_validated_success').toUpperCase() : t('dashboard.day_validated_success')}
-              </div>
-              <div style={{ fontSize: 14, color: u.textMuted, marginTop: 12, fontWeight: 600 }}>
-                {isAdo ? 'RDV demain pour la suite ! 🔥' : 'Tes missions ont été validées bravo ! 🎉'}
-              </div>
-
-              {/* Reset for tomorrow button */}
-              <button
-                onClick={() => setAcknowledgedDay(true)}
-                style={{
-                  marginTop: 24,
-                  width: '100%',
-                  padding: '16px',
-                  borderRadius: isAdo ? 12 : 16,
-                  background: u.accent,
-                  color: '#fff',
-                  fontWeight: 900,
-                  fontSize: 14,
-                  textTransform: 'uppercase',
-                  letterSpacing: 1,
-                  border: 'none',
-                  cursor: 'pointer',
-                  boxShadow: `0 4px 12px ${u.accent}40`,
-                }}
-              >
-                {t('child.next_day_button', "Passer au jour suivant")}
-              </button>
-            </div>
-          </div>
+          /* Day Complete State — avec countdown 5s */
+          <DayCompleteCard
+            isAdo={isAdo}
+            u={u}
+            onAcknowledge={() => setAcknowledgedDay(true)}
+          />
         ) : isAdo ? (
           /* Ado: list style */
           <div style={{
