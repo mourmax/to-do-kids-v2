@@ -335,15 +335,19 @@ export default function ChildDashboard({
   const allValidated = missions.length > 0 && missions.every((m) => m.parent_validated || m.validation_result === 'success')
   const doneCount = missions.filter((m) => m.done).length
 
+  // Stable ref for the reset callback to prevent DayCompleteCard's interval from resetting
+  const onResetRef = useRef(onReset)
+  useEffect(() => { onResetRef.current = onReset }, [onReset])
+
   const handleAcknowledge = useCallback(async () => {
     if (isResettingRef.current) return
     isResettingRef.current = true
     try {
-      await onReset?.()
+      await onResetRef.current?.()
     } finally {
       isResettingRef.current = false
     }
-  }, [onReset])
+  }, []) // No dependencies needed anymore thanks to the Ref
 
   // ── 1. Streak modal — quand TOUTES les missions sont validées par le PARENT ─
   useEffect(() => {

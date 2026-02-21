@@ -14,6 +14,17 @@ import { useTranslation } from 'react-i18next'
 import RoleSelection from './components/auth/RoleSelection'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 
+const dedupMissions = (list) => {
+  const seen = new Set()
+  return (list || []).filter(m => {
+    // Clé composite agressive : titre et icône uniquement
+    const key = `${m.title}-${m.icon}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 export default function App() {
   const { t } = useTranslation()
   const [session, setSession] = useState(null)
@@ -160,16 +171,8 @@ export default function App() {
 
   // --- TODOKIDS DATA (ChildApp) ---
 
-  const dedupMissions = (list) => {
-    const seen = new Set()
-    return (list || []).filter(m => {
-      // Clé composite agressive : titre et icône uniquement
-      const key = `${m.title}-${m.icon}`
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
-    })
-  }
+  // No changes here, just moving usage
+
 
   const fetchChildData = useCallback(async (activeProf, familyId) => {
     if (!activeProf?.id || !familyId) return
@@ -225,7 +228,7 @@ export default function App() {
       setTkChallenge(null)
     }
     setTkProfile(activeProf)
-  }, [dedupMissions])
+  }, []) // Stability achieved by using the function from outside the scope or wrapping it correctly
 
   const handleResetToday = useCallback(async () => {
     if (!activeProfile?.id) return
