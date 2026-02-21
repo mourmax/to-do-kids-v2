@@ -258,7 +258,7 @@ export default function App() {
           filter: `id=eq.${activeProfile.id}`
         }, (payload) => {
           console.log('[Realtime] Profile update detected:', payload.new)
-          setActiveProfile(payload.new)
+          // Re-fetch child data with latest profile data
           fetchChildData(payload.new, family.id)
         })
         .subscribe()
@@ -275,31 +275,9 @@ export default function App() {
     }
   }, [isParentMode, activeProfile, family?.id, fetchChildData])
 
-  // 🔄 REALTIME PARENT: Refresh ALL data when ANY child updates daily_logs
-  useEffect(() => {
-    if (isParentMode && family?.id && profiles?.length > 0) {
-      console.log(`[Realtime-Parent] Subscribing for family: ${family.id}`)
-      const channel = supabase
-        .channel(`parent-sync-${family.id}`)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'daily_logs'
-        }, (payload) => {
-          // Check if this log belongs to our family
-          const isFamilyMember = profiles.some(p => p.id === payload.new?.profile_id || p.id === payload.old?.profile_id)
-          if (isFamilyMember) {
-            console.log('[Realtime-Parent] Change detected, refreshing family data...')
-            loadFamilyData(true)
-          }
-        })
-        .subscribe()
+  // 🔄 REALTIME PARENT: Handled exclusively in ParentDashboard.jsx to avoid channel name conflicts
+  // (removing duplicate parent-sync channel that was conflicting)
 
-      return () => {
-        supabase.removeChannel(channel)
-      }
-    }
-  }, [isParentMode, family?.id, profiles, loadFamilyData])
 
   const handleMissionToggle = useCallback(async (missionId, done) => {
     const today = new Date().toISOString().split('T')[0]
