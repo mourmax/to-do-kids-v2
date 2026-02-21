@@ -112,7 +112,7 @@ export function CosmosStreak({ streak }) {
           }}>
             {streak}
           </span>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#38BDF8' }}>sol{streak > 1 ? 's' : ''}</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#38BDF8' }}>jour{streak > 1 ? 's' : ''}</span>
         </div>
 
         {/* Holo bar */}
