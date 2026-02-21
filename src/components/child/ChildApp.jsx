@@ -19,7 +19,7 @@ import ChildDashboard from './ChildDashboard'
 // ── Étapes ────────────────────────────────────────────────────
 const STEP = {
   UNIVERSE: 'universe',
-  AVATAR:   'avatar',
+  AVATAR: 'avatar',
   DASHBOARD: 'dashboard',
 }
 
@@ -31,6 +31,7 @@ export default function ChildApp({
   streak = 0,
   challenge = null,
   onMissionToggle,
+  onReset,
 }) {
   const { universeKey, avatar, saveUniverse, saveAvatar, isFirstVisit } = useChildProfile(profileId)
 
@@ -46,7 +47,7 @@ export default function ChildApp({
     } else {
       setStep(STEP.DASHBOARD)
     }
-  // avatar intentionally omitted: after init, step is driven by handlers only
+    // avatar intentionally omitted: after init, step is driven by handlers only
   }, [isFirstVisit]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Handlers ───────────────────────────────────────────────
@@ -120,6 +121,7 @@ export default function ChildApp({
       streak={streak}
       challenge={challenge}
       onMissionToggle={onMissionToggle}
+      onReset={onReset}
       onEditAvatar={handleEditAvatar}
     />
   )

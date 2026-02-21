@@ -73,19 +73,8 @@ function CountdownRing({ seconds, total = 5, color = '#fff' }) {
 export function KidModal({ universeKey, childName, streak, onClose }) {
   const cfg = KID_CONFIG[universeKey] ?? KID_CONFIG.rainbow
   const StreakComp = cfg.StreakComp
-  const AUTO_CLOSE_DELAY = 5
+  // No auto-close logic here as requested by user
 
-  const [countdown, setCountdown] = useState(AUTO_CLOSE_DELAY)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) { clearInterval(interval); onClose(); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [onClose])
 
   return (
     <>
@@ -188,7 +177,6 @@ export function KidModal({ universeKey, childName, streak, onClose }) {
               }}
             >
               <span>SUPER ! 🎉</span>
-              <CountdownRing seconds={countdown} total={AUTO_CLOSE_DELAY} color={cfg.closeBg} />
             </button>
           </div>
         </div>

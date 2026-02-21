@@ -74,7 +74,7 @@ function HeroBienvenue() {
         transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%,-56%)',
+          transform: 'translate(-50%,-50%)',
           fontSize: 80,
           filter: 'drop-shadow(0 0 28px rgba(167,139,250,.9)) drop-shadow(0 8px 20px rgba(0,0,0,.4))',
         }}
@@ -130,7 +130,7 @@ function HeroChild() {
           backdropFilter: 'blur(8px)',
           border: '3.5px solid rgba(255,255,255,.95)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transform: 'translate(-50%,-54%)',
+          transform: 'translate(-50%,-50%)',
           animation: 'tm-glow-ring 2.4s ease-in-out infinite',
         }}
         animate={{ scale: [1, 1.06, 1] }}
@@ -194,8 +194,8 @@ function HeroParent() {
         animate={{ scale: [1, 1.08, 1], y: [0, -5, 0] }}
         transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
         style={{
-          position: 'absolute', top: '48%', left: '50%',
-          transform: 'translate(-50%,-56%)',
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%,-50%)',
           textAlign: 'center', lineHeight: .9,
         }}
       >
@@ -268,7 +268,7 @@ function HeroReward() {
         transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%,-56%)',
+          transform: 'translate(-50%,-50%)',
           fontSize: 72,
           filter: 'drop-shadow(0 0 24px rgba(251,191,36,.9)) drop-shadow(0 8px 18px rgba(0,0,0,.4))',
         }}
@@ -349,7 +349,7 @@ function HeroGo() {
         animate={{ scale: [1, 1.12, 1], rotate: [-4, 4, -4] }}
         transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
         style={{
-          position: 'absolute', top: '42%', left: '50%',
+          position: 'absolute', top: '50%', left: '50%',
           transform: 'translate(-50%,-50%)',
           fontSize: 80,
           filter: 'drop-shadow(0 0 28px rgba(251,191,36,.9)) drop-shadow(0 8px 20px rgba(0,0,0,.5))',

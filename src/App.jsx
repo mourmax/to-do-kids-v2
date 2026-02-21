@@ -225,7 +225,26 @@ export default function App() {
       setTkChallenge(null)
     }
     setTkProfile(activeProf)
-  }, [])
+  }, [dedupMissions])
+
+  const handleResetToday = useCallback(async () => {
+    if (!activeProfile?.id) return
+    const today = new Date().toISOString().split('T')[0]
+
+    // Clear logs for today to allow re-testing missions immediately
+    const { error } = await supabase
+      .from('daily_logs')
+      .delete()
+      .eq('profile_id', activeProfile.id)
+      .eq('date', today)
+
+    if (error) {
+      console.error('Error resetting today:', error)
+    } else {
+      console.log('[ChildReset] Today reset success, refreshing...')
+      fetchChildData(activeProfile, family?.id)
+    }
+  }, [activeProfile, family?.id, fetchChildData])
 
   useEffect(() => {
     if (!isParentMode && activeProfile?.id && family?.id) {
@@ -547,6 +566,7 @@ export default function App() {
                   status: tkChallenge.status,
                 } : null}
                 onMissionToggle={handleMissionToggle}
+                onReset={handleResetToday}
               />
             )}
           </AnimatePresence>

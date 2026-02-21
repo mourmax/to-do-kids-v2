@@ -316,21 +316,34 @@ export default function ChildDashboard({
   streak = 0,
   challenge = null,
   onMissionToggle,
+  onReset,
   onEditAvatar,
 }) {
   const { t } = useTranslation()
-  const [togglingId, setTogglingId] = useState(null)
+  const u = UNIVERSES[universeKey] ?? UNIVERSES.rainbow
+  const isAdo = universeKey === 'ado'
+
   const [showStreakModal, setShowStreakModal] = useState(false)
   const [showVictoryModal, setShowVictoryModal] = useState(false)
   const [showMalusModal, setShowMalusModal] = useState(false)
-  const [acknowledgedDay, setAcknowledgedDay] = useState(false)
+  const [togglingId, setTogglingId] = useState(null)
 
-  const u = UNIVERSES[universeKey] ?? UNIVERSES.rainbow
-  const isAdo = universeKey === 'ado'
+  // Ref pour éviter les doubles clics sur le reset
+  const isResettingRef = useRef(false)
 
   const allDone = missions.length > 0 && missions.every((m) => m.done)
   const allValidated = missions.length > 0 && missions.every((m) => m.parent_validated || m.validation_result === 'success')
   const doneCount = missions.filter((m) => m.done).length
+
+  const handleAcknowledge = useCallback(async () => {
+    if (isResettingRef.current) return
+    isResettingRef.current = true
+    try {
+      await onReset?.()
+    } finally {
+      isResettingRef.current = false
+    }
+  }, [onReset])
 
   // ── 1. Streak modal — quand TOUTES les missions sont validées par le PARENT ─
   useEffect(() => {
@@ -481,36 +494,12 @@ export default function ChildDashboard({
         </div>
 
         {/* ── Missions list ─────────────────────────────────────── */}
-        {allValidated && acknowledgedDay ? (
-          /* ── Waiting for next day ─────────────────────────── */
-          <div style={{ padding: '0 20px' }}>
-            <div style={{
-              borderRadius: isAdo ? 12 : 24,
-              padding: '36px 24px',
-              textAlign: 'center',
-              background: u.cardBg,
-              border: `2px solid ${u.cardBorder}`,
-              boxShadow: `0 8px 32px rgba(0,0,0,0.08)`,
-            }}>
-              <div style={{ fontSize: 52, marginBottom: 16, animation: 'emojiFloat 2.5s ease-in-out infinite' }}>
-                🌙
-              </div>
-              <div style={{ fontSize: isAdo ? 18 : 22, fontWeight: 900, color: u.textPrimary, lineHeight: 1.2 }}>
-                {isAdo ? 'RDV demain pour la suite !' : 'À demain pour la suite !'}
-              </div>
-              <div style={{ fontSize: 14, color: u.textMuted, marginTop: 10, fontWeight: 600 }}>
-                {isAdo
-                  ? 'Tes missions du jour suivant seront disponibles demain. 🔥'
-                  : 'Tes nouvelles missions arrivent demain. Bien joué aujourd\'hui ! ⭐'}
-              </div>
-            </div>
-          </div>
-        ) : allValidated && !acknowledgedDay ? (
+        {allValidated ? (
           /* Day Complete State — avec countdown 5s */
           <DayCompleteCard
             isAdo={isAdo}
             u={u}
-            onAcknowledge={() => setAcknowledgedDay(true)}
+            onAcknowledge={handleAcknowledge}
           />
         ) : isAdo ? (
           /* Ado: list style */
