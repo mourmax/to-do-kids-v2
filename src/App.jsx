@@ -182,7 +182,11 @@ export default function App() {
     const [missionsRes, logsRes, challengeRes] = await Promise.all([
       supabase.from('missions').select('*').eq('family_id', familyId).order('order_index'),
       supabase.from('daily_logs').select('*').eq('profile_id', activeProf.id).eq('date', today),
-      supabase.from('challenges').select('*').eq('family_id', familyId).maybeSingle(),
+      supabase.from('challenges')
+        .select('*')
+        .eq('family_id', familyId)
+        .eq('assigned_to', activeProf.id)
+        .maybeSingle(),
     ])
 
     if (missionsRes.error) console.error('[ChildData] Erreur missions:', missionsRes.error)
@@ -270,6 +274,32 @@ export default function App() {
       fetchChildData(activeProfile, family.id)
     }
   }, [isParentMode, activeProfile, family?.id, fetchChildData])
+
+  // 🔄 REALTIME PARENT: Refresh ALL data when ANY child updates daily_logs
+  useEffect(() => {
+    if (isParentMode && family?.id && profiles?.length > 0) {
+      console.log(`[Realtime-Parent] Subscribing for family: ${family.id}`)
+      const channel = supabase
+        .channel(`parent-sync-${family.id}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'daily_logs'
+        }, (payload) => {
+          // Check if this log belongs to our family
+          const isFamilyMember = profiles.some(p => p.id === payload.new?.profile_id || p.id === payload.old?.profile_id)
+          if (isFamilyMember) {
+            console.log('[Realtime-Parent] Change detected, refreshing family data...')
+            loadFamilyData(true)
+          }
+        })
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [isParentMode, family?.id, profiles, loadFamilyData])
 
   const handleMissionToggle = useCallback(async (missionId, done) => {
     const today = new Date().toISOString().split('T')[0]

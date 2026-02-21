@@ -243,6 +243,7 @@ export default function ChildDashboard({
   const [showStreakModal, setShowStreakModal] = useState(false)
   const [showVictoryModal, setShowVictoryModal] = useState(false)
   const [showMalusModal, setShowMalusModal] = useState(false)
+  const [acknowledgedDay, setAcknowledgedDay] = useState(false)
 
   const u = UNIVERSES[universeKey] ?? UNIVERSES.rainbow
   const isAdo = universeKey === 'ado'
@@ -397,7 +398,7 @@ export default function ChildDashboard({
         </div>
 
         {/* ── Missions list ─────────────────────────────────────── */}
-        {allValidated ? (
+        {allValidated && !acknowledgedDay ? (
           /* Day Complete State */
           <div style={{ padding: '0 20px' }}>
             <div style={{
@@ -413,6 +414,28 @@ export default function ChildDashboard({
               <div style={{ fontSize: 14, color: u.textMuted, marginTop: 12, fontWeight: 600 }}>
                 {isAdo ? 'RDV demain pour la suite ! 🔥' : 'Tes missions ont été validées bravo ! 🎉'}
               </div>
+
+              {/* Reset for tomorrow button */}
+              <button
+                onClick={() => setAcknowledgedDay(true)}
+                style={{
+                  marginTop: 24,
+                  width: '100%',
+                  padding: '16px',
+                  borderRadius: isAdo ? 12 : 16,
+                  background: u.accent,
+                  color: '#fff',
+                  fontWeight: 900,
+                  fontSize: 14,
+                  textTransform: 'uppercase',
+                  letterSpacing: 1,
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: `0 4px 12px ${u.accent}40`,
+                }}
+              >
+                {t('child.next_day_button', "Passer au jour suivant")}
+              </button>
             </div>
           </div>
         ) : isAdo ? (
