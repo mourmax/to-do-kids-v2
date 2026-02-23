@@ -29,7 +29,7 @@ export default function ValidationTab({ theme, challenge, missions, refresh, onE
   // Toast State : null ou { message: string, type: 'success' | 'error' }
   const [toast, setToast] = useState(null)
 
-  const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed && m.parent_validated)
+  const allMissionsDone = missions.length > 0 && missions.every(m => m.is_completed || m.parent_validated)
   const childFinishedAll = missions.length > 0 && missions.every(m => m.is_completed) && !allMissionsDone
   const isDaySuccess = missions.length > 0 && missions.some(m => m.validation_result === 'success')
 
@@ -74,6 +74,7 @@ export default function ValidationTab({ theme, challenge, missions, refresh, onE
         mission_id: missionId,
         profile_id: profile.id, // 🛠️ CRUCIAL: Identifier l'enfant
         parent_validated: !currentStatus,
+        child_validated: true, // 🛠️ On considère que si le parent valide, c'est que c'est fait
         date: today
       }, { onConflict: 'mission_id, profile_id, date' })
 
@@ -105,14 +106,20 @@ export default function ValidationTab({ theme, challenge, missions, refresh, onE
 
     const today = new Date().toISOString().split('T')[0]
 
-    // ✅ SUCCESS: On met à jour le résultat pour notifier l'enfant en temps réel
-    const { error: logError } = await supabase.from('daily_logs').update({
+    // ✅ SUCCESS: On mark TOITES les missions comme success pour garantir l'état chez l'enfant
+    const logsToUpsert = missions.map(m => ({
+      mission_id: m.id,
+      profile_id: profile.id,
+      date: today,
       validation_result: 'success',
-      parent_validated: true, // 🛠️ CRUCIAL: Marquer toutes les missions comme validées par le parent
-      validation_requested: false // 🔄 On libère la demande
+      parent_validated: true,
+      validation_requested: false,
+      child_validated: true // On force à true car la journée est un succès
+    }))
+
+    const { error: logError } = await supabase.from('daily_logs').upsert(logsToUpsert, {
+      onConflict: 'mission_id, profile_id, date'
     })
-      .eq('profile_id', profile.id)
-      .eq('date', today)
 
     if (logError) {
       console.error("Error updating logs on success:", logError)

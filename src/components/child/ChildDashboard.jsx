@@ -246,10 +246,11 @@ function CountdownRing({ seconds, total = 5, color = '#fff' }) {
 }
 
 // ── Day Complete Card — bouton avec countdown 5s ─────────────────
-function DayCompleteCard({ isAdo, u, onAcknowledge }) {
+function DayCompleteCard({ isAdo, u, onAcknowledge, paused }) {
   const [countdown, setCountdown] = useState(5)
 
   useEffect(() => {
+    if (paused) return
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) { clearInterval(interval); onAcknowledge(); return 0 }
@@ -257,7 +258,7 @@ function DayCompleteCard({ isAdo, u, onAcknowledge }) {
       })
     }, 1000)
     return () => clearInterval(interval)
-  }, [onAcknowledge])
+  }, [onAcknowledge, paused])
 
   return (
     <div style={{ padding: '0 20px' }}>
@@ -326,13 +327,17 @@ export default function ChildDashboard({
   const [showStreakModal, setShowStreakModal] = useState(false)
   const [showVictoryModal, setShowVictoryModal] = useState(false)
   const [showMalusModal, setShowMalusModal] = useState(false)
+  const [isCelebrating, setIsCelebrating] = useState(false)
   const [togglingId, setTogglingId] = useState(null)
 
   // Ref pour éviter les doubles clics sur le reset
   const isResettingRef = useRef(false)
 
   const allDone = missions.length > 0 && missions.every((m) => m.done)
-  const allValidated = missions.length > 0 && missions.every((m) => m.parent_validated || m.validation_result === 'success')
+  const allValidated = missions.length > 0 && (
+    missions.every((m) => m.parent_validated || m.validation_result === 'success') ||
+    missions.some((m) => m.validation_result === 'success')
+  )
   const doneCount = missions.filter((m) => m.done).length
 
   // Stable ref for the reset callback to prevent DayCompleteCard's interval from resetting
@@ -342,6 +347,7 @@ export default function ChildDashboard({
   const handleAcknowledge = useCallback(async () => {
     if (isResettingRef.current) return
     isResettingRef.current = true
+    setIsCelebrating(false)
     try {
       await onResetRef.current?.()
     } finally {
@@ -352,15 +358,16 @@ export default function ChildDashboard({
   // ── 1. Streak modal — quand TOUTES les missions sont validées par le PARENT ─
   useEffect(() => {
     if (allValidated && missions.length > 0) {
+      if (!isCelebrating) setIsCelebrating(true)
       const timer = setTimeout(() => setShowStreakModal(true), 600)
       return () => clearTimeout(timer)
     }
-  }, [allValidated, missions.length])
+  }, [allValidated, missions.length, isCelebrating])
 
   // ── Streak display: quand le modal s'ouvre, le parent vient d'incrémenter
   // current_streak mais le realtime n'a pas encore propagé le nouveau chiffre →
   // on affiche au minimum 1 pour éviter "0 jour consécutif"
-  const displayStreak = allValidated ? Math.max(1, streak) : streak
+  const displayStreak = isCelebrating ? Math.max(1, streak) : streak
 
   // ── 2. Victory modal — quand challenge.status passe à "won" ───
   useEffect(() => {
@@ -504,6 +511,7 @@ export default function ChildDashboard({
             isAdo={isAdo}
             u={u}
             onAcknowledge={handleAcknowledge}
+            paused={showStreakModal || showVictoryModal || showMalusModal}
           />
         ) : isAdo ? (
           /* Ado: list style */

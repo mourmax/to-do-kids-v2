@@ -17,3 +17,4 @@
 - **Settings Inputs**: SUCCESS. Text remains while background refreshes happen.
 - **Mission List Detail**: SUCCESS. Full list (Icon + Title) displays in renewal view.
 - **Edit Button Link**: SUCCESS. Redirects to Settings > Missions and stays there.
+- **Child Celebration Sync**: SUCCESS. Celebration modal now triggers correctly even if missions were skipped.

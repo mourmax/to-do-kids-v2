@@ -70,11 +70,13 @@ function HeroBienvenue() {
 
       {/* Fusée */}
       <motion.div
-        animate={{ y: [-4, 4, -4], x: [-2, 2, -2] }}
+        animate={{
+          y: ['-52%', '-48%', '-52%'],
+          x: ['-51%', '-49%', '-51%']
+        }}
         transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%,-50%)',
           fontSize: 80,
           filter: 'drop-shadow(0 0 28px rgba(167,139,250,.9)) drop-shadow(0 8px 20px rgba(0,0,0,.4))',
         }}
@@ -130,7 +132,7 @@ function HeroChild() {
           backdropFilter: 'blur(8px)',
           border: '3.5px solid rgba(255,255,255,.95)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transform: 'translate(-50%,-50%)',
+          x: '-50%', y: '-50%',
           animation: 'tm-glow-ring 2.4s ease-in-out infinite',
         }}
         animate={{ scale: [1, 1.06, 1] }}
@@ -184,18 +186,18 @@ function HeroParent() {
       <div style={{
         position: 'absolute', top: '50%', left: '50%',
         width: 140, height: 140, borderRadius: '50%',
-        transform: 'translate(-50%,-50%)',
+        transform: 'translate(-50%,-50%) rotate(0deg)',
         background: 'conic-gradient(from 0deg, rgba(253,230,138,.5), transparent 25%, rgba(253,230,138,.4) 50%, transparent 75%)',
         animation: 'tm-spin 6s linear infinite',
       }} />
 
       {/* Couronne + Shield */}
       <motion.div
-        animate={{ scale: [1, 1.08, 1], y: [0, -5, 0] }}
+        animate={{ scale: [1, 1.08, 1], y: ['-52%', '-48%', '-52%'] }}
         transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%,-50%)',
+          x: '-50%',
           textAlign: 'center', lineHeight: .9,
         }}
       >
@@ -256,7 +258,7 @@ function HeroReward() {
           width: 160, height: 2,
           background: 'rgba(251,191,36,.4)',
           transformOrigin: '0 50%',
-          transform: `translate(0,-50%) rotate(${angle}deg)`,
+          transform: `translate(0,-1px) rotate(${angle}deg)`,
           animation: `tm-ray 3s ease-out infinite`,
           animationDelay: `${i * .15}s`,
         }} />
@@ -268,7 +270,7 @@ function HeroReward() {
         transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%,-50%)',
+          x: '-50%', y: '-50%',
           fontSize: 72,
           filter: 'drop-shadow(0 0 24px rgba(251,191,36,.9)) drop-shadow(0 8px 18px rgba(0,0,0,.4))',
         }}
@@ -316,7 +318,7 @@ function HeroGo() {
       <div style={{
         position: 'absolute', top: '50%', left: '50%',
         width: 180, height: 180, borderRadius: '50%',
-        transform: 'translate(-50%,-50%)',
+        transform: 'translate(-50%,-50%) rotate(0deg)',
         background: 'conic-gradient(from 0deg, rgba(251,191,36,.35), transparent 20%, rgba(251,191,36,.25) 40%, transparent 60%, rgba(251,191,36,.3) 80%, transparent)',
         animation: 'tm-spin 5s linear infinite',
       }} />
@@ -344,13 +346,12 @@ function HeroGo() {
         }}>{e}</div>
       ))}
 
-      {/* Trophée central */}
       <motion.div
         animate={{ scale: [1, 1.12, 1], rotate: [-4, 4, -4] }}
         transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%,-50%)',
+          x: '-50%', y: '-50%',
           fontSize: 80,
           filter: 'drop-shadow(0 0 28px rgba(251,191,36,.9)) drop-shadow(0 8px 20px rgba(0,0,0,.5))',
         }}
@@ -486,6 +487,7 @@ export default function TutorialModal({ onClose }) {
               variants={variants}
               initial="enter" animate="center" exit="exit"
               transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              style={{ position: 'relative', width: '100%' }}
             >
               <slide.Hero />
             </motion.div>

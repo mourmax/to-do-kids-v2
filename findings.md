@@ -6,6 +6,7 @@
 - **Real-time Reset Bug**: Background refreshes (polling/real-time) were overwriting local React state in inputs. Fixed by tying `useEffect` to `challenge.id` instead of the whole object.
 - **Parent Mode Security**: Redirection must be handled carefully to prevent kids from bypassing PIN via direct URL/Cache manipulation (Client-side focus).
 - **Notion Integration**: Browser tool initialization error prevents direct Notion reading; fallback to manual copy-paste from user required.
+- **Validation Sync Bug**: Child celebration was blocked if some missions were skipped (no log entries). Fixed by using `upsert` in `handleSuccess` and robust checking in `ChildDashboard`.
 
 ---
 
