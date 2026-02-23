@@ -219,7 +219,7 @@ export default function ParentDashboard({
     console.log("[DEBUG] Sync Effect:", { isNewUser, onboardingStep, activeTab, dismissed })
 
     if (isNewUser && !dismissed && onboardingStep !== 'done') {
-      if (activeTab !== 'settings') {
+      if (activeTab !== 'settings' && !manualTabChangeRef.current) {
         console.log("[DEBUG] Forcing settings")
         setActiveTab('settings')
       }
@@ -271,6 +271,7 @@ export default function ParentDashboard({
       <NotificationBanner
         notifications={notifications}
         onSelect={(childId) => {
+          manualTabChangeRef.current = true
           onSwitchProfile(childId)
           setActiveTab('validation')
           setNotifications(prev => prev.filter(n => n.profile_id !== childId))
@@ -315,7 +316,11 @@ export default function ParentDashboard({
                   return (
                     <button
                       key={p.id}
-                      onClick={() => { onSwitchProfile(p.id); setActiveTab('validation') }}
+                      onClick={() => {
+                        manualTabChangeRef.current = true
+                        onSwitchProfile(p.id)
+                        setActiveTab('validation')
+                      }}
                       className={`relative flex items-center gap-1.5 h-9 px-3 rounded-xl font-bold text-sm transition-all shrink-0 ${isActive
                         ? 'text-white shadow-sm'
                         : `bg-white/70 border ${theme.border} text-slate-600 hover:bg-white`

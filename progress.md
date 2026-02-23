@@ -17,4 +17,7 @@
 - **Settings Inputs**: SUCCESS. Text remains while background refreshes happen.
 - **Mission List Detail**: SUCCESS. Full list (Icon + Title) displays in renewal view.
 - **Edit Button Link**: SUCCESS. Redirects to Settings > Missions and stays there.
-- **Child Celebration Sync**: SUCCESS. Celebration modal now triggers correctly even if missions were skipped.
+- **Validation Sync Fix**: SUCCESS. Celebration modal now triggers correctly even if missions were skipped.
+- **Streak Display Flicker Fix**: SUCCESS. Celebration lock prevents streak from reverting to 0 during sync.
+- **Onboarding Centering Fix**: SUCCESS. All hero elements in tutorial are now perfectly centered.
+- **Git Push**: SUCCESS. All changes pushed to main.

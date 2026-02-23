@@ -332,6 +332,10 @@ export default function ChildDashboard({
 
   // Ref pour éviter les doubles clics sur le reset
   const isResettingRef = useRef(false)
+  // 🔒 Verrou anti-spam : Supabase envoie 1 event par mission upsértée.
+  // Sans ce verrou, le timer de 600ms est annulé + redémarré à chaque event,
+  // et la modale de célébration ne se déclenche jamais.
+  const celebScheduledRef = useRef(false)
 
   const allDone = missions.length > 0 && missions.every((m) => m.done)
   const allValidated = missions.length > 0 && (
@@ -348,21 +352,25 @@ export default function ChildDashboard({
     if (isResettingRef.current) return
     isResettingRef.current = true
     setIsCelebrating(false)
+    celebScheduledRef.current = false  // 🔓 Reset pour le prochain jour
     try {
       await onResetRef.current?.()
     } finally {
       isResettingRef.current = false
     }
-  }, []) // No dependencies needed anymore thanks to the Ref
+  }, [])
 
-  // ── 1. Streak modal — quand TOUTES les missions sont validées par le PARENT ─
+  // ── 1. Streak modal — se déclenche UNE SEULE FOIS quand le parent valide ──
+  // Le verrou `celebScheduledRef` empêche les multiples events Supabase realtime
+  // (un par log upserté) de réinitialiser le timer en boucle.
   useEffect(() => {
-    if (allValidated && missions.length > 0) {
-      if (!isCelebrating) setIsCelebrating(true)
+    if (allValidated && missions.length > 0 && !celebScheduledRef.current) {
+      celebScheduledRef.current = true  // 🔒 Un seul tir, pas de spam
+      setIsCelebrating(true)            // Verrouille l'affichage du streak
       const timer = setTimeout(() => setShowStreakModal(true), 600)
       return () => clearTimeout(timer)
     }
-  }, [allValidated, missions.length, isCelebrating])
+  }, [allValidated, missions.length])  // PAS isCelebrating dans les déps !
 
   // ── Streak display: quand le modal s'ouvre, le parent vient d'incrémenter
   // current_streak mais le realtime n'a pas encore propagé le nouveau chiffre →

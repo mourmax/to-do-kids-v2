@@ -19,68 +19,117 @@ const KEYFRAMES = `
 @keyframes tm-gift    { 0%,100%{transform:scale(1)rotate(-2deg)}50%{transform:scale(1.1)rotate(2deg)} }
 @keyframes tm-star-burst { 0%{transform:scale(0)rotate(0deg);opacity:1}100%{transform:scale(2.5)rotate(360deg);opacity:0} }
 @keyframes tm-rocket-fire { 0%,100%{transform:scaleY(1);opacity:.8}50%{transform:scaleY(1.5);opacity:1} }
+@keyframes tm-heart   { 0%{transform:translateY(0)scale(0);opacity:0}15%{opacity:1;transform:scale(1.2)}80%{opacity:.6}100%{transform:translateY(-60px)scale(.5);opacity:0} }
+@keyframes tm-wave    { 0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)} }
+@keyframes tm-cloud   { 0%{transform:translateX(0)}50%{transform:translateX(8px)}100%{transform:translateX(0)} }
+@keyframes tm-smoke   { 0%{transform:translateY(0)scale(1);opacity:.7}100%{transform:translateY(-50px)scale(2.5);opacity:0} }
+@keyframes tm-liftoff { 0%{transform:translateX(-50%) translateY(0)}30%{transform:translateX(-50%) translateY(-4px)}60%{transform:translateX(-50%) translateY(-80px)}80%{transform:translateX(-50%) translateY(-160px);opacity:0.6}100%{transform:translateX(-50%) translateY(-220px);opacity:0} }
+@keyframes tm-star-streak { 0%{transform:translateX(0) translateY(0);opacity:1}100%{transform:translateX(-80px) translateY(40px);opacity:0} }
+@keyframes tm-bubble  { 0%{opacity:0;transform:scale(0) translateY(0)}20%{opacity:.9;transform:scale(1)}80%{opacity:.7}100%{opacity:0;transform:scale(.6) translateY(-40px)} }
+@keyframes tm-zen-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(110,231,183,.3)} 50%{box-shadow:0 0 0 14px rgba(110,231,183,.0)} }
 `
 
 /* ═══════════════════════════════════════════════════════════
-   HERO 1 — BIENVENUE : violet/bleu, fusée, étoiles
+   HERO 1 — BIENVENUE : La Maison Magique (Concept A)
+   Ciel nocturne, maison lumière, 4 étoiles orbitent — aucun stéréotype
 ═══════════════════════════════════════════════════════════ */
 function HeroBienvenue() {
-  const starData = [
-    { x: '8%', y: '12%', s: 20, d: .1 }, { x: '88%', y: '8%', s: 16, d: .5 }, { x: '75%', y: '35%', s: 12, d: .9 },
-    { x: '15%', y: '55%', s: 14, d: .3 }, { x: '92%', y: '60%', s: 18, d: .7 }, { x: '45%', y: '8%', s: 10, d: .4 },
-    { x: '28%', y: '75%', s: 16, d: .6 }, { x: '68%', y: '70%', s: 12, d: .2 }, { x: '5%', y: '85%', s: 8, d: .8 },
-    { x: '85%', y: '82%', s: 14, d: 1.0 }, { x: '52%', y: '78%', s: 10, d: .15 }, { x: '38%', y: '20%', s: 8, d: .55 },
+  // 4 étoiles = 4 membres de la famille, sans genre ni âge imposés
+  const familyStars = [
+    { label: 'A', color: '#fde68a', size: 28, orbitR: 72, angle: -30, dur: 8 },
+    { label: 'B', color: '#93c5fd', size: 22, orbitR: 72, angle: 60, dur: 10 },
+    { label: 'C', color: '#f9a8d4', size: 20, orbitR: 72, angle: 160, dur: 9 },
+    { label: 'D', color: '#86efac', size: 18, orbitR: 72, angle: 240, dur: 11 },
   ]
-  const dotData = [
-    { x: '20%', y: '30%' }, { x: '65%', y: '15%' }, { x: '35%', y: '60%' },
-    { x: '80%', y: '45%' }, { x: '12%', y: '40%' }, { x: '55%', y: '55%' },
+  // Petites étoiles fixées dans le ciel
+  const bgStars = [
+    { x: '6%', y: '8%', s: 12 }, { x: '82%', y: '6%', s: 10 },
+    { x: '15%', y: '22%', s: 8 }, { x: '70%', y: '18%', s: 14 },
+    { x: '90%', y: '40%', s: 10 }, { x: '5%', y: '55%', s: 8 },
+    { x: '88%', y: '62%', s: 12 }, { x: '38%', y: '10%', s: 8 },
+    { x: '55%', y: '5%', s: 6 },
   ]
   return (
     <div style={{
       position: 'relative', height: 220,
-      background: 'linear-gradient(160deg,#2e1065 0%,#4c1d95 45%,#6d28d9 70%,#818cf8 100%)',
+      background: 'linear-gradient(180deg,#0b0f2e 0%,#1e1b4b 45%,#312e81 75%,#3730a3 100%)',
       overflow: 'hidden',
     }}>
-      {/* Lumière radiale centrale */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse at 50% 60%, rgba(167,139,250,.35) 0%, transparent 65%)'
-      }} />
+      {/* Lune */}
+      <motion.div
+        animate={{ scale: [1, 1.04, 1], opacity: [0.9, 1, 0.9] }}
+        transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
+        style={{
+          position: 'absolute', top: 12, right: 20,
+          fontSize: 30,
+          filter: 'drop-shadow(0 0 14px rgba(253,230,138,.7))',
+        }}
+      >🌙</motion.div>
 
-      {/* Étoiles ★ animées */}
-      {starData.map((s, i) => (
+      {/* Étoiles de fond fixes */}
+      {bgStars.map((s, i) => (
         <div key={i} style={{
           position: 'absolute', left: s.x, top: s.y,
-          fontSize: s.s, color: '#fff', lineHeight: 1,
-          animation: `tm-twinkle ${1.5 + Math.random()}s ease-in-out infinite`,
-          animationDelay: `${s.d}s`, pointerEvents: 'none',
+          color: '#fff', fontSize: s.s, opacity: .6,
+          animation: `tm-twinkle ${2 + i * .3}s ease-in-out infinite`,
+          animationDelay: `${i * .4}s`,
         }}>★</div>
       ))}
 
-      {/* Petits points lumineux */}
-      {dotData.map((d, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: d.x, top: d.y,
-          width: 4, height: 4, borderRadius: '50%',
-          background: 'rgba(255,255,255,.6)',
-          animation: `tm-twinkle ${2 + i * .3}s ease-in-out infinite`,
-          animationDelay: `${i * .4}s`,
-        }} />
-      ))}
+      {/* Sol / horizon */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: 48,
+        background: 'linear-gradient(0deg,#1c1917 0%,#292524 100%)',
+      }} />
 
-      {/* Fusée */}
+      {/* Maison centrale */}
       <motion.div
         animate={{
-          y: ['-52%', '-48%', '-52%'],
-          x: ['-51%', '-49%', '-51%']
+          filter: [
+            'drop-shadow(0 0 14px rgba(251,191,36,.5))',
+            'drop-shadow(0 0 28px rgba(251,191,36,.9))',
+            'drop-shadow(0 0 14px rgba(251,191,36,.5))',
+          ]
         }}
-        transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+        transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
         style={{
-          position: 'absolute', top: '50%', left: '50%',
-          fontSize: 80,
-          filter: 'drop-shadow(0 0 28px rgba(167,139,250,.9)) drop-shadow(0 8px 20px rgba(0,0,0,.4))',
+          position: 'absolute', bottom: 30, left: '50%',
+          x: '-50%',
+          fontSize: 64, lineHeight: 1,
         }}
-      >🚀</motion.div>
+      >🧸
+        {/* Faux toit + fenêtres lumineuses */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          fontSize: 64, textAlign: 'center',
+        }}>🏠</div>
+      </motion.div>
+
+      {/* 4 étoiles-famille qui orbitent lentement autour de la maison */}
+      {familyStars.map((s, i) => (
+        <motion.div
+          key={s.label}
+          animate={{ rotate: [s.angle, s.angle + 360] }}
+          transition={{ repeat: Infinity, duration: s.dur, ease: 'linear' }}
+          style={{
+            position: 'absolute',
+            // Centre de l'orbite = centre de la maison
+            bottom: 55, left: '50%',
+            width: s.orbitR * 2, height: s.orbitR * 2,
+            marginLeft: -s.orbitR, marginBottom: -s.orbitR,
+            borderRadius: '50%',
+            // L'étoile est placée sur le bord du cercle d'orbite
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            top: 0, left: '50%',
+            transform: `translateX(-50%) translateY(-${s.orbitR}px)`,
+            fontSize: s.size,
+            filter: `drop-shadow(0 0 8px ${s.color})`,
+          }}>⭐</div>
+        </motion.div>
+      ))}
     </div>
   )
 }
@@ -158,79 +207,112 @@ function HeroChild() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   HERO 3 — POUR LE PARENT : amber/orange, couronne + shield
+   HERO 3 — POUR LE PARENT : zen & contrôle, fini les répétitions
 ═══════════════════════════════════════════════════════════ */
 function HeroParent() {
-  const sparkles = [
-    { x: '14%', y: '18%', s: 22 }, { x: '80%', y: '12%', s: 18 }, { x: '88%', y: '65%', s: 20 },
-    { x: '10%', y: '68%', s: 16 }, { x: '50%', y: '6%', s: 14 }, { x: '26%', y: '80%', s: 12 },
-    { x: '72%', y: '76%', s: 18 },
+  // Bulles d'actions qui disparaissent ("plus besoin de répéter")
+  const noBubbles = [
+    { emoji: '🔄', label: 'Répéter', x: '8%', y: '14%', delay: 0, dur: 3.2 },
+    { emoji: '📢', label: 'Rappeler', x: '64%', y: '10%', delay: 1.1, dur: 2.8 },
+    { emoji: '⏰', label: 'Relancer', x: '82%', y: '55%', delay: 0.5, dur: 3.5 },
+    { emoji: '😩', label: 'Stresser', x: '5%', y: '60%', delay: 1.6, dur: 2.6 },
   ]
-  const constellations = [
-    { x: '8%', y: '22%' }, { x: '90%', y: '20%' }, { x: '85%', y: '75%' },
-    { x: '6%', y: '80%' }, { x: '48%', y: '88%' },
+  // Check items flottants (missions validées en un clic)
+  const checks = [
+    { x: '20%', y: '22%', delay: 0.2 },
+    { x: '75%', y: '28%', delay: 0.9 },
+    { x: '14%', y: '74%', delay: 1.4 },
+    { x: '80%', y: '72%', delay: 0.5 },
   ]
   return (
     <div style={{
       position: 'relative', height: 220,
-      background: 'linear-gradient(135deg,#78350f 0%,#b45309 30%,#d97706 60%,#fbbf24 100%)',
+      background: 'linear-gradient(135deg,#0f4c75 0%,#1a6fa8 40%,#0d9488 75%,#34d399 100%)',
       overflow: 'hidden',
     }}>
-      {/* Swirl radial */}
+      {/* Lueur zen centrale */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.22) 0%, transparent 60%)'
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(110,231,183,.25) 0%, transparent 65%)'
       }} />
 
-      {/* Spirale tournante */}
-      <div style={{
-        position: 'absolute', top: '50%', left: '50%',
-        width: 140, height: 140, borderRadius: '50%',
-        transform: 'translate(-50%,-50%) rotate(0deg)',
-        background: 'conic-gradient(from 0deg, rgba(253,230,138,.5), transparent 25%, rgba(253,230,138,.4) 50%, transparent 75%)',
-        animation: 'tm-spin 6s linear infinite',
-      }} />
+      {/* Bulles "à éliminer" — s'estompent et disparaissent */}
+      {noBubbles.map((b, i) => (
+        <motion.div
+          key={i}
+          animate={{ opacity: [1, 0.35, 1], y: [0, -6, 0] }}
+          transition={{ repeat: Infinity, duration: b.dur, delay: b.delay, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', left: b.x, top: b.y,
+            background: 'rgba(255,255,255,.12)',
+            backdropFilter: 'blur(6px)',
+            border: '1.5px solid rgba(255,255,255,.2)',
+            borderRadius: 12,
+            padding: '4px 9px',
+            fontSize: 13,
+            color: 'rgba(255,255,255,.85)',
+            display: 'flex', alignItems: 'center', gap: 4,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {/* Barre rouge de barrage */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', alignItems: 'center',
+          }}>
+            <div style={{
+              width: '110%', height: 2.5, background: '#f87171',
+              left: '-5%', position: 'absolute',
+              borderRadius: 2, opacity: .9,
+            }} />
+          </div>
+          <span>{b.emoji}</span>
+          <span style={{ fontSize: 10, fontWeight: 700 }}>{b.label}</span>
+        </motion.div>
+      ))}
 
-      {/* Couronne + Shield */}
+      {/* Carrés checks (missions validées) */}
+      {checks.map((c, i) => (
+        <motion.div
+          key={i}
+          animate={{ scale: [0.8, 1.05, 0.8], opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 2.5 + i * 0.4, delay: c.delay }}
+          style={{
+            position: 'absolute', left: c.x, top: c.y,
+            width: 28, height: 28, borderRadius: 8,
+            background: 'rgba(255,255,255,.15)',
+            border: '2px solid rgba(110,231,183,.8)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#6ee7b7', fontSize: 14, fontWeight: 900,
+          }}
+        >✓</motion.div>
+      ))}
+
+      {/* Élément central : tlphone + parent zen */}
       <motion.div
-        animate={{ scale: [1, 1.08, 1], y: ['-52%', '-48%', '-52%'] }}
-        transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
+        animate={{ y: ['-52%', '-48%', '-52%'] }}
+        transition={{ repeat: Infinity, duration: 3.2, ease: 'easeInOut' }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
           x: '-50%',
-          textAlign: 'center', lineHeight: .9,
+          textAlign: 'center',
         }}
       >
-        <div style={{
-          fontSize: 28, marginBottom: 2,
-          filter: 'drop-shadow(0 0 12px rgba(251,191,36,.9))',
-        }}>👑</div>
-        <div style={{
-          fontSize: 68,
-          filter: 'drop-shadow(0 0 24px rgba(251,191,36,.8)) drop-shadow(0 6px 14px rgba(0,0,0,.4))',
-        }}>🛡️</div>
+        {/* Halo zen animé — grand personnage zen au centre, pas de picto calculette */}
+        <motion.div
+          animate={{ scale: [1, 1.12, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ repeat: Infinity, duration: 3.2, ease: 'easeInOut' }}
+          style={{
+            width: 100, height: 100, borderRadius: '50%',
+            background: 'rgba(110,231,183,.15)',
+            border: '2.5px solid rgba(110,231,183,.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto',
+          }}
+        >
+          <span style={{ fontSize: 62, lineHeight: 1 }}>🧘</span>
+        </motion.div>
       </motion.div>
-
-      {/* Sparkles dorés */}
-      {sparkles.map((s, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: s.x, top: s.y,
-          color: '#fde68a', fontSize: s.s,
-          animation: `tm-sparkle ${2 + i * .4}s ease-in-out infinite`,
-          animationDelay: `${i * .5}s`,
-        }}>✦</div>
-      ))}
-
-      {/* Constellation dots */}
-      {constellations.map((c, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: c.x, top: c.y,
-          width: 4, height: 4, borderRadius: '50%',
-          background: 'rgba(255,255,255,.7)',
-          animation: `tm-twinkle ${2.2 + i * .3}s ease-in-out infinite`,
-          animationDelay: `${i * .35}s`,
-        }} />
-      ))}
     </div>
   )
 }
@@ -290,72 +372,131 @@ function HeroReward() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   HERO 5 — C'EST PARTI : violet/rose, trophée + confettis
+   HERO 5 — C'EST PARTI : fusée qui décolle + traînée de feu
 ═══════════════════════════════════════════════════════════ */
 function HeroGo() {
-  const confetti = [
-    { x: '5%', c: '#f97316', d: 0, dur: 1.7 }, { x: '16%', c: '#facc15', d: .3, dur: 2.0 },
-    { x: '28%', c: '#ec4899', d: .6, dur: 1.8 }, { x: '40%', c: '#a78bfa', d: .1, dur: 2.2 },
-    { x: '52%', c: '#34d399', d: .8, dur: 1.6 }, { x: '63%', c: '#f97316', d: .4, dur: 2.1 },
-    { x: '74%', c: '#facc15', d: .9, dur: 1.7 }, { x: '84%', c: '#ec4899', d: .2, dur: 1.9 },
-    { x: '93%', c: '#60a5fa', d: .5, dur: 2.0 }, { x: '10%', c: '#fff', d: 1.1, dur: 2.3 },
-    { x: '45%', c: '#fde68a', d: .7, dur: 1.8 }, { x: '79%', c: '#34d399', d: 1.3, dur: 2.0 },
+  const stars = [
+    { x: '8%', y: '12%', d: 0.0, dur: 1.8 }, { x: '78%', y: '8%', d: 0.4, dur: 2.1 },
+    { x: '90%', y: '38%', d: 0.7, dur: 1.6 }, { x: '5%', y: '50%', d: 0.2, dur: 2.0 },
+    { x: '60%', y: '18%', d: 1.0, dur: 1.7 }, { x: '30%', y: '7%', d: 0.5, dur: 1.9 },
+    { x: '15%', y: '30%', d: 1.3, dur: 2.2 }, { x: '85%', y: '60%', d: 0.9, dur: 1.5 },
   ]
-  const decoEmoji = ['🎆', '🎇', '🧨', '⭐', '🎉']
+  // Particules de fumée/feu qui sortent du bas de la fusée
+  const smokeParticles = [
+    { x: '50%', delay: 0, dur: 1.2, size: 18, color: 'rgba(251,146,60,.8)' },
+    { x: '48%', delay: 0.2, dur: 1.0, size: 14, color: 'rgba(252,211,77,.7)' },
+    { x: '52%', delay: 0.4, dur: 1.3, size: 16, color: 'rgba(220,38,38,.6)' },
+    { x: '49%', delay: 0.6, dur: 1.1, size: 22, color: 'rgba(120,113,108,.4)' },
+    { x: '51%', delay: 0.1, dur: 0.9, size: 12, color: 'rgba(251,191,36,.9)' },
+  ]
   return (
     <div style={{
       position: 'relative', height: 220,
-      background: 'linear-gradient(160deg,#4c1d95 0%,#7c3aed 40%,#db2777 80%,#be185d 100%)',
+      background: 'linear-gradient(180deg,#020617 0%,#0f172a 40%,#1e1b4b 70%,#312e81 100%)',
       overflow: 'hidden',
     }}>
-      {/* Socle noir au bas */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: 50,
-        background: 'linear-gradient(0deg, rgba(10,5,20,.8) 0%, transparent 100%)',
-      }} />
-
-      {/* Rayons lumineux */}
-      <div style={{
-        position: 'absolute', top: '50%', left: '50%',
-        width: 180, height: 180, borderRadius: '50%',
-        transform: 'translate(-50%,-50%) rotate(0deg)',
-        background: 'conic-gradient(from 0deg, rgba(251,191,36,.35), transparent 20%, rgba(251,191,36,.25) 40%, transparent 60%, rgba(251,191,36,.3) 80%, transparent)',
-        animation: 'tm-spin 5s linear infinite',
-      }} />
-
-      {/* Confettis */}
-      {confetti.map((c, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: c.x, top: -16,
-          width: i % 4 === 0 ? 12 : 8, height: i % 4 === 0 ? 5 : 10,
-          borderRadius: i % 3 === 0 ? '50%' : 2,
-          background: c.c,
-          animation: `tm-confetti ${c.dur}s linear infinite`,
-          animationDelay: `${c.d}s`,
-        }} />
+      {/* Étoiles qui filent vers l'arrière (sensation de vitesse) */}
+      {stars.map((s, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            x: [0, -40],
+            y: [0, 20],
+            opacity: [0.9, 0],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: s.dur,
+            delay: s.d,
+            ease: 'linear',
+          }}
+          style={{
+            position: 'absolute', left: s.x, top: s.y,
+            color: '#fff', fontSize: 12 + i % 3 * 4,
+          }}
+        >★</motion.div>
       ))}
 
-      {/* Emoji décoratifs éjectés */}
-      {decoEmoji.map((e, i) => (
-        <div key={i} style={{
-          position: 'absolute',
-          left: `${10 + i * 18}%`, top: `${8 + i % 2 * 12}%`,
-          fontSize: 20,
-          animation: `tm-fall ${2 + i * .4}s ease-in-out infinite`,
-          animationDelay: `${i * .6}s`,
-        }}>{e}</div>
+      {/* Rampe de lancement */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: '50%',
+        transform: 'translateX(-50%)',
+        width: 60, height: 18,
+        background: 'linear-gradient(0deg,#475569,#64748b)',
+        borderRadius: '8px 8px 0 0',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: 0, left: '50%',
+        transform: 'translateX(-50%)',
+        width: 100, height: 8,
+        background: '#334155',
+        borderRadius: 4,
+      }} />
+
+      {/* Fumée / Feu de propulsion */}
+      {smokeParticles.map((p, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            y: [36, 80],
+            scale: [0.3, 2.2],
+            opacity: [0.9, 0],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: p.dur,
+            delay: p.delay,
+            ease: 'easeOut',
+          }}
+          style={{
+            position: 'absolute',
+            left: p.x, bottom: 18,
+            width: p.size, height: p.size,
+            borderRadius: '50%',
+            background: p.color,
+            x: `-${p.size / 2}px`,
+          }}
+        />
       ))}
 
+      {/* FUSE qui décolle — animation de levée */}
       <motion.div
-        animate={{ scale: [1, 1.12, 1], rotate: [-4, 4, -4] }}
-        transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
-        style={{
-          position: 'absolute', top: '50%', left: '50%',
-          x: '-50%', y: '-50%',
-          fontSize: 80,
-          filter: 'drop-shadow(0 0 28px rgba(251,191,36,.9)) drop-shadow(0 8px 20px rgba(0,0,0,.5))',
+        animate={{
+          y: [0, -8, -170],
+          opacity: [1, 1, 0],
         }}
-      >🏆</motion.div>
+        transition={{
+          repeat: Infinity,
+          duration: 2.5,
+          times: [0, 0.25, 1],
+          ease: ['easeIn', 'easeIn'],
+          repeatDelay: 0.8,
+        }}
+        style={{
+          position: 'absolute',
+          bottom: 18, left: '50%',
+          x: '-50%',
+          fontSize: 64,
+          // rotate(-45deg) corrige l'orientation diagonale de l'émoji 🚀
+          // qui par défaut pointe vers l'upper-right — on le force vers le haut
+          rotate: '-45deg',
+          filter: 'drop-shadow(0 0 20px rgba(251,146,60,.9)) drop-shadow(0 0 40px rgba(252,211,77,.6))',
+          lineHeight: 1,
+        }}
+      >🚀</motion.div>
+
+      {/* Lueur de launchpad qui pulse au moment du décollage */}
+      <motion.div
+        animate={{ opacity: [0, 0.7, 0], scale: [0.5, 1.6, 0.5] }}
+        transition={{ repeat: Infinity, duration: 2.5, repeatDelay: 0.8, ease: 'easeOut' }}
+        style={{
+          position: 'absolute',
+          bottom: 10, left: '50%',
+          x: '-50%',
+          width: 80, height: 80, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(251,191,36,.8) 0%, transparent 70%)',
+        }}
+      />
     </div>
   )
 }

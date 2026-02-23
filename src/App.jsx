@@ -222,7 +222,14 @@ export default function App() {
         malus_text: challengeRes.data.malus_message,
         days_completed: challengeRes.data.current_streak,
         days_total: challengeRes.data.duration_days,
-        status: challengeRes.data.is_active ? 'active' : 'won',
+        status: (() => {
+          const rawStatus = challengeRes.data.status
+          const cs = challengeRes.data.current_streak || 0
+          const dur = challengeRes.data.duration_days || 1
+          if (rawStatus === 'lost') return 'lost'
+          if (cs >= dur) return 'won'
+          return 'active'
+        })(),
       })
     } else {
       setTkChallenge(null)
